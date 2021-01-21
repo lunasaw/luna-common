@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class FileUtilsTest {
+public class JsonFileUtilsTest {
     @Test
     public void test1DownloadFile() {
         FileUtils.downloadFile(
