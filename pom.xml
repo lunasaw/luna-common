@@ -8,7 +8,7 @@
     <artifactId>luna-common</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-
+    <url>https://github.com/czy1024/luna-common</url>
     <properties>
         <java.version>1.8</java.version>
         <!-- github server corresponds to entry in ~/.m2/settings.xml -->
