@@ -1,5 +1,6 @@
 package com.luna.common.utils;
 
+import com.luna.common.net.RestUtils;
 import org.junit.Assert;
 
 import com.google.common.collect.ImmutableMap;

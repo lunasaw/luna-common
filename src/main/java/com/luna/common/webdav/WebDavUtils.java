@@ -1,7 +1,7 @@
-package com.luna.common.utils.httpd;
+package com.luna.common.webdav;
 
-import com.luna.common.utils.FileUtils;
-import com.luna.common.utils.HttpUtils;
+import com.luna.common.file.FileUtils;
+import com.luna.common.net.HttpUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;

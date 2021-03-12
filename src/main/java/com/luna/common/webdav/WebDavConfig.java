@@ -1,4 +1,4 @@
-package com.luna.common.utils.httpd;
+package com.luna.common.webdav;
 
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;

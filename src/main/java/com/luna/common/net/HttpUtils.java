@@ -1,4 +1,4 @@
-package com.luna.common.utils;
+package com.luna.common.net;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;

@@ -1,4 +1,4 @@
-package com.luna.common.utils;
+package com.luna.common.file;
 
 import java.io.*;
 import java.net.MalformedURLException;

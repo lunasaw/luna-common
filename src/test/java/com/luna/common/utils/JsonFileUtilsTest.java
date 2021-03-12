@@ -1,5 +1,6 @@
 package com.luna.common.utils;
 
+import com.luna.common.file.FileUtils;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;

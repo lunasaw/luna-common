@@ -1,7 +1,8 @@
-package com.luna.common.utils;
+package com.luna.common.net;
 
 import java.util.Map;
 
+import com.luna.common.net.HttpUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.http.HttpResponse;
 
