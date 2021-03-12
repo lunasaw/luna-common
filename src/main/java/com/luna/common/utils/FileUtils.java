@@ -1,10 +1,6 @@
 package com.luna.common.utils;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -25,16 +21,15 @@ public class FileUtils {
     /**
      * 读取文件所有内容
      *
-     * @param file
+     * @param fileName
      * @return
      */
-    public static List<String> readAllLines(String file) {
+    public static List<String> readAllLines(String fileName) {
         try {
-            return Files.readAllLines(Paths.get(file), StandardCharsets.UTF_8);
+            return Files.readAllLines(Paths.get(fileName), StandardCharsets.UTF_8);
         } catch (IOException e) {
-            // do nothing
+            throw new RuntimeException(e);
         }
-        return null;
     }
 
     /**
@@ -46,18 +41,46 @@ public class FileUtils {
         try {
             Files.deleteIfExists(Paths.get(file));
         } catch (IOException e) {
-            // do nothing
+            throw new RuntimeException(e);
         }
     }
 
     /**
      * 判断一个文件是否存在
      *
-     * @param fileName
+     * @param fileName 文件路径
      * @return
      */
     public static boolean isFileExists(String fileName) {
         return Files.exists(Paths.get(fileName));
+    }
+
+    /**
+     * 字节写入文件
+     * 
+     * @param bytes 字节数组
+     * @param fileName 文件路径
+     */
+    public static void writeBytesToFile(byte[] bytes, String fileName) {
+        try {
+            Files.write(Paths.get(fileName), bytes);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 文件读取字节
+     * 
+     * @param fileName 文件路径
+     * @return 字节数组
+     */
+    public static byte[] readFileToBytes(String fileName) {
+        try {
+            return Files.readAllBytes(Paths.get(fileName));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /** 行数统计时一次性读byte大小 */
@@ -72,24 +95,13 @@ public class FileUtils {
      */
     public static long countFileLines(String fileName) {
         try {
-            InputStream is = new BufferedInputStream(new FileInputStream(fileName));
-
-            byte[] c = new byte[BYTE_SIZE];
-            long count = 0L;
-            int readChars = 0;
-            boolean empty = true;
-            while ((readChars = is.read(c)) != -1) {
-                empty = false;
-                for (int i = 0; i < readChars; ++i) {
-                    if (c[i] == '\n') {
-                        ++count;
-                    }
-                }
-            }
-            is.close();
-            return (count == 0 && !empty) ? 1 : count;
-        } catch (Exception e) {
-            return -1;
+            LineNumberReader reader = new LineNumberReader(new FileReader(fileName));
+            reader.skip(Long.MAX_VALUE);
+            long lines = reader.getLineNumber();
+            reader.close();
+            return lines;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -192,5 +204,11 @@ public class FileUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static void main(String[] args) {
+        downloadFile(
+            "https://i0.hdslb.com/bfs/sycp/creative_img/202103/b7ba89517edf98a362ed92f4e3c49ea0.jpg@880w_388h_1c_95q",
+            "./a.jpg");
     }
 }

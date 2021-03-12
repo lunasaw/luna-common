@@ -1,15 +1,16 @@
 package com.luna.common.utils;
 
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.SSLContext;
 
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -240,7 +241,76 @@ public class HttpUtils {
         return sbUrl.toString();
     }
 
+    /**
+     * 检测响应体
+     *
+     * @param httpResponse
+     * @return
+     */
+    public static String checkResponseAndGetResult(HttpResponse httpResponse, boolean isEnsure) {
+        if (httpResponse == null) {
+            throw new RuntimeException();
+        }
+        if (httpResponse.getStatusLine() == null) {
+            throw new RuntimeException();
+        }
+        if (isEnsure && HttpStatus.SC_OK != httpResponse.getStatusLine().getStatusCode()) {
+            throw new RuntimeException();
+        }
+        HttpEntity entity = httpResponse.getEntity();
+        try {
+            return EntityUtils.toString(entity, Charset.defaultCharset());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 检测响应体获取相应流
+     *
+     * @param httpResponse
+     * @return
+     */
+    public static byte[] checkResponseStreamAndGetResult(HttpResponse httpResponse) {
+        if (httpResponse == null) {
+            throw new RuntimeException();
+        }
+        if (httpResponse.getStatusLine() == null) {
+            throw new RuntimeException();
+        }
+        if (HttpStatus.SC_OK != httpResponse.getStatusLine().getStatusCode()) {
+            throw new RuntimeException();
+        }
+        HttpEntity entity = httpResponse.getEntity();
+        try {
+            return EntityUtils.toByteArray(entity);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static byte[] checkResponseStreamAndGetResult(HttpResponse httpResponse, List<Integer> statusList) {
+        checkCode(httpResponse, statusList);
+        HttpEntity entity = httpResponse.getEntity();
+        try {
+            return EntityUtils.toByteArray(entity);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static String checkResponseAndGetResult(HttpResponse httpResponse, List<Integer> statusList) {
+        checkCode(httpResponse, statusList);
+
+        HttpEntity entity = httpResponse.getEntity();
+        try {
+            return EntityUtils.toString(entity, ENCODE);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void checkCode(HttpResponse httpResponse, List<Integer> statusList) {
         if (httpResponse == null) {
             throw new RuntimeException();
         }
@@ -249,13 +319,6 @@ public class HttpUtils {
         }
         if (!statusList.contains(httpResponse.getStatusLine().getStatusCode())) {
             throw new RuntimeException();
-        }
-
-        HttpEntity entity = httpResponse.getEntity();
-        try {
-            return EntityUtils.toString(entity, ENCODE);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
