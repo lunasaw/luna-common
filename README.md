@@ -1,13 +1,24 @@
 # luna-common
+
 isczy.tk luna-common
 
-
 # Contributor
-- Luna 
 
+- Luna
 
+# Use
+
+```xml
+
+<dependency>
+    <groupId>com.github.czy1024</groupId>
+    <artifactId>luna-common</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
 
 # 代码规范
+
 - 后端使用同一份代码格式化膜模板ali-code-style.xml，ecplise直接导入使用，idea使用Eclipse Code Formatter插件配置xml后使用。
 - 前端代码使用vs插件的Beautify格式化，缩进使用TAB
 - 后端代码非特殊情况准守P3C插件规范
