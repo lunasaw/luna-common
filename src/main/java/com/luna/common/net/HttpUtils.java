@@ -153,7 +153,7 @@ public class HttpUtils {
      * @param headers
      * @param queries
      * @param body
-     * @return
+     * @return HttpResponse
      * @throws Exception
      */
     public static HttpResponse doPost(String host, String path, Map<String, String> headers,
