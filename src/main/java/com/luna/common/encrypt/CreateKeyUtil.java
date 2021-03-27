@@ -1,4 +1,4 @@
-package com.luna.common.utils;
+package com.luna.common.encrypt;
 
 /**
  * 自动生成密码

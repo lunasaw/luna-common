@@ -1,4 +1,4 @@
-package com.luna.common.utils;
+package com.luna.common.parsejson;
 
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.io.IOUtils;

@@ -1,4 +1,4 @@
-package com.luna.common.utils;
+package com.luna.common.dto;
 
 import com.luna.common.dto.ResultDTO;
 

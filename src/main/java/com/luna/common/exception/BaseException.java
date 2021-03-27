@@ -1,4 +1,4 @@
-package com.luna.common.utils.exception;
+package com.luna.common.exception;
 
 public class BaseException extends RuntimeException {
     private int    code;

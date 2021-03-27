@@ -1,4 +1,4 @@
-package com.luna.common.utils;
+package com.luna.common.encrypt;
 
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;

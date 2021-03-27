@@ -1,7 +1,7 @@
 package com.luna.common.net;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -9,8 +9,11 @@ import java.util.Map;
 
 import javax.net.ssl.SSLContext;
 
+import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
+import com.luna.common.dto.constant.ResultCode;
+import com.luna.common.exception.BaseException;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -289,6 +292,33 @@ public class HttpUtils {
         }
     }
 
+    /**
+     * 解析生成URL
+     * 
+     * @param map 键值对
+     * @return 生成的URL尾部
+     * @throws UnsupportedEncodingException
+     */
+    public static String urlencode(Map<?, ?> map) throws UnsupportedEncodingException {
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
+            if (sb.length() > 0) {
+                sb.append("&");
+            }
+            sb.append(String.format("%s=%s",
+                URLEncoder.encode(entry.getKey().toString(), "UTF-8"),
+                URLEncoder.encode(entry.getValue().toString(), "UTF-8")));
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 检测响应体并解析
+     * 
+     * @param httpResponse 响应体
+     * @param statusList 状态码列表
+     * @return 解析字节
+     */
     public static byte[] checkResponseStreamAndGetResult(HttpResponse httpResponse, List<Integer> statusList) {
         checkCode(httpResponse, statusList);
         HttpEntity entity = httpResponse.getEntity();
@@ -299,6 +329,13 @@ public class HttpUtils {
         }
     }
 
+    /**
+     * 检测响应体并解析
+     * 
+     * @param httpResponse 响应体
+     * @param statusList 状态码列表
+     * @return 解析字符串
+     */
     public static String checkResponseAndGetResult(HttpResponse httpResponse, List<Integer> statusList) {
         checkCode(httpResponse, statusList);
 
@@ -310,6 +347,12 @@ public class HttpUtils {
         }
     }
 
+    /**
+     * 检测状态码
+     * 
+     * @param httpResponse
+     * @param statusList
+     */
     private static void checkCode(HttpResponse httpResponse, List<Integer> statusList) {
         if (httpResponse == null) {
             throw new RuntimeException();
@@ -322,8 +365,71 @@ public class HttpUtils {
         }
     }
 
+    /**
+     * 解析响应体
+     * 
+     * @param httpResponse
+     * @return
+     */
     public static String checkResponseAndGetResult(HttpResponse httpResponse) {
         return checkResponseAndGetResult(httpResponse, ImmutableList.of(HttpStatus.SC_OK));
+    }
+
+    /**
+     * 读取
+     *
+     * @param rd
+     * @return
+     * @throws IOException
+     */
+    public static String readAll(Reader rd) {
+        try {
+            StringBuilder sb = new StringBuilder();
+            int cp;
+            while ((cp = rd.read()) != -1) {
+                sb.append((char)cp);
+            }
+            return sb.toString();
+        } catch (IOException e) {
+            throw new BaseException(ResultCode.ERROR_SYSTEM_EXCEPTION, e.getMessage());
+        }
+    }
+
+    /**
+     * 创建链接
+     *
+     * @param url
+     * @return
+     * @throws IOException
+     * @throws JSONException
+     */
+    private static JSONObject readJsonFromUrl(String url) throws Exception {
+        InputStream is = new URL(url).openStream();
+        try {
+            BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+            String jsonText = readAll(rd);
+            JSONObject json = JSONObject.parseObject(jsonText);
+            return json;
+        } finally {
+            is.close();
+        }
+    }
+
+    /**
+     * 检查是不是网络路径
+     *
+     * @param url
+     * @return
+     */
+    public static boolean isNetUrl(String url) {
+        boolean reault = false;
+        if (url != null) {
+            if (url.toLowerCase().startsWith("http") || url.toLowerCase().startsWith("rtsp")
+                || url.toLowerCase().startsWith("mms")) {
+                reault = true;
+            }
+        }
+        return reault;
     }
 
 }
