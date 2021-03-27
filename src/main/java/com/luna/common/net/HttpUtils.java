@@ -1,9 +1,11 @@
 package com.luna.common.net;
 
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -290,6 +292,59 @@ public class HttpUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * doURL
+     *
+     * @param url url路径
+     * @param method 方法
+     * @param headers 请求头
+     * @param queryParams 请求参数
+     * @return
+     * @throws IOException
+     */
+    public static JSONObject doURL(String url, String method, Map<String, String> headers,
+        Map<String, String> queryParams) throws IOException {
+        // url参数拼接
+        if (!queryParams.isEmpty()) {
+            url += "?" + HttpUtils.urlencode(queryParams);
+        }
+        URL realUrl = new URL(url);
+        HttpURLConnection conn = (HttpURLConnection)realUrl.openConnection();
+        conn.setConnectTimeout(5000);
+        conn.setReadTimeout(5000);
+        conn.setRequestMethod(method);
+
+        // request headers
+        for (Map.Entry<String, String> entry : headers.entrySet()) {
+            conn.setRequestProperty(entry.getKey(), entry.getValue());
+        }
+
+        // request body
+        Map<String, Boolean> methods = new HashMap<>();
+        methods.put("POST", true);
+        methods.put("PUT", true);
+        methods.put("PATCH", true);
+        Boolean hasBody = methods.get(method);
+        if (hasBody != null) {
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
+            conn.setDoOutput(true);
+            DataOutputStream out = new DataOutputStream(conn.getOutputStream());
+            out.writeBytes(urlencode(queryParams));
+            out.flush();
+            out.close();
+        }
+
+        // 定义 BufferedReader输入流来读取URL的响应
+        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        String line;
+        String result = "";
+        while ((line = in.readLine()) != null) {
+            result += line;
+        }
+        return JSONObject.parseObject(result);
     }
 
     /**
