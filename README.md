@@ -13,7 +13,7 @@ isczy.tk luna-common
 <dependency>
     <groupId>com.github.czy1024</groupId>
     <artifactId>luna-common</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.6</version>
 </dependency>
 ```
 
