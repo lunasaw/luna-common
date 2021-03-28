@@ -15,14 +15,13 @@ import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.luna.common.dto.constant.ResultCode;
 import com.luna.common.exception.BaseException;
+import com.luna.common.text.CharsetKit;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
+import org.apache.http.*;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.config.Registry;
@@ -32,7 +31,10 @@ import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -47,10 +49,6 @@ import com.google.common.collect.Lists;
  * @author Luna
  */
 public class HttpUtils {
-    /** urlEncode编码 */
-    private static final String        ENCODE            = "utf-8";
-
-    private static final String        FORM_CONTENT_TYPE = "application/x-www-form-urlencoded; charset=UTF-8";
 
     private static CloseableHttpClient httpClient;
 
@@ -88,10 +86,10 @@ public class HttpUtils {
     /**
      * get
      *
-     * @param host
-     * @param path
-     * @param headers
-     * @param queries
+     * @param host 主机地址
+     * @param path 路径
+     * @param headers 请求头
+     * @param queries 请求参数
      * @return
      * @throws Exception
      */
@@ -111,13 +109,12 @@ public class HttpUtils {
     }
 
     /**
-     * Post form
+     * Post form 文件
      *
-     * @param host
-     * @param path
-     * @param headers
-     * @param queries
-     * @param bodies
+     * @param host 主机地址
+     * @param path 路径
+     * @param headers 请求头
+     * @param queries 请求参数
      * @return
      * @throws Exception
      */
@@ -132,16 +129,20 @@ public class HttpUtils {
         if (MapUtils.isNotEmpty(bodies)) {
             List<NameValuePair> nameValuePairList = Lists.newArrayList();
             for (String key : bodies.keySet()) {
+                // 传入参数可以为file或者filePath，在此处做转换
+                File file = new File(bodies.get(key));
+                MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+                // 设置浏览器兼容模式
+                builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+                // 设置请求的编码格式
+                builder.setCharset(Consts.UTF_8);
+                builder.setContentType(ContentType.MULTIPART_FORM_DATA);
+                // 添加文件
+                builder.addBinaryBody(key, file);
+                HttpEntity reqEntity = builder.build();
+                request.setEntity(reqEntity);
                 nameValuePairList.add(new BasicNameValuePair(key, bodies.get(key)));
             }
-            UrlEncodedFormEntity formEntity = null;
-            try {
-                formEntity = new UrlEncodedFormEntity(nameValuePairList, ENCODE);
-            } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException(e);
-            }
-            formEntity.setContentType(FORM_CONTENT_TYPE);
-            request.setEntity(formEntity);
         }
         try {
             return httpClient.execute(request);
@@ -153,11 +154,11 @@ public class HttpUtils {
     /**
      * Post String
      *
-     * @param host
-     * @param path
-     * @param headers
-     * @param queries
-     * @param body
+     * @param host 主机地址
+     * @param path 路径
+     * @param headers 请求头
+     * @param queries 请求参数
+     * @param body 请求体
      * @return HttpResponse
      * @throws Exception
      */
@@ -170,8 +171,7 @@ public class HttpUtils {
             }
         }
         if (StringUtils.isNotBlank(body)) {
-            request.setEntity(new StringEntity(body, ENCODE));
-
+            request.setEntity(new StringEntity(body, Charset.defaultCharset()));
         }
         try {
             return httpClient.execute(request);
@@ -183,11 +183,11 @@ public class HttpUtils {
     /**
      * Post stream
      *
-     * @param host
-     * @param path
-     * @param headers
-     * @param queries
-     * @param body
+     * @param host 主机地址
+     * @param path 路径
+     * @param headers 请求头
+     * @param queries 请求参数
+     * @param body 请求体
      * @return
      * @throws Exception
      */
@@ -209,6 +209,14 @@ public class HttpUtils {
         }
     }
 
+    /**
+     * 构建url
+     * 
+     * @param host 主机地址
+     * @param path 路径
+     * @param queries 请求参数
+     * @return
+     */
     private static String buildUrl(String host, String path, Map<String, String> queries) {
         StringBuilder sbUrl = new StringBuilder();
         sbUrl.append(host);
@@ -231,7 +239,7 @@ public class HttpUtils {
                     if (StringUtils.isNotBlank(query.getValue())) {
                         sbQuery.append("=");
                         try {
-                            sbQuery.append(URLEncoder.encode(query.getValue(), ENCODE));
+                            sbQuery.append(URLEncoder.encode(query.getValue(), CharsetKit.UTF_8));
                         } catch (UnsupportedEncodingException e) {
                             throw new RuntimeException(e);
                         }
@@ -396,7 +404,7 @@ public class HttpUtils {
 
         HttpEntity entity = httpResponse.getEntity();
         try {
-            return EntityUtils.toString(entity, ENCODE);
+            return EntityUtils.toString(entity, Charset.defaultCharset());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

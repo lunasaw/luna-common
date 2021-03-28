@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -53,7 +54,7 @@ public class JsonFileUtil<T> {
      * @param jsonFile
      * @return
      */
-    public List<?> readFileToList(Class c, String jsonFile) {
+    public static List<?> readFileToList(Class c, String jsonFile) {
         String text = null;
         try {
             InputStream inputStream = new FileInputStream(jsonFile);
@@ -71,7 +72,7 @@ public class JsonFileUtil<T> {
      * @param jsonFile
      * @return
      */
-    public T readFileToObject(Class c, String jsonFile) {
+    public static <T> T readFileToObject(Class c, String jsonFile) {
         String text = null;
         try {
             InputStream inputStream = new FileInputStream(jsonFile);
@@ -79,6 +80,6 @@ public class JsonFileUtil<T> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return (T)JSON.parseObject(text, c);
+        return JSON.parseObject(text, (Type)c);
     }
 }
