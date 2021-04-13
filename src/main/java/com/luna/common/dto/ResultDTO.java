@@ -2,14 +2,16 @@ package com.luna.common.dto;
 
 import com.luna.common.dto.constant.ResultCode;
 
+import java.io.Serializable;
+
 /**
  * 返回值
  * 
- * @author 15272
+ * @author luna
  *
  * @param <T>
  */
-public class ResultDTO<T> {
+public class ResultDTO<T> implements Serializable {
 
     /** 是否调用以及过参数校验 */
     private boolean success = false;

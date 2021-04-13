@@ -205,10 +205,4 @@ public class FileUtils {
             throw new RuntimeException(e);
         }
     }
-
-    public static void main(String[] args) {
-        downloadFile(
-            "https://i0.hdslb.com/bfs/sycp/creative_img/202103/b7ba89517edf98a362ed92f4e3c49ea0.jpg@880w_388h_1c_95q",
-            "./a.jpg");
-    }
 }
