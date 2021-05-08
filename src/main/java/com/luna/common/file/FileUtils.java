@@ -6,6 +6,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -63,6 +64,10 @@ public class FileUtils {
      */
     public static void writeBytesToFile(byte[] bytes, String fileName) {
         try {
+            Path path = Paths.get(fileName);
+            if (!Files.exists(path)) {
+                Files.createFile(Paths.get(fileName));
+            }
             Files.write(Paths.get(fileName), bytes);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -143,7 +148,6 @@ public class FileUtils {
                 // do nothing
             }
         }
-
         downloadFile(url, file);
     }
 
@@ -167,14 +171,16 @@ public class FileUtils {
     /**
      * write file
      * 
-     * @param file
+     * @param fileName
      * @param content
      */
-    public static void writeStringToFile(String file, String content) {
+    public static void writeStringToFile(String fileName, String content) {
         try {
-            File parentDir = new File(new File(file).getParent());
-            parentDir.mkdir();
-            org.apache.commons.io.FileUtils.writeStringToFile(new File(file), content, Charset.forName("utf-8"));
+            Path path = Paths.get(fileName);
+            if (!Files.exists(path)) {
+                Files.createFile(Paths.get(fileName));
+            }
+            org.apache.commons.io.FileUtils.writeStringToFile(new File(fileName), content, Charset.forName("utf-8"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
