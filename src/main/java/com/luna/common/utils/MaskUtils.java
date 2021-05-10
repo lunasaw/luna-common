@@ -6,7 +6,7 @@ import org.apache.commons.validator.routines.EmailValidator;
 /**
  * @author Luna
  */
-public class CommonUtils {
+public class MaskUtils {
     /** 中国大陆手机号正则 */
     private static final String CHINA_MAINLAND_MOBILE_PHONE_REGEX = "0?(13|14|15|17|18|19)[0-9]{9}";
 

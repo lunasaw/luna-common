@@ -14,7 +14,7 @@ import org.apache.commons.io.FileUtils;
 /**
  * @author Luna
  */
-public class FileUtil {
+public class FileTools {
     /**
      * 读取文件所有内容
      *
