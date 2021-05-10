@@ -1,24 +1,20 @@
 package com.luna.common.file;
 
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
-import com.google.common.hash.HashCode;
-import com.google.common.hash.Hashing;
+import com.luna.common.text.CharsetKit;
+import org.apache.commons.io.FileUtils;
 
 /**
  * @author Luna
  */
-public class FileUtils {
+public class FileUtil {
     /**
      * 读取文件所有内容
      *
@@ -52,7 +48,7 @@ public class FileUtils {
      * @param fileName 文件路径
      * @return
      */
-    public static boolean isFileExists(String fileName) {
+    public static boolean isExists(String fileName) {
         return Files.exists(Paths.get(fileName));
     }
 
@@ -62,13 +58,24 @@ public class FileUtils {
      * @param bytes 字节数组
      * @param fileName 文件路径
      */
-    public static void writeBytesToFile(byte[] bytes, String fileName) {
+    public static void write(byte[] bytes, String fileName) {
         try {
-            Path path = Paths.get(fileName);
-            if (!Files.exists(path)) {
-                Files.createFile(Paths.get(fileName));
-            }
             Files.write(Paths.get(fileName), bytes);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 字符串写入文件
+     * 
+     * @param fileName 文件路径
+     * @param content 文本内容
+     * @throws IOException
+     */
+    public static void write(String content, String fileName) {
+        try {
+            Files.write(Paths.get(fileName), content.getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -80,16 +87,13 @@ public class FileUtils {
      * @param fileName 文件路径
      * @return 字节数组
      */
-    public static byte[] readFileToBytes(String fileName) {
+    public static byte[] read(String fileName) {
         try {
             return Files.readAllBytes(Paths.get(fileName));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
-
-    /** 行数统计时一次性读byte大小 */
-    private static final int BYTE_SIZE = 1024 * 8;
 
     /**
      * 计算文件中行数
@@ -98,7 +102,7 @@ public class FileUtils {
      * @return
      * @throws Exception
      */
-    public static long countFileLines(String fileName) {
+    public static long count(String fileName) {
         try {
             LineNumberReader reader = new LineNumberReader(new FileReader(fileName));
             reader.skip(Long.MAX_VALUE);
@@ -122,11 +126,9 @@ public class FileUtils {
      * @param url
      * @param file
      */
-    public static void downloadFile(String url, String file) {
+    public static void download(String url, String file) {
         try {
-            org.apache.commons.io.FileUtils.copyURLToFile(new URL(url), new File(file), 5000, 5000);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
+            FileUtils.copyURLToFile(new URL(url), new File(file), 5000, 5000);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -139,48 +141,44 @@ public class FileUtils {
      * @param file
      * @param maxRetry
      */
-    public static void downloadFileWithRetry(String url, String file, int maxRetry) {
+    public static void downloadWithRetry(String url, String file, int maxRetry) {
         for (int i = 0; i < maxRetry - 1; i++) {
             try {
-                downloadFile(url, file);
+                download(url, file);
                 return;
             } catch (Exception e) {
                 // do nothing
             }
         }
-        downloadFile(url, file);
-    }
-
-    /**
-     * file check
-     *
-     * @param file
-     * @param sha256
-     * @return
-     */
-    public static boolean checkFileWithSHA256(String file, String sha256) {
-        try {
-            HashCode hash = com.google.common.io.Files.asByteSource(new File(file)).hash(Hashing.sha256());
-            String fileHash = hash.toString();
-            return StringUtils.equalsIgnoreCase(fileHash, sha256);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        download(url, file);
     }
 
     /**
      * write file
      * 
-     * @param fileName
+     * @param path
      * @param content
      */
-    public static void writeStringToFile(String fileName, String content) {
+    public static void writeStringToFile(String path, String content) {
+        writeStringToFile(path, content, true);
+    }
+
+    /**
+     * write file
+     *
+     * @param path 文件路径
+     * @param content 文件内容
+     * @param override 不存在是否创建
+     */
+    public static void writeStringToFile(String path, String content, boolean override) {
         try {
-            Path path = Paths.get(fileName);
-            if (!Files.exists(path)) {
-                Files.createFile(Paths.get(fileName));
+            Path filePath = Paths.get(path);
+            if (!Files.exists(filePath)) {
+                if (override) {
+                    Files.createFile(filePath);
+                }
             }
-            org.apache.commons.io.FileUtils.writeStringToFile(new File(fileName), content, Charset.forName("utf-8"));
+            FileUtils.writeStringToFile(new File(path), content, CharsetKit.UTF_8);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -189,11 +187,11 @@ public class FileUtils {
     /**
      * read file
      * 
-     * @param file
+     * @param path 文件全路径
      */
-    public static String readFileToString(String file) {
+    public static String readFileToString(String path) {
         try {
-            return org.apache.commons.io.FileUtils.readFileToString(new File(file), Charset.forName("utf-8"));
+            return FileUtils.readFileToString(new File(path), CharsetKit.UTF_8);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -202,11 +200,11 @@ public class FileUtils {
     /**
      * 清空目录下所有文件
      * 
-     * @param file
+     * @param path
      */
-    public static void cleanDirectory(String file) {
+    public static void cleanDirectory(String path) {
         try {
-            org.apache.commons.io.FileUtils.cleanDirectory(new File(file));
+            FileUtils.cleanDirectory(new File(path));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

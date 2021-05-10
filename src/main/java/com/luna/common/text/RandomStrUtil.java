@@ -38,4 +38,12 @@ public class RandomStrUtil {
         return new String(nonceChars);
     }
 
+    /**
+     * 获取6位随机验证码
+     *
+     * @return
+     */
+    public static String getValidationCode() {
+        return String.valueOf((new Random().nextInt(899999) + 100000));
+    }
 }

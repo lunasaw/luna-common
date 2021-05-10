@@ -9,6 +9,8 @@ import org.w3c.dom.Document;
 
 /**
  * 2018/7/3
+ * 
+ * @author luna_mac
  */
 public final class XmlUtil {
     public static DocumentBuilder newDocumentBuilder() throws ParserConfigurationException {

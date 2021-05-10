@@ -1,6 +1,6 @@
 package com.luna.common.webdav;
 
-import com.luna.common.file.FileUtils;
+import com.luna.common.file.FileUtil;
 import com.luna.common.net.HttpUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -173,7 +173,7 @@ public class WebDavUtils {
         HttpGet get = new HttpGet(url);
         HttpResponse response = webDavConfig.getClient().execute(get, webDavConfig.getContext());
         byte[] bytes = HttpUtils.checkResponseStreamAndGetResult(response);
-        FileUtils.writeBytesToFile(bytes, filePath);
+        FileUtil.write(bytes, filePath);
     }
 
     public static void main(String[] args) throws URISyntaxException, IOException {

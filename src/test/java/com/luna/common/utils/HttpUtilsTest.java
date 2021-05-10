@@ -29,19 +29,4 @@ public class HttpUtilsTest {
         String responseString = EntityUtils.toString(entity, "utf-8");
         Assert.assertNotNull(responseString);
     }
-
-    // @Test
-    public void test3Post() throws Exception {
-        HttpResponse httpResponse = HttpUtils.doPost("http://localhost:8081", "/fusion-user/api/login",
-            ImmutableMap.of("Content-Type", "application/json"),
-            null, "{\"userMark\":\"15696756584\",\"password\":\"22222222\",\"site\":\"wednesday\"}");
-        Assert.assertEquals(200, httpResponse.getStatusLine().getStatusCode());
-        HttpEntity entity = httpResponse.getEntity();
-        String responseString = EntityUtils.toString(entity, "utf-8");
-        Assert.assertNotNull(responseString);
-        Header[] headers = httpResponse.getHeaders("Set-Cookie");
-        for (Header h : headers) {
-            Assert.assertNotNull(h.getValue());
-        }
-    }
 }
