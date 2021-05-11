@@ -13,29 +13,17 @@ import java.util.Properties;
  * 获取当前系统信息
  */
 public class SystemInfoUtil {
-    // 当前实例
-    private static SystemInfoUtil currentSystem = null;
     private static InetAddress    localHost     = null;
 
-    private SystemInfoUtil() {
+    public static InetAddress getLocalHost() {
         try {
-            localHost = InetAddress.getLocalHost();
+            if (localHost == null) {
+                localHost = InetAddress.getLocalHost();
+            }
+            return localHost;
         } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * 单例模式获取对象
-     *
-     * @return
-     */
-    public static SystemInfoUtil getInstance() {
-        if (currentSystem == null) {
-            currentSystem = new SystemInfoUtil();
-        }
-        return currentSystem;
     }
 
     /**
@@ -44,8 +32,7 @@ public class SystemInfoUtil {
      * @return IP地址
      */
     public static String getIP() {
-        String ip = localHost.getHostAddress();
-        return ip;
+        return getLocalHost().getHostAddress();
     }
 
     /**
@@ -54,7 +41,7 @@ public class SystemInfoUtil {
      * @return
      */
     public static String getHostName() {
-        return localHost.getHostName();
+        return getLocalHost().getHostName();
     }
 
     /**
@@ -64,17 +51,20 @@ public class SystemInfoUtil {
      */
     public static String getDiskNumber() {
         String line = "";
-        String HdSerial = "";// 记录硬盘序列号
+        String HdSerial = "";
+        // 记录硬盘序列号
 
         try {
 
-            Process proces = Runtime.getRuntime().exec("cmd /c dir c:");// 获取命令行参数
+            Process proces = Runtime.getRuntime().exec("cmd /c dir c:");
+            // 获取命令行参数
             BufferedReader buffreader = new BufferedReader(
                 new InputStreamReader(proces.getInputStream()));
 
             while ((line = buffreader.readLine()) != null) {
 
-                if (line.indexOf("卷的序列号是 ") != -1) { // 读取参数并获取硬盘序列号
+                if (line.indexOf("卷的序列号是 ") != -1) {
+                    // 读取参数并获取硬盘序列号
 
                     HdSerial = line.substring(line.indexOf("卷的序列号是 ")
                         + "卷的序列号是 ".length(), line.length());
@@ -98,14 +88,12 @@ public class SystemInfoUtil {
     public static String getMac() {
         NetworkInterface byInetAddress;
         try {
-            byInetAddress = NetworkInterface.getByInetAddress(localHost);
+            byInetAddress = NetworkInterface.getByInetAddress(getLocalHost());
             byte[] hardwareAddress = byInetAddress.getHardwareAddress();
             return getMacFromBytes(hardwareAddress);
-        } catch (SocketException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return null;
     }
 
     /**
@@ -116,8 +104,7 @@ public class SystemInfoUtil {
     public static String getSystemName() {
         Properties sysProperty = System.getProperties();
         // 系统名称
-        String systemName = sysProperty.getProperty("os.name");
-        return systemName;
+        return sysProperty.getProperty("os.name");
     }
 
     private static String getMacFromBytes(byte[] bytes) {

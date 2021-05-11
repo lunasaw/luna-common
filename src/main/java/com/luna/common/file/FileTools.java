@@ -154,7 +154,7 @@ public class FileTools {
     }
 
     /**
-     * write file
+     * 读取文件
      * 
      * @param path
      * @param content
@@ -164,7 +164,24 @@ public class FileTools {
     }
 
     /**
-     * write file
+     * 路径创建文件夹
+     * 
+     * @param pathDir
+     */
+    public static void createDirectory(String pathDir) {
+        try {
+            Path path = Paths.get(pathDir);
+            if (!Files.isDirectory(path)) {
+                path = path.getParent();
+            }
+            Files.createDirectories(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 写入文件
      *
      * @param path 文件路径
      * @param content 文件内容
@@ -185,7 +202,7 @@ public class FileTools {
     }
 
     /**
-     * read file
+     * 读取文件
      * 
      * @param path 文件全路径
      */
