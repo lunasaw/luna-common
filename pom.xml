@@ -7,7 +7,7 @@
     <groupId>com.github.czy1024</groupId>
     <artifactId>luna-common</artifactId>
     <name>luna-common</name>
-    <version>1.1.2</version>
+    <version>1.1.3</version>
     <description>common is project which contains common utils</description>
     <url>https://github.com/czy1024/luna-common</url>
 
@@ -18,6 +18,19 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!--dependencies-->
+        <jackrabbit-webdav.version>2.21.1</jackrabbit-webdav.version>
+        <commons-collections4.version>4.3</commons-collections4.version>
+        <commons-validator.version>1.6</commons-validator.version>
+        <commons-lang3.version>3.11</commons-lang3.version>
+        <commons-io.version>2.6</commons-io.version>
+        <httpclient.version>4.5.11</httpclient.version>
+        <httpmime.version>4.5.11</httpmime.version>
+        <jackson-databind.version>2.10.3</jackson-databind.version>
+        <fastjson.version>1.2.70</fastjson.version>
+        <gson.version>2.8.6</gson.version>
+        <json-jackson.version>1.1.0</json-jackson.version>
+        <guava.version>27.0.1-jre</guava.version>
+        <joda-time.version>2.10.6</joda-time.version>
     </properties>
     <developers>
         <developer>
@@ -37,66 +50,54 @@
         <dependency>
             <groupId>org.apache.jackrabbit</groupId>
             <artifactId>jackrabbit-webdav</artifactId>
-            <version>2.21.1</version>
+            <version>${jackrabbit-webdav.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
-            <version>4.3</version>
+            <version>${commons-collections4.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/commons-validator/commons-validator -->
         <dependency>
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
-            <version>1.6</version>
+            <version>${commons-validator.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.11</version>
+            <version>${commons-lang3.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5.11</version>
+            <version>${httpclient.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpmime</artifactId>
-            <version>4.5.11</version>
+            <version>${httpmime.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.6</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.10.3</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>1.2.54</version>
+            <version>${commons-io.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>27.0.1-jre</version>
+            <version>${guava.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/joda-time/joda-time -->
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.10.6</version>
+            <version>${joda-time.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/junit/junit -->
         <dependency>
