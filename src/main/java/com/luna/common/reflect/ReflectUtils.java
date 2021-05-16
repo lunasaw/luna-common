@@ -6,8 +6,6 @@ import java.util.Date;
 import com.luna.common.date.DateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 反射工具类. 提供调用getter/setter方法, 访问私有变量, 调用私有方法, 获取泛型类型Class, 被AOP过的真实类等工具函数.
@@ -21,8 +19,6 @@ public class ReflectUtils {
     private static final String GETTER_PREFIX         = "get";
 
     private static final String CGLIB_CLASS_SEPARATOR = "$$";
-
-    private static Logger       logger                = LoggerFactory.getLogger(ReflectUtils.class);
 
     /**
      * 调用Getter方法.
@@ -63,14 +59,13 @@ public class ReflectUtils {
     public static <E> E getFieldValue(final Object obj, final String fieldName) {
         Field field = getAccessibleField(obj, fieldName);
         if (field == null) {
-            logger.debug("在 [" + obj.getClass() + "] 中，没有找到 [" + fieldName + "] 字段 ");
             return null;
         }
         E result = null;
         try {
             result = (E)field.get(obj);
         } catch (IllegalAccessException e) {
-            logger.error("不可能抛出的异常{}", e.getMessage());
+            throw new RuntimeException("不可能抛出的异常{}" + e.getMessage());
         }
         return result;
     }
@@ -81,14 +76,11 @@ public class ReflectUtils {
     public static <E> void setFieldValue(final Object obj, final String fieldName, final E value) {
         Field field = getAccessibleField(obj, fieldName);
         if (field == null) {
-            // throw new IllegalArgumentException("在 [" + obj.getClass() + "] 中，没有找到 [" + fieldName + "] 字段 ");
-            logger.debug("在 [" + obj.getClass() + "] 中，没有找到 [" + fieldName + "] 字段 ");
             return;
         }
         try {
             field.set(obj, value);
         } catch (IllegalAccessException e) {
-            logger.error("不可能抛出的异常: {}", e.getMessage());
         }
     }
 
@@ -105,7 +97,6 @@ public class ReflectUtils {
         }
         Method method = getAccessibleMethod(obj, methodName, parameterTypes);
         if (method == null) {
-            logger.debug("在 [" + obj.getClass() + "] 中，没有找到 [" + methodName + "] 方法 ");
             return null;
         }
         try {
@@ -126,7 +117,6 @@ public class ReflectUtils {
         Method method = getAccessibleMethodByName(obj, methodName, args.length);
         if (method == null) {
             // 如果为空不报错，直接返回空。
-            logger.debug("在 [" + obj.getClass() + "] 中，没有找到 [" + methodName + "] 方法 ");
             return null;
         }
         try {
@@ -179,8 +169,7 @@ public class ReflectUtils {
                 Field field = superClass.getDeclaredField(fieldName);
                 makeAccessible(field);
                 return field;
-            } catch (NoSuchFieldException e) {
-                continue;
+            } catch (NoSuchFieldException ignored) {
             }
         }
         return null;
@@ -274,19 +263,15 @@ public class ReflectUtils {
         Type genType = clazz.getGenericSuperclass();
 
         if (!(genType instanceof ParameterizedType)) {
-            logger.debug(clazz.getSimpleName() + "'s superclass not ParameterizedType");
             return Object.class;
         }
 
         Type[] params = ((ParameterizedType)genType).getActualTypeArguments();
 
         if (index >= params.length || index < 0) {
-            logger.debug("Index: " + index + ", Size of " + clazz.getSimpleName() + "'s Parameterized Type: "
-                + params.length);
             return Object.class;
         }
         if (!(params[index] instanceof Class)) {
-            logger.debug(clazz.getSimpleName() + " not set the actual class on superclass generic parameter");
             return Object.class;
         }
 

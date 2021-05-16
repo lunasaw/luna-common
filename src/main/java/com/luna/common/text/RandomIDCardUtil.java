@@ -12,7 +12,7 @@ import java.util.Random;
  * @Description:
  */
 class Cities {
-    static final int cities[] = {
+    static final int CITIES[] = {
         350602, 370782, 513431, 532624, 530426, 370203, 350128, 421002, 350624, 430225, 360300, 350203, 220211, 420822,
         530625, 653126, 420203, 220182, 230603, 533323, 430121, 621225, 652827, 511500, 450205, 652824, 411402, 440781,
         469022, 370214, 542521, 433101, 460100, 530381, 411722, 533400, 110229, 640300, 210700, 450127, 440105, 530828,
@@ -262,8 +262,8 @@ public class RandomIDCardUtil {
     public static String getIdNo(String birth, boolean male) {
         StringBuilder sb = new StringBuilder();
         Random random = new Random();
-        int value = random.nextInt(Cities.cities.length);
-        sb.append(Cities.cities[value]);
+        int value = random.nextInt(Cities.CITIES.length);
+        sb.append(Cities.CITIES[value]);
         sb.append(birth);
         value = random.nextInt(999) + 1;
         if (male && value % 2 == 0) {

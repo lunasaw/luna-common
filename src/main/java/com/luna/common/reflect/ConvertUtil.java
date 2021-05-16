@@ -21,8 +21,6 @@ import javax.xml.transform.stream.StreamResult;
 
 import com.luna.common.xml.XmlUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -32,8 +30,6 @@ import org.w3c.dom.NodeList;
  * @author luna
  */
 public class ConvertUtil {
-
-    private static final Logger log = LoggerFactory.getLogger(ConvertUtil.class);
 
     /**
      * 将Map转换为XML格式的字符串
@@ -102,9 +98,7 @@ public class ConvertUtil {
             }
             return data;
         } catch (Exception ex) {
-            log.warn("Invalid XML, can not convert to map. Error message: {}. XML content: {}", ex.getMessage(),
-                strXML);
-            throw ex;
+            throw new RuntimeException(ex);
         }
 
     }
