@@ -5,31 +5,33 @@ import java.util.List;
 
 public class Page<T> implements Serializable {
 
-    // 页数（第几页）
+    /** 页数（第几页） */
     private long    currentpage;
 
-    // 查询数据库里面对应的数据有多少条
-    private long    total;      // 从数据库查处的总记录数
+    /** 查询数据库里面对应的数据有多少条 从数据库查处的总记录数 */
+    private long    total;
 
-    // 每页查5条
+    /** 每页查5条 */
     private int     size;
 
-    // 下页
+    /** 下页 */
     private int     next;
 
-    private List<T> list;
+    private List<?> list;
 
-    // 最后一页
+    /** 最后一页 */
     private int     last;
 
-    private int     lpage;      // 左边的开始的页码
+    /** 左边的开始的页码 */
+    private int     lpage;
 
-    private int     rpage;      // 右边额开始的页码
+    /** 右边额开始的页码 */
+    private int     rpage;
 
-    // 从哪条开始查
+    /** 从哪条开始查 */
     private long    start;
 
-    // 全局偏移量
+    /** 全局偏移量 */
     public int      offsize = 2;
 
     public Page() {
@@ -63,12 +65,20 @@ public class Page<T> implements Serializable {
         this.start = (this.currentpage - 1) * pagesize;
     }
 
-    // 上一页
+    /**
+     * 上一页
+     * 
+     * @return
+     */
     public long getUpper() {
         return currentpage > 1 ? currentpage - 1 : currentpage;
     }
 
-    // 总共有多少页，即末页
+    /**
+     * 总共有多少页，即末页
+     * 
+     * @param last
+     */
     public void setLast(int last) {
         this.last = (int)(total % size == 0 ? total / size : (total / size) + 1);
     }
@@ -113,7 +123,8 @@ public class Page<T> implements Serializable {
         setCurrentpage(currentpage, total, pagesize);
 
         // 分页计算
-        int leftcount = this.offsize, // 需要向上一页执行多少次
+        // 需要向上一页执行多少次
+        int leftcount = this.offsize,
             rightcount = this.offsize;
 
         // 起点页
@@ -218,24 +229,14 @@ public class Page<T> implements Serializable {
     /**
      * @return the list
      */
-    public List<T> getList() {
+    public List<?> getList() {
         return list;
     }
 
     /**
      * @param list the list to set
      */
-    public void setList(List<T> list) {
+    public void setList(List<?> list) {
         this.list = list;
-    }
-
-    public static void main(String[] args) {
-        // 总记录数
-        // 当前页
-        // 每页显示多少条
-        int cpage = 17;
-        Page page = new Page(1001, cpage, 50, 7);
-        System.out.println("开始页:" + page.getLpage() + "__当前页：" + page.getCurrentpage() + "__结束页" + page.getRpage()
-            + "____总页数：" + page.getLast());
     }
 }

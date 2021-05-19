@@ -9,7 +9,7 @@ import com.google.common.collect.ImmutableMap;
 /**
  * 返回参数
  * 
- * @author 15272
+ * @author luna
  *
  */
 public interface ResultCode {
