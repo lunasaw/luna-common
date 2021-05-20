@@ -5,7 +5,7 @@ import com.luna.common.dto.constant.ResultCode;
 /**
  * @author Luna
  */
-public class ResultDTOUtils {
+public class ResultDTOUtils<T> {
     public static <T> T checkResultAndGetData(ResultDTO<T> resultDTO) {
         if (resultDTO.isSuccess() == false) {
             throw new RuntimeException("code=" + resultDTO.getCode() + ", message=" + resultDTO.getMessage());
@@ -17,7 +17,7 @@ public class ResultDTOUtils {
         return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS);
     }
 
-    public static ResultDTO<Object> success(Object object) {
+    public static ResultDTO<?> success(Object object) {
         return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, object);
     }
 
