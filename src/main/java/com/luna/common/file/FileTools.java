@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import com.luna.common.net.base.HttpBaseUtils;
 import com.luna.common.text.CharsetKit;
 import org.apache.commons.io.FileUtils;
 
@@ -28,6 +29,8 @@ public class FileTools {
             throw new RuntimeException(e);
         }
     }
+
+
 
     /**
      * 删除文件或空目录

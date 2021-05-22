@@ -162,7 +162,7 @@ public class HttpBaseUtils {
      * @param charsetName 编码格式
      * @return
      */
-    public String readWithString(InputStream inputStream, String charsetName) {
+    public static String readWithString(InputStream inputStream, String charsetName) {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, charsetName));
             return readWithReader(reader);
