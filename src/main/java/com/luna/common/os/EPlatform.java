@@ -1,5 +1,9 @@
 package com.luna.common.os;
 
+/**
+ * @author luna
+ */
+
 public enum EPlatform {
     Any("any"),
     Linux("Linux"),

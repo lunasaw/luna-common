@@ -7,7 +7,7 @@
     <groupId>com.github.czy1024</groupId>
     <artifactId>luna-common</artifactId>
     <name>luna-common</name>
-    <version>1.1.6</version>
+    <version>1.1.7</version>
     <description>common is project which contains common utils</description>
     <url>https://github.com/czy1024/luna-common</url>
 

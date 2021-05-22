@@ -2,7 +2,6 @@ package com.luna.common.net.base;
 
 import com.luna.common.file.FileTools;
 import com.luna.common.net.HttpUtils;
-import org.apache.commons.lang3.StringUtils;
 import java.io.*;
 import java.net.*;
 import java.util.List;
@@ -133,6 +132,41 @@ public class HttpBaseUtils {
             }
             return sb.toString();
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 读取
+     *
+     * @param rd
+     * @return
+     * @throws IOException
+     */
+    public static String readWithReader(Reader rd) {
+        try {
+            StringBuilder sb = new StringBuilder();
+            int cp;
+            while ((cp = rd.read()) != -1) {
+                sb.append((char)cp);
+            }
+            return sb.toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 字符编码指定格式读取
+     * @param inputStream 输入流
+     * @param charsetName 编码格式
+     * @return
+     */
+    public String readWithString(InputStream inputStream, String charsetName) {
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, charsetName));
+            return readWithReader(reader);
+        } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
     }
