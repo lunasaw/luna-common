@@ -17,8 +17,20 @@ public class ResultDTOUtils<T> {
         return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS);
     }
 
-    public static ResultDTO<?> success(Object object) {
+    public static <T> ResultDTO<T> success(T object) {
         return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, object);
+    }
+
+    public static ResultDTO<Void> success(int code, String message) {
+        return new ResultDTO<>(true, code, message);
+    }
+
+    public static <T> ResultDTO<T> success(int code, String message, T object) {
+        return new ResultDTO<>(true, code, message, object);
+    }
+
+    public static <T> ResultDTO<T> failure(T object) {
+        return new ResultDTO<>(false, ResultCode.ERROR_SYSTEM_EXCEPTION, ResultCode.MSG_ERROR_SYSTEM_EXCEPTION, object);
     }
 
     public static ResultDTO<Void> failure() {
@@ -29,7 +41,7 @@ public class ResultDTOUtils<T> {
         return new ResultDTO<>(false, code, message);
     }
 
-    public static ResultDTO<Object> failure(int code, String message, Object object) {
+    public static <T> ResultDTO<T> failure(int code, String message, T object) {
         return new ResultDTO<>(false, code, message, object);
     }
 }
