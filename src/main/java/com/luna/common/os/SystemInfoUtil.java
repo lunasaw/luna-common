@@ -1,19 +1,20 @@
 package com.luna.common.os;
 
+import com.google.common.collect.Lists;
+import org.apache.commons.lang3.RandomUtils;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.util.Properties;
+import java.net.*;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 获取当前系统信息
  */
 public class SystemInfoUtil {
-    private static InetAddress    localHost     = null;
+    private static InetAddress localHost = null;
 
     public static InetAddress getLocalHost() {
         try {
@@ -85,15 +86,60 @@ public class SystemInfoUtil {
      *
      * @return Mac地址，例如：F0-4D-A2-39-24-A6
      */
-    public static String getMac() {
-        NetworkInterface byInetAddress;
+    public static String getMac(InetAddress addr) {
         try {
-            byInetAddress = NetworkInterface.getByInetAddress(getLocalHost());
+            NetworkInterface byInetAddress = NetworkInterface.getByInetAddress(addr);
             byte[] hardwareAddress = byInetAddress.getHardwareAddress();
             return getMacFromBytes(hardwareAddress);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static String getMac() {
+        return getMac(getLocalHost());
+    }
+
+    /**
+     * 获取所有网卡的Mac地址
+     * 
+     * @return
+     */
+    public static List<String> getMacList() {
+        try {
+            ArrayList<String> list = Lists.newArrayList();
+            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+            while (networkInterfaces.hasMoreElements()) {
+                NetworkInterface iface = networkInterfaces.nextElement();
+                List<InterfaceAddress> addrs = iface.getInterfaceAddresses();
+                List<String> collect = addrs.stream().filter(interfaceAddress -> {
+                    try {
+                        return NetworkInterface.getByInetAddress(interfaceAddress.getAddress())
+                            .getHardwareAddress() != null;
+                    } catch (SocketException e) {
+                        return false;
+                    }
+                }).map(address -> getMac(address.getAddress()))
+                    .distinct().collect(Collectors.toList());
+                list.addAll(collect);
+            }
+            return list.stream().distinct().collect(Collectors.toList());
+        } catch (SocketException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 获取本机随机Mac地址
+     * @return
+     */
+    public static String getRandomMac() {
+        List<String> macList = getMacList();
+        return macList.get(RandomUtils.nextInt(0, macList.size() - 1));
+    }
+
+    public static void main(String[] args) {
+        System.out.println(getRandomMac());
     }
 
     /**
