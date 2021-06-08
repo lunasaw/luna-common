@@ -4,15 +4,15 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.w3c.dom.Document;
 
 /**
- * 2018/7/3
+ * 2020/7/3
  * 
  * @author luna_mac
  */
 public final class XmlUtil {
+
     public static DocumentBuilder newDocumentBuilder() throws ParserConfigurationException {
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
@@ -29,4 +29,5 @@ public final class XmlUtil {
     public static Document newDocument() throws ParserConfigurationException {
         return newDocumentBuilder().newDocument();
     }
+
 }

@@ -1,6 +1,6 @@
 # luna-common
 
-isczy.tk luna-common
+www.isczy.tk luna-common
 
 # Contributor
 
@@ -15,7 +15,7 @@ isczy.tk luna-common
 <dependency>
     <groupId>com.github.czy1024</groupId>
     <artifactId>luna-common</artifactId>
-    <version>1.1.5</version>
+    <version>1.2.1</version>
 </dependency>
 
 ```
