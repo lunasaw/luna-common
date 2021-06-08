@@ -8,14 +8,14 @@ www.isczy.tk luna-common
 
 # Use
 
-[文档链接](https://czy1024.github.io/luna-common/)
+[文档链接](https://lunasaw.github.io/luna-common/)
 
 ```xml
 
 <dependency>
     <groupId>com.github.czy1024</groupId>
     <artifactId>luna-common</artifactId>
-    <version>1.2.1</version>
+    <version>1.3.0</version>
 </dependency>
 
 ```
