@@ -1,16 +1,11 @@
 package com.luna.common.net;
 
-import java.io.*;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import javax.net.ssl.SSLContext;
-
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.luna.common.net.method.HttpDelete;
 import com.luna.common.text.CharsetKit;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.*;
 import org.apache.http.client.config.RequestConfig;
@@ -37,8 +32,16 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.util.EntityUtils;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
+
+import javax.net.ssl.SSLContext;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Luna
@@ -269,6 +272,43 @@ public class HttpUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static String buildUrlObject(String host, String path, Map<String, Object> queries) {
+        StringBuilder sbUrl = new StringBuilder();
+        sbUrl.append(host);
+
+        if (StringUtils.isNotBlank(path)) {
+            sbUrl.append(path);
+        }
+
+        if (MapUtils.isNotEmpty(queries)) {
+            StringBuilder sbQuery = new StringBuilder();
+            for (Map.Entry<String, Object> query : queries.entrySet()) {
+                if (0 < sbQuery.length()) {
+                    sbQuery.append("&");
+                }
+                if (StringUtils.isBlank(query.getKey()) && ObjectUtils.isNotEmpty(query.getValue())) {
+                    sbQuery.append(query.getValue());
+                }
+                if (StringUtils.isNotBlank(query.getKey())) {
+                    sbQuery.append(query.getKey());
+                    if (ObjectUtils.isNotEmpty(query.getValue())) {
+                        sbQuery.append("=");
+                        try {
+                            sbQuery.append(URLEncoder.encode(String.valueOf(query.getValue()), CharsetKit.UTF_8));
+                        } catch (UnsupportedEncodingException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+            }
+            if (0 < sbQuery.length()) {
+                sbUrl.append("?").append(sbQuery);
+            }
+        }
+
+        return sbUrl.toString();
     }
 
     /**

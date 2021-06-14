@@ -15,4 +15,6 @@ public interface HttpUtilsConstant {
     String MSEXCEL               = "application/msexcel";
 
     String TEXT                  = "text/html; charset=UTF-8";
+
+    String MEDIA                 = "application/octet-stream";
 }

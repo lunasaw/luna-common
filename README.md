@@ -15,7 +15,7 @@ www.isczy.tk luna-common
 <dependency>
     <groupId>com.github.czy1024</groupId>
     <artifactId>luna-common</artifactId>
-    <version>1.3.0</version>
+    <version>1.3.2</version>
 </dependency>
 
 ```

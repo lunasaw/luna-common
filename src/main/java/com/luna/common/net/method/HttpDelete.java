@@ -9,6 +9,8 @@ import java.net.URI;
  * 2021年05月12日 09:28
  */
 public class HttpDelete extends HttpEntityEnclosingRequestBase {
+
+
     public final static String METHOD_NAME = "DELETE";
 
     public HttpDelete() {
