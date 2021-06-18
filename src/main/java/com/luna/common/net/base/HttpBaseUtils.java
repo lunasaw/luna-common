@@ -50,9 +50,8 @@ public class HttpBaseUtils {
      * @return
      * @throws IOException
      */
-    public static InputStream
-        doURL(String host, String path, String method, Map<String, String> headers,
-            Map<String, String> queries, String body) {
+    public static InputStream doURL(String host, String path, String method, Map<String, String> headers,
+        Map<String, String> queries, String body) {
         try {
             HttpURLConnection conn = getConnection(host, path, method, headers, queries);
             if (!Objects.isNull(body)) {
@@ -66,6 +65,59 @@ public class HttpBaseUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * doURL
+     *
+     * @param host 主机地址
+     * @param path 路径
+     * @param headers 请求头
+     * @param queries 请求参数
+     * @param file 请求体
+     * @return
+     * @throws IOException
+     */
+    public static InputStream doURL(String host, String path, String method, Map<String, String> headers,
+        Map<String, String> queries, File file) {
+        DataOutputStream out = null;
+        DataInputStream in = null;
+        try {
+            HttpURLConnection conn = getConnection(host, path, method, headers, queries);
+            if (!Objects.isNull(file)) {
+                out = new DataOutputStream(conn.getOutputStream());
+                in = new DataInputStream(new FileInputStream(file));
+                conn.setDoOutput(true);
+                int bytes = 0;
+                byte[] bufferOut = new byte[1024];
+                while ((bytes = in.read(bufferOut)) != -1) {
+                    out.write(bufferOut, 0, bytes);
+                }
+                out.flush();
+            }
+            return conn.getInputStream();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                assert out != null;
+                out.close();
+                assert in != null;
+                in.close();
+            } catch (IOException ignored) {
+
+            }
+        }
+    }
+
+    public static byte[] doURLWithByte(String host, String path, String method, Map<String, String> headers,
+        Map<String, String> queries, File file) {
+        return readWithByte(doURL(host, path, method, headers, queries, file));
+    }
+
+    public static String doURLWithString(String host, String path, String method, Map<String, String> headers,
+        Map<String, String> queries, File file) {
+        return readWithString(doURL(host, path, method, headers, queries, file));
     }
 
     public static byte[] doURLWithByte(String host, String path, String method, Map<String, String> headers,
@@ -158,6 +210,7 @@ public class HttpBaseUtils {
 
     /**
      * 字符编码指定格式读取
+     * 
      * @param inputStream 输入流
      * @param charsetName 编码格式
      * @return
