@@ -117,7 +117,7 @@ public class HttpUtils {
     }
 
     /**
-     * get
+     * 发送 get 请求
      *
      * @param host 主机地址
      * @param path 路径
@@ -162,14 +162,14 @@ public class HttpUtils {
     }
 
     /**
-     * put request
+     * PUT 方法请求
      * 
      * @param host 主机地址
      * @param path 路径
      * @param headers 请求头
      * @param queries 请求参数
-     * @param body
-     * @return
+     * @param body 请求体
+     * @return HttpResponse
      */
     public static HttpResponse doPut(String host, String path, Map<String, String> headers,
         Map<String, String> queries, String body) {
@@ -186,13 +186,14 @@ public class HttpUtils {
     }
 
     /**
-     * Post form 文件
+     * POST 发送文件请求
      *
      * @param host 主机地址
      * @param path 路径
      * @param headers 请求头
      * @param queries 请求参数
-     * @return
+     * @param bodies 文件列表
+     * @return HttpResponse
      * @throws Exception
      */
     public static HttpResponse doPost(String host, String path, Map<String, String> headers,
@@ -225,7 +226,7 @@ public class HttpUtils {
     }
 
     /**
-     * Post String
+     * POST请求体为字符串
      *
      * @param host 主机地址
      * @param path 路径
@@ -233,7 +234,7 @@ public class HttpUtils {
      * @param queries 请求参数
      * @param body 请求体
      * @return HttpResponse
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static HttpResponse doPost(String host, String path, Map<String, String> headers,
         Map<String, String> queries, String body) {
@@ -257,8 +258,8 @@ public class HttpUtils {
      * @param headers 请求头
      * @param queries 请求参数
      * @param body 请求体
-     * @return
-     * @throws Exception
+     * @return HttpResponse
+     * @throws RuntimeException
      */
     public static HttpResponse doPost(String host, String path, Map<String, String> headers,
         Map<String, String> queries, byte[] body) {
@@ -274,41 +275,51 @@ public class HttpUtils {
         }
     }
 
-    public static String buildUrlObject(String host, String path, Map<String, Object> queries) {
+    /**
+     * 构建请求路径
+     * 
+     * @param host 主机地址
+     * @param path 请求路径
+     * @return String
+     */
+    public static String buildUrlHead(String host, String path) {
         StringBuilder sbUrl = new StringBuilder();
         sbUrl.append(host);
 
         if (StringUtils.isNotBlank(path)) {
+            if (!path.startsWith("/")) {
+                path += "/";
+            }
             sbUrl.append(path);
         }
 
-        if (MapUtils.isNotEmpty(queries)) {
-            StringBuilder sbQuery = new StringBuilder();
-            for (Map.Entry<String, Object> query : queries.entrySet()) {
-                if (0 < sbQuery.length()) {
-                    sbQuery.append("&");
-                }
-                if (StringUtils.isBlank(query.getKey()) && ObjectUtils.isNotEmpty(query.getValue())) {
-                    sbQuery.append(query.getValue());
-                }
-                if (StringUtils.isNotBlank(query.getKey())) {
-                    sbQuery.append(query.getKey());
-                    if (ObjectUtils.isNotEmpty(query.getValue())) {
-                        sbQuery.append("=");
-                        try {
-                            sbQuery.append(URLEncoder.encode(String.valueOf(query.getValue()), CharsetKit.UTF_8));
-                        } catch (UnsupportedEncodingException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                }
-            }
-            if (0 < sbQuery.length()) {
-                sbUrl.append("?").append(sbQuery);
-            }
-        }
-
         return sbUrl.toString();
+    }
+
+    /**
+     * 构建请求路径
+     * 
+     * @param host 主机地址
+     * @param path 请求路径
+     * @param queries 请求参数
+     * @return String
+     */
+    public static String buildUrlObject(String host, String path, Map<String, Object> queries) {
+
+        return buildUrl(host, path, queries);
+    }
+
+    /**
+     * 构建请求路径
+     * 
+     * @param host 主机地址
+     * @param path 请求路径
+     * @param queries 请求参数
+     * @return String
+     */
+    public static String buildUrlString(String host, String path, Map<String, String> queries) {
+
+        return buildUrl(host, path, queries);
     }
 
     /**
@@ -317,37 +328,13 @@ public class HttpUtils {
      * @param host 主机地址
      * @param path 路径
      * @param queries 请求参数
-     * @return
+     * @return String
      */
-    public static String buildUrl(String host, String path, Map<String, String> queries) {
-        StringBuilder sbUrl = new StringBuilder();
-        sbUrl.append(host);
-
-        if (StringUtils.isNotBlank(path)) {
-            sbUrl.append(path);
-        }
+    public static String buildUrl(String host, String path, Map<?, ?> queries) {
+        StringBuilder sbUrl = new StringBuilder(buildUrlHead(host, path));
 
         if (MapUtils.isNotEmpty(queries)) {
-            StringBuilder sbQuery = new StringBuilder();
-            for (Map.Entry<String, String> query : queries.entrySet()) {
-                if (0 < sbQuery.length()) {
-                    sbQuery.append("&");
-                }
-                if (StringUtils.isBlank(query.getKey()) && StringUtils.isNotBlank(query.getValue())) {
-                    sbQuery.append(query.getValue());
-                }
-                if (StringUtils.isNotBlank(query.getKey())) {
-                    sbQuery.append(query.getKey());
-                    if (StringUtils.isNotBlank(query.getValue())) {
-                        sbQuery.append("=");
-                        try {
-                            sbQuery.append(URLEncoder.encode(query.getValue(), CharsetKit.UTF_8));
-                        } catch (UnsupportedEncodingException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                }
-            }
+            String sbQuery = urlEncode(queries);
             if (0 < sbQuery.length()) {
                 sbUrl.append("?").append(sbQuery);
             }
@@ -359,8 +346,8 @@ public class HttpUtils {
     /**
      * 检测响应体
      *
-     * @param httpResponse
-     * @return
+     * @param httpResponse 响应体
+     * @return String
      */
     public static String checkResponseAndGetResult(HttpResponse httpResponse, boolean isEnsure) {
         if (httpResponse == null) {
@@ -383,7 +370,7 @@ public class HttpUtils {
     /**
      * 检测响应体获取相应流
      *
-     * @param httpResponse
+     * @param httpResponse 响应体
      * @return
      */
     public static byte[] checkResponseStreamAndGetResult(HttpResponse httpResponse) {
@@ -409,18 +396,19 @@ public class HttpUtils {
      * 
      * @param map 键值对
      * @return 生成的URL尾部
-     * @throws UnsupportedEncodingException
      */
-    public static String urlEncode(Map<?, ?> map) throws UnsupportedEncodingException {
+    public static String urlEncode(Map<?, ?> map) {
         StringBuilder sb = new StringBuilder();
-        for (Map.Entry<?, ?> entry : map.entrySet()) {
-            if (sb.length() > 0) {
-                sb.append("&");
+        map.forEach((k, v) -> {
+            try {
+                sb.append(String.format("%s=%s",
+                    URLEncoder.encode(k.toString(), CharsetKit.UTF_8),
+                    URLEncoder.encode(v.toString(), CharsetKit.UTF_8)));
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
             }
-            sb.append(String.format("%s=%s",
-                URLEncoder.encode(entry.getKey().toString(), "UTF-8"),
-                URLEncoder.encode(entry.getValue().toString(), "UTF-8")));
-        }
+        });
+
         return sb.toString();
     }
 
@@ -462,8 +450,8 @@ public class HttpUtils {
     /**
      * 检测状态码
      * 
-     * @param httpResponse
-     * @param statusList
+     * @param httpResponse 响应体
+     * @param statusList 检测状态表
      */
     private static void checkCode(HttpResponse httpResponse, List<Integer> statusList) {
         if (httpResponse == null) {
@@ -480,20 +468,18 @@ public class HttpUtils {
     /**
      * 解析响应体
      * 
-     * @param httpResponse
-     * @return
+     * @param httpResponse 响应体
+     * @return String
      */
     public static String checkResponseAndGetResult(HttpResponse httpResponse) {
         return checkResponseAndGetResult(httpResponse, ImmutableList.of(HttpStatus.SC_OK));
     }
 
-
-
     /**
      * 检查是不是网络路径
      *
      * @param url
-     * @return
+     * @return boolean
      */
     public static boolean isNetUrl(String url) {
         boolean reault = false;

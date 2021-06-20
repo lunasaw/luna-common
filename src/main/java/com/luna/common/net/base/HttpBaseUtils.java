@@ -170,8 +170,8 @@ public class HttpBaseUtils {
     /**
      * 读取字符
      *
-     * @param inputStream
-     * @return
+     * @param inputStream 输入流
+     * @return String
      * @throws IOException
      */
     public static String readWithString(InputStream inputStream, int bufferSize) {
@@ -191,8 +191,8 @@ public class HttpBaseUtils {
     /**
      * 读取
      *
-     * @param rd
-     * @return
+     * @param rd 输入字符流
+     * @return String
      * @throws IOException
      */
     public static String readWithReader(Reader rd) {
@@ -213,7 +213,7 @@ public class HttpBaseUtils {
      * 
      * @param inputStream 输入流
      * @param charsetName 编码格式
-     * @return
+     * @return String
      */
     public static String readWithString(InputStream inputStream, String charsetName) {
         try {
@@ -224,10 +224,24 @@ public class HttpBaseUtils {
         }
     }
 
+    /**
+     * 读取字符
+     *
+     * @param inputStream 输入流
+     * @return String
+     * @throws IOException
+     */
     public static String readWithString(InputStream inputStream) {
         return readWithString(inputStream, DEFAULT_BUFFER_SIZE);
     }
 
+    /**
+     * 读取字节
+     *
+     * @param inputStream 输入流
+     * @return String
+     * @throws IOException
+     */
     public static byte[] readWithByte(InputStream inputStream) {
         return readWithByte(inputStream, DEFAULT_BUFFER_SIZE);
     }
