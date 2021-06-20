@@ -13,7 +13,7 @@ www.isczy.tk luna-common
 ```xml
 
 <dependency>
-    <groupId>com.github.czy1024</groupId>
+    <groupId>io.github.lunasaw</groupId>
     <artifactId>luna-common</artifactId>
     <version>1.3.4</version>
 </dependency>
