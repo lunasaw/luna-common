@@ -5,6 +5,7 @@ com.luna.common.dto.constant
 com.luna.common.encrypt
 com.luna.common.exception
 com.luna.common.file
+com.luna.common.media
 com.luna.common.net
 com.luna.common.net.base
 com.luna.common.net.method
