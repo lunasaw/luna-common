@@ -5,6 +5,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+/**
+ * @author luna
+ */
 public class PcmUtils {
     public PcmUtils() {
     }

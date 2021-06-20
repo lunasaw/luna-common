@@ -7,7 +7,7 @@
     <groupId>io.github.lunasaw</groupId>
     <artifactId>luna-common</artifactId>
     <name>luna-common</name>
-    <version>1.3.3</version>
+    <version>1.3.4</version>
     <description>common is project which contains common utils</description>
     <url>https://github.com/lunasaw/luna-common</url>
 
@@ -99,14 +99,14 @@
 
 
     <distributionManagement>
-<!--        <repository>-->
-<!--            <id>ossrh</id>-->
-<!--            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>-->
-<!--        </repository>-->
-<!--        <snapshotRepository>-->
-<!--            <id>ossrh</id>-->
-<!--            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>-->
-<!--        </snapshotRepository>-->
+        <!--        <repository>-->
+        <!--            <id>ossrh</id>-->
+        <!--            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>-->
+        <!--        </repository>-->
+        <!--        <snapshotRepository>-->
+        <!--            <id>ossrh</id>-->
+        <!--            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>-->
+        <!--        </snapshotRepository>-->
 
 
         <!-- 两个ID必须与setting.xml中的<server><id>nexus-releases</id></server>保持一致-->

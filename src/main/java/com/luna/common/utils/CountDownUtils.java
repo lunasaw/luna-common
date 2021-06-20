@@ -1,10 +1,8 @@
 package com.luna.common.utils;
 
+
 /**
- * @author luna@mac
- * @className CountDownUtils.java
- * @description TODO
- * @createTime 2021年01月12日 23:50:00
+ * @author luna
  */
 public class CountDownUtils {
 
