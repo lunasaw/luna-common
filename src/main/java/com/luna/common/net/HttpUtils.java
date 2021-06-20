@@ -401,9 +401,11 @@ public class HttpUtils {
         StringBuilder sb = new StringBuilder();
         map.forEach((k, v) -> {
             try {
-                sb.append(String.format("%s=%s",
-                    URLEncoder.encode(k.toString(), CharsetKit.UTF_8),
-                    URLEncoder.encode(v.toString(), CharsetKit.UTF_8)));
+                if (ObjectUtils.isNotEmpty(k) && ObjectUtils.isNotEmpty(v)) {
+                    sb.append(String.format("%s=%s",
+                        URLEncoder.encode(k.toString(), CharsetKit.UTF_8),
+                        URLEncoder.encode(v.toString(), CharsetKit.UTF_8)));
+                }
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
             }
