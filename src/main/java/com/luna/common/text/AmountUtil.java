@@ -65,7 +65,7 @@ public class AmountUtil {
         if (!amount.matches(CURRENCY_FEN_REGEX)) {
             throw new Exception("金额格式有误");
         }
-        return BigDecimal.valueOf(Long.valueOf(amount)).divide(new BigDecimal(100)).toString();
+        return BigDecimal.valueOf(Long.parseLong(amount)).divide(new BigDecimal(100)).toString();
     }
 
     /**

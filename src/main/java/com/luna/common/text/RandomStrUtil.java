@@ -5,11 +5,8 @@ import java.util.Random;
 import java.util.UUID;
 
 /**
- * @Package: com.luna.common.utils.text
- * @ClassName: RandomStrUtil
- * @Author: luna
- * @CreateTime: 2020/8/16 13:43
- * @Description:
+ * 随机字符串
+ * @author luna
  */
 public class RandomStrUtil {
 

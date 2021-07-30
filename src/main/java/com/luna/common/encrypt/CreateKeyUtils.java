@@ -2,6 +2,7 @@ package com.luna.common.encrypt;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.luna.common.constant.Constant;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,31 +10,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 自动生成密码
- * Usage: java CreateKey length count
- * length-密码长度，最小为6
- * count -密码个数
- * 
- * @author luna_mac
+ * @author luna
  */
-
 public class CreateKeyUtils {
-
-    /** 数字个数 */
-    public static final int    NUMBER_CASE = 1;
-    /** 小写字母 */
-    public static final int    LOWER_CASE  = 1;
-    /** 大写字母 */
-    public static final int    UPPER_CASE  = 1;
-    /** 字符 */
-    public static final int    STR_CASE    = 1;
-    public static final String TABLE       = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz!@#$";
-    public static final String TABLE_TWO   = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz!@#$^&*<>/.,";
-
-    public static void main(String[] args) {
-        System.out.println(getRandomKeys(10));
-    }
-
     /**
      * 随机生成密码 默认都最小有1个
      * 
@@ -41,7 +20,8 @@ public class CreateKeyUtils {
      * @return
      */
     public static String getRandomKeys(int intLength) {
-        return getRandomKeys(intLength, NUMBER_CASE, LOWER_CASE, UPPER_CASE, STR_CASE);
+        return getRandomKeys(intLength, Constant.NUMBER_ONE, Constant.NUMBER_ONE, Constant.NUMBER_ONE,
+            Constant.NUMBER_ONE);
     }
 
     /**
@@ -62,14 +42,18 @@ public class CreateKeyUtils {
     /**
      * 生成指定长度的密码
      * 
-     * @param intLength
+     * @param intLength 总长度
+     * @param numbercaseMax 数字个数
+     * @param lowercaseMax 小写字母
+     * @param uppercaseMax 大写字母
+     * @param strcaseMax 字符
      * @return
      */
     public static String getRandomKeys(int intLength, int numbercaseMax, int lowercaseMax, int uppercaseMax,
         int strcaseMax) {
 
         StringBuilder retStr; // 生成的密码
-        String strTable = TABLE;
+        String strTable = Constant.TABLE;
         // 密码使用符号，可更改
 
         int len = strTable.length();

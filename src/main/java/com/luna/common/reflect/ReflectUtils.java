@@ -2,8 +2,7 @@ package com.luna.common.reflect;
 
 import java.lang.reflect.*;
 import java.util.Date;
-
-import com.luna.common.date.DateUtil;
+import com.luna.common.date.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
@@ -139,7 +138,7 @@ public class ReflectUtils {
                         args[i] = ConvertUtil.toFloat(args[i]);
                     } else if (cs[i] == Date.class) {
                         if (args[i] instanceof String) {
-                            args[i] = DateUtil.parseDate(args[i]);
+                            args[i] = DateUtils.parseDate((String) args[i]);
                         } else {
                             args[i] = new Date((Long)args[i]);
                         }

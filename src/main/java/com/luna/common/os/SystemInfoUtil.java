@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 /**
  * 获取当前系统信息
+ * @author luna
  */
 public class SystemInfoUtil {
     private static InetAddress localHost = null;
@@ -136,10 +137,6 @@ public class SystemInfoUtil {
     public static String getRandomMac() {
         List<String> macList = getMacList();
         return macList.get(RandomUtils.nextInt(0, macList.size() - 1));
-    }
-
-    public static void main(String[] args) {
-        System.out.println(getRandomMac());
     }
 
     /**
