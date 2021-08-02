@@ -19,6 +19,30 @@ public class EncryptUtils {
     private static final char[] hexDigits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd',
         'e', 'f'};
 
+
+    /**
+     * 根据内容生成一串校验和
+     *
+     * @param md5Prefix 指定前缀
+     * @param md5Postfix 指定后缀
+     * @param toDigest 原内容
+     * @return 校验和
+     * @throws Exception
+     */
+    public static String md5Checksum(String md5Prefix, String md5Postfix, String toDigest) {
+
+        try {
+            String md5Unid = md5Prefix + toDigest + md5Postfix;
+            MessageDigest md5 = MessageDigest.getInstance("MD5");
+            byte[] checksum = md5.digest(md5Unid.getBytes());
+
+            return Integer.toHexString(checksum[0] & 0xff) +
+                    Integer.toHexString(checksum[1] & 0xff);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * 获得一个字符串的encrypt值
      *

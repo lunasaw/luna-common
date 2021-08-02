@@ -139,7 +139,7 @@ public class HttpUtils {
 
     /**
      * delete request
-     * 
+     *
      * @param host 主机地址
      * @param path 路径
      * @param headers 请求头
@@ -163,7 +163,7 @@ public class HttpUtils {
 
     /**
      * PUT 方法请求
-     * 
+     *
      * @param host 主机地址
      * @param path 路径
      * @param headers 请求头
@@ -277,7 +277,7 @@ public class HttpUtils {
 
     /**
      * 构建请求路径
-     * 
+     *
      * @param host 主机地址
      * @param path 请求路径
      * @return String
@@ -298,7 +298,7 @@ public class HttpUtils {
 
     /**
      * 构建请求路径
-     * 
+     *
      * @param host 主机地址
      * @param path 请求路径
      * @param queries 请求参数
@@ -311,7 +311,7 @@ public class HttpUtils {
 
     /**
      * 构建请求路径
-     * 
+     *
      * @param host 主机地址
      * @param path 请求路径
      * @param queries 请求参数
@@ -324,7 +324,7 @@ public class HttpUtils {
 
     /**
      * 构建url
-     * 
+     *
      * @param host 主机地址
      * @param path 路径
      * @param queries 请求参数
@@ -393,7 +393,7 @@ public class HttpUtils {
 
     /**
      * 解析生成URL
-     * 
+     *
      * @param map 键值对
      * @return 生成的URL尾部
      */
@@ -414,9 +414,21 @@ public class HttpUtils {
         return sb.toString();
     }
 
+    public static String urlEncodeWithUtf8(String s) {
+        return urlEncode(s, CharsetKit.UTF_8);
+    }
+
+    public static String urlEncode(String s, String chareset) {
+        try {
+            return URLEncoder.encode(s, chareset);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * 检测响应体并解析
-     * 
+     *
      * @param httpResponse 响应体
      * @param statusList 状态码列表
      * @return 解析字节
@@ -433,7 +445,7 @@ public class HttpUtils {
 
     /**
      * 检测响应体并解析
-     * 
+     *
      * @param httpResponse 响应体
      * @param statusList 状态码列表
      * @return 解析字符串
@@ -451,7 +463,7 @@ public class HttpUtils {
 
     /**
      * 检测状态码
-     * 
+     *
      * @param httpResponse 响应体
      * @param statusList 检测状态表
      */
@@ -469,7 +481,7 @@ public class HttpUtils {
 
     /**
      * 解析响应体
-     * 
+     *
      * @param httpResponse 响应体
      * @return String
      */
