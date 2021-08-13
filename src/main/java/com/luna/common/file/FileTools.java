@@ -2,12 +2,14 @@ package com.luna.common.file;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import com.luna.common.constant.Constant;
 import com.luna.common.net.base.HttpBaseUtils;
 import com.luna.common.text.CharsetKit;
 import org.apache.commons.io.FileUtils;
@@ -24,13 +26,11 @@ public class FileTools {
      */
     public static List<String> readAllLines(String fileName) {
         try {
-            return Files.readAllLines(Paths.get(fileName), StandardCharsets.UTF_8);
+            return Files.readAllLines(Paths.get(fileName), Charset.defaultCharset());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
-
-
 
     /**
      * 删除文件或空目录
@@ -78,7 +78,7 @@ public class FileTools {
      */
     public static void write(String content, String fileName) {
         try {
-            Files.write(Paths.get(fileName), content.getBytes(StandardCharsets.UTF_8));
+            Files.write(Paths.get(fileName), content.getBytes(Charset.defaultCharset()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -106,14 +106,19 @@ public class FileTools {
      * @throws Exception
      */
     public static long count(String fileName) {
+        LineNumberReader reader = null;
         try {
-            LineNumberReader reader = new LineNumberReader(new FileReader(fileName));
+            reader = new LineNumberReader(new FileReader(fileName));
             reader.skip(Long.MAX_VALUE);
-            long lines = reader.getLineNumber();
-            reader.close();
-            return lines;
+            return reader.getLineNumber();
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            try {
+                reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -131,7 +136,7 @@ public class FileTools {
      */
     public static void download(String url, String file) {
         try {
-            FileUtils.copyURLToFile(new URL(url), new File(file), 5000, 5000);
+            FileUtils.copyURLToFile(new URL(url), new File(file), Constant.FIVE_THOUSAND, Constant.FIVE_THOUSAND);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -193,10 +198,11 @@ public class FileTools {
     public static void writeStringToFile(String path, String content, boolean override) {
         try {
             Path filePath = Paths.get(path);
-            if (!Files.exists(filePath)) {
-                if (override) {
-                    Files.createFile(filePath);
+            if (Files.notExists(filePath)) {
+                if (!override) {
+                    return;
                 }
+                Files.createFile(filePath);
             }
             FileUtils.writeStringToFile(new File(path), content, CharsetKit.UTF_8);
         } catch (IOException e) {
@@ -211,7 +217,7 @@ public class FileTools {
      */
     public static String readFileToString(String path) {
         try {
-            return FileUtils.readFileToString(new File(path), CharsetKit.UTF_8);
+            return FileUtils.readFileToString(new File(path), Charset.defaultCharset());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -14,9 +14,9 @@ import java.io.Serializable;
 public class ResultDTO<T> implements Serializable {
 
     /** 是否调用以及过参数校验 */
-    private boolean success = false;
+    private Boolean success;
     /** 业务code，见{@link ResultCode} */
-    private int     code;
+    private Integer     code;
     /** 业务消息，见{@link ResultCode} */
     private String  message;
     /** 返回值 */
@@ -67,5 +67,15 @@ public class ResultDTO<T> implements Serializable {
 
     public void setData(T data) {
         this.data = data;
+    }
+
+    @Override
+    public String toString() {
+        return "ResultDTO{" +
+                "success=" + success +
+                ", code=" + code +
+                ", message='" + message + '\'' +
+                ", data=" + data +
+                '}';
     }
 }

@@ -2,6 +2,7 @@ package com.luna.common.net;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.luna.common.constant.Constant;
 import com.luna.common.net.method.HttpDelete;
 import com.luna.common.text.CharsetKit;
 import org.apache.commons.collections4.MapUtils;
@@ -39,18 +40,16 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Luna
  */
 public class HttpUtils {
 
-    private static CloseableHttpClient httpClient;
+    private static final CloseableHttpClient httpClient;
 
-    private static BasicCookieStore    cookieStore;
+    private static final BasicCookieStore    cookieStore;
 
     static {
         SSLConnectionSocketFactory socketFactory = null;
@@ -86,6 +85,22 @@ public class HttpUtils {
                 .setDefaultCookieStore(cookieStore).build();
     }
 
+    public static boolean isUrl(String str) {
+        // 转换为小写
+        str = str.toLowerCase();
+        String regex = "^((https|http|ftp|rtsp|mms)?://)" // https、http、ftp、rtsp、mms
+                + "?(([0-9a-z_!~*'().&=+$%-]+: )?[0-9a-z_!~*'().&=+$%-]+@)?" // ftp的user@
+                + "(([0-9]{1,3}\\.){3}[0-9]{1,3}" // IP形式的URL- 例如：199.194.52.184
+                + "|" // 允许IP和DOMAIN（域名）
+                + "([0-9a-z_!~*'()-]+\\.)*" // 域名- www.
+                + "([0-9a-z][0-9a-z-]{0,61})?[0-9a-z]\\." // 二级域名
+                + "[a-z]{2,6})" // first level domain- .com or .museum
+                + "(:[0-9]{1,5})?" // 端口号最大为65535,5位数
+                + "((/?)|" // a slash isn't required if there is no file name
+                + "(/[0-9a-z_!~*'().;?:@&=+$,%#-]+)+/?)$";
+        return str.matches(regex);
+    }
+
     /**
      * 请求头构建
      *
@@ -93,11 +108,10 @@ public class HttpUtils {
      * @param requestBase
      */
     private static void builderHeader(Map<String, String> headers, HttpRequestBase requestBase) {
-        if (MapUtils.isNotEmpty(headers)) {
-            for (Map.Entry<String, String> e : headers.entrySet()) {
-                requestBase.addHeader(e.getKey(), e.getValue());
-            }
+        if (MapUtils.isEmpty(headers)) {
+            return;
         }
+        headers.forEach(requestBase::addHeader);
     }
 
     public static List<Cookie> getCookie() {
@@ -174,12 +188,12 @@ public class HttpUtils {
     public static HttpResponse doPut(String host, String path, Map<String, String> headers,
         Map<String, String> queries, String body) {
         try {
-            HttpPut request = new HttpPut(buildUrl(host, path, queries));
-            builderHeader(headers, request);
+            HttpPut httpPut = new HttpPut(buildUrl(host, path, queries));
+            builderHeader(headers, httpPut);
             if (StringUtils.isNotBlank(body)) {
-                request.setEntity(new StringEntity(body, Charset.defaultCharset()));
+                httpPut.setEntity(new StringEntity(body, Charset.defaultCharset()));
             }
-            return httpClient.execute(request);
+            return httpClient.execute(httpPut);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -194,17 +208,16 @@ public class HttpUtils {
      * @param queries 请求参数
      * @param bodies 文件列表
      * @return HttpResponse
-     * @throws Exception
+     * @throws Exception 运行时异常
      */
     public static HttpResponse doPost(String host, String path, Map<String, String> headers,
         Map<String, String> queries, Map<String, String> bodies) {
         HttpPost request = new HttpPost(buildUrl(host, path, queries));
         builderHeader(headers, request);
         if (MapUtils.isNotEmpty(bodies)) {
-            List<NameValuePair> nameValuePairList = Lists.newArrayList();
-            for (String key : bodies.keySet()) {
+            bodies.forEach((k, v) -> {
                 // 传入参数可以为file或者filePath，在此处做转换
-                File file = new File(bodies.get(key));
+                File file = new File(v);
                 MultipartEntityBuilder builder = MultipartEntityBuilder.create();
                 // 设置浏览器兼容模式
                 builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
@@ -212,11 +225,10 @@ public class HttpUtils {
                 builder.setCharset(Consts.UTF_8);
                 builder.setContentType(ContentType.MULTIPART_FORM_DATA);
                 // 添加文件
-                builder.addBinaryBody(key, file);
+                builder.addBinaryBody(k, file);
                 HttpEntity reqEntity = builder.build();
                 request.setEntity(reqEntity);
-                nameValuePairList.add(new BasicNameValuePair(key, bodies.get(key)));
-            }
+            });
         }
         try {
             return httpClient.execute(request);
@@ -265,7 +277,7 @@ public class HttpUtils {
         Map<String, String> queries, byte[] body) {
         HttpPost request = new HttpPost(buildUrl(host, path, queries));
         builderHeader(headers, request);
-        if (body != null) {
+        if (ObjectUtils.isNotEmpty(body)) {
             request.setEntity(new ByteArrayEntity(body));
         }
         try {
@@ -285,14 +297,12 @@ public class HttpUtils {
     public static String buildUrlHead(String host, String path) {
         StringBuilder sbUrl = new StringBuilder();
         sbUrl.append(host);
-
         if (StringUtils.isNotBlank(path)) {
-            if (!path.startsWith("/")) {
-                path += "/";
+            if (!path.startsWith(Constant.SPRIT)) {
+                path += Constant.SPRIT;
             }
             sbUrl.append(path);
         }
-
         return sbUrl.toString();
     }
 
@@ -332,14 +342,13 @@ public class HttpUtils {
      */
     public static String buildUrl(String host, String path, Map<?, ?> queries) {
         StringBuilder sbUrl = new StringBuilder(buildUrlHead(host, path));
-
-        if (MapUtils.isNotEmpty(queries)) {
-            String sbQuery = urlEncode(queries);
-            if (0 < sbQuery.length()) {
-                sbUrl.append("?").append(sbQuery);
-            }
+        if (MapUtils.isEmpty(queries)) {
+            return sbUrl.toString();
         }
-
+        String sbQuery = urlEncode(queries);
+        if (StringUtils.isNotBlank(sbQuery)) {
+            sbUrl.append(Constant.QUESTION).append(sbQuery);
+        }
         return sbUrl.toString();
     }
 
@@ -374,10 +383,10 @@ public class HttpUtils {
      * @return
      */
     public static byte[] checkResponseStreamAndGetResult(HttpResponse httpResponse) {
-        if (httpResponse == null) {
-            throw new RuntimeException();
+        if (Objects.isNull(httpResponse)) {
+            throw new NullPointerException();
         }
-        if (httpResponse.getStatusLine() == null) {
+        if (Objects.isNull(httpResponse.getStatusLine())) {
             throw new RuntimeException();
         }
         if (HttpStatus.SC_OK != httpResponse.getStatusLine().getStatusCode()) {
@@ -488,22 +497,4 @@ public class HttpUtils {
     public static String checkResponseAndGetResult(HttpResponse httpResponse) {
         return checkResponseAndGetResult(httpResponse, ImmutableList.of(HttpStatus.SC_OK));
     }
-
-    /**
-     * 检查是不是网络路径
-     *
-     * @param url
-     * @return boolean
-     */
-    public static boolean isNetUrl(String url) {
-        boolean reault = false;
-        if (url != null) {
-            if (url.toLowerCase().startsWith("http") || url.toLowerCase().startsWith("rtsp")
-                || url.toLowerCase().startsWith("mms")) {
-                reault = true;
-            }
-        }
-        return reault;
-    }
-
 }

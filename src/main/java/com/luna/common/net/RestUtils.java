@@ -12,7 +12,6 @@ import com.google.common.collect.Maps;
  * @author Luna
  */
 public class RestUtils {
-    private static final String ENCODE = "utf-8";
 
     public static String doGet(String host, String path, Map<String, String> headers,
         Map<String, String> queries) {
@@ -25,7 +24,7 @@ public class RestUtils {
         if (MapUtils.isEmpty(headers)) {
             headers = Maps.newHashMap();
         }
-        headers.put("Content-Type", "application/json");
+        headers.put(HttpContentTypeEnum.CONTENT_TYPE_JSON.getKey(), HttpContentTypeEnum.CONTENT_TYPE_JSON.getValue());
         HttpResponse httpResponse = HttpUtils.doPost(host, path, headers, queries, body);
         return HttpUtils.checkResponseAndGetResult(httpResponse);
     }

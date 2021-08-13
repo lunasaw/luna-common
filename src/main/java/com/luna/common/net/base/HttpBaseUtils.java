@@ -105,7 +105,7 @@ public class HttpBaseUtils {
                 assert in != null;
                 in.close();
             } catch (IOException ignored) {
-
+                ignored.printStackTrace();
             }
         }
     }

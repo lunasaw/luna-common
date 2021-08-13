@@ -12,9 +12,11 @@ import java.util.stream.Collectors;
 
 /**
  * 获取当前系统信息
+ * 
  * @author luna
  */
 public class SystemInfoUtil {
+    public static final String STR       = "卷的序列号是 ";
     private static InetAddress localHost = null;
 
     public static InetAddress getLocalHost() {
@@ -65,11 +67,11 @@ public class SystemInfoUtil {
 
             while ((line = buffreader.readLine()) != null) {
 
-                if (line.indexOf("卷的序列号是 ") != -1) {
+                if (line.contains(STR)) {
                     // 读取参数并获取硬盘序列号
 
-                    HdSerial = line.substring(line.indexOf("卷的序列号是 ")
-                        + "卷的序列号是 ".length(), line.length());
+                    HdSerial = line.substring(line.indexOf(STR)
+                        + STR.length(), line.length());
                     break;
                 }
             }
@@ -132,6 +134,7 @@ public class SystemInfoUtil {
 
     /**
      * 获取本机随机Mac地址
+     * 
      * @return
      */
     public static String getRandomMac() {

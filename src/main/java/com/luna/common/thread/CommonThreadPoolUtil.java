@@ -3,14 +3,8 @@ package com.luna.common.thread;
 import com.luna.common.dto.ResultDTO;
 import com.luna.common.dto.ResultDTOUtils;
 import com.luna.common.dto.constant.ResultCode;
-import com.sun.org.slf4j.internal.Logger;
-import com.sun.org.slf4j.internal.LoggerFactory;
-import sun.nio.ch.ThreadPool;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.*;
 
 /**
@@ -42,8 +36,6 @@ public class CommonThreadPoolUtil {
                                                                          }
                                                                      };
 
-    private static final Logger                log                   =
-        LoggerFactory.getLogger(CommonThreadPoolUtil.class);
 
     /** 初始化线程池 */
     private MyselfThreadPoolExecutor           threadPool            =
@@ -153,9 +145,9 @@ public class CommonThreadPoolUtil {
                 threadPool.setCorePoolSize(currentcorePoolSize);
                 threadPool.setMaximumPoolSize(currentcorePoolSize);
                 cacheCorePoolSize = currentcorePoolSize;
-                log.warn("动态改变线程池大小====原核心线程池数目为：" + corePoolSize + ";现累加为：" + currentcorePoolSize);
+                System.out.println("动态改变线程池大小====原核心线程池数目为：" + corePoolSize + ";现累加为：" + currentcorePoolSize);
             } else {
-                log.warn("动态改变线程池大小====核心线程池数目已累加为：" + cacheCorePoolSize + "；不会继续无限增加");
+                System.out.println("动态改变线程池大小====核心线程池数目已累加为：" + cacheCorePoolSize + "；不会继续无限增加");
             }
         }
     }

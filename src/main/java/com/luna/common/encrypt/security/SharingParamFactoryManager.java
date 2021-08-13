@@ -1,7 +1,4 @@
 package com.luna.common.encrypt.security;
-
-import java.util.Arrays;
-
 /**
  * @author luna
  */

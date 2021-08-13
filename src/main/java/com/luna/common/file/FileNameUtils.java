@@ -1,5 +1,8 @@
 package com.luna.common.file;
 
+import com.luna.common.constant.Constant;
+import org.apache.commons.lang3.ObjectUtils;
+
 import java.io.*;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -84,15 +87,20 @@ public class FileNameUtils {
      * 获取文件类型,包括图片,若格式不是已配置的,则返回null
      */
     public static String getFileTypeByFile(File file) {
+        InputStream is = null;
         try {
-            byte[] b = new byte[50];
-            InputStream is = new FileInputStream(file);
-            is.read(b);
-            String filetype = getFileTypeByStream(b);
-            is.close();
-            return filetype;
+            byte[] b = new byte[Constant.NUMBER_FIFTY];
+            is = new FileInputStream(file);
+            int read = is.read(b);
+            return getFileTypeByStream(b);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            try {
+                is.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -116,14 +124,14 @@ public class FileNameUtils {
      */
     public static String getFileHexString(byte[] b) {
         StringBuilder stringBuilder = new StringBuilder();
-        if (b == null || b.length <= 0) {
+        if (ObjectUtils.isEmpty(b)) {
             return null;
         }
         for (byte value : b) {
             int v = value & 0xFF;
             String hv = Integer.toHexString(v);
-            if (hv.length() < 2) {
-                stringBuilder.append(0);
+            if (hv.length() < Constant.NUMBER_TWO) {
+                stringBuilder.append(Constant.NUMBER_ZERO);
             }
             stringBuilder.append(hv);
         }

@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 /**
  * 字符集工具类
@@ -27,11 +28,11 @@ public class CharsetKit {
     /**
      * ISO-8859-1
      */
-    public static final Charset CHARSET_ISO_8859_1 = Charset.forName(ISO_8859_1);
+    public static final Charset CHARSET_ISO_8859_1 = StandardCharsets.ISO_8859_1;
     /**
      * UTF-8
      */
-    public static final Charset CHARSET_UTF_8      = Charset.forName(UTF_8);
+    public static final Charset CHARSET_UTF_8      = StandardCharsets.UTF_8;
     /**
      * GBK
      */
@@ -68,11 +69,11 @@ public class CharsetKit {
      * @return 转换后的字符集
      */
     public static String convert(String source, Charset srcCharset, Charset destCharset) {
-        if (null == srcCharset) {
+        if (Objects.isNull(srcCharset)) {
             srcCharset = StandardCharsets.ISO_8859_1;
         }
 
-        if (null == destCharset) {
+        if (Objects.isNull(destCharset)) {
             srcCharset = StandardCharsets.UTF_8;
         }
 

@@ -1,9 +1,11 @@
 package com.luna.common.file;
 
+
 import java.io.*;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
 
 /**
  * @author luna
@@ -11,6 +13,8 @@ import java.util.zip.ZipOutputStream;
 public class ZipUtil {
 
     private static final int BUFFER_SIZE = 1024 * 5;
+
+
 
     /**
      * 压缩成ZIP 方法1
@@ -42,6 +46,7 @@ public class ZipUtil {
                 try {
                     zos.close();
                 } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }
@@ -70,10 +75,13 @@ public class ZipUtil {
                 try {
                     zos.close();
                 } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }
     }
+
+
 
     /**
      * 递归压缩方法
@@ -90,7 +98,8 @@ public class ZipUtil {
         byte[] buf = new byte[BUFFER_SIZE];
         if (sourceFile.isFile()) {
             // 向zip输出流中添加一个zip实体，构造器中name为zip实体的文件的名字
-            zos.putNextEntry(new ZipEntry(name));
+            ZipEntry zipEntry = new ZipEntry(name);
+            zos.putNextEntry(zipEntry);
             // copy文件到zip输出流中
             int len;
             FileInputStream in = new FileInputStream(sourceFile);
@@ -105,7 +114,8 @@ public class ZipUtil {
                 // 需要保留原来的文件结构时,需要对空文件夹进行处理
                 if (keepDirStructure) {
                     // 空文件夹的处理
-                    zos.putNextEntry(new ZipEntry(name + "/"));
+                    ZipEntry zipEntry = new ZipEntry(name + "/");
+                    zos.putNextEntry(zipEntry);
                     // 没有文件，不需要文件的copy
                     zos.closeEntry();
                 }

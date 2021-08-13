@@ -26,22 +26,29 @@ public class Html2Text extends HTMLEditorKit.ParserCallback {
      * @return
      */
     public static String getContent(String str) {
-        try {
-            html2Text.parse(str);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        html2Text.parse(str);
         return html2Text.getText();
     }
 
-    public void parse(String str) throws IOException {
-        InputStream iin = new ByteArrayInputStream(str.getBytes());
-        Reader in = new InputStreamReader(iin);
-        s = new StringBuffer();
-        ParserDelegator delegator = new ParserDelegator();
-        delegator.parse(in, this, Boolean.TRUE);
-        iin.close();
-        in.close();
+    public void parse(String str) {
+        InputStream iin = null;
+        Reader in = null;
+        try {
+            iin = new ByteArrayInputStream(str.getBytes());
+            in = new InputStreamReader(iin);
+            s = new StringBuffer();
+            ParserDelegator delegator = new ParserDelegator();
+            delegator.parse(in, this, Boolean.TRUE);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                iin.close();
+                in.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
