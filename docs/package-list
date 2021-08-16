@@ -1,4 +1,5 @@
 com.luna.common.anno
+com.luna.common.command
 com.luna.common.constant
 com.luna.common.date
 com.luna.common.dto
@@ -12,8 +13,11 @@ com.luna.common.net
 com.luna.common.net.base
 com.luna.common.net.method
 com.luna.common.os
+com.luna.common.os.hardware
+com.luna.common.os.hardware.constant
 com.luna.common.page
 com.luna.common.reflect
 com.luna.common.text
+com.luna.common.thread
 com.luna.common.utils
 com.luna.common.xml
