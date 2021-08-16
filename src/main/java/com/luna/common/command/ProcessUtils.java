@@ -3,7 +3,6 @@ package com.luna.common.command;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -19,7 +18,6 @@ import com.luna.common.exception.BaseException;
 import com.luna.common.os.SystemInfoUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
-import oshi.SystemInfo;
 import oshi.software.os.OSProcess;
 
 /**

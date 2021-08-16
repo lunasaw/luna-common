@@ -1,5 +1,8 @@
 package com.luna.common.text;
 
+import com.luna.common.dto.constant.ResultCode;
+import com.luna.common.exception.BaseException;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,12 +13,13 @@ import javax.swing.text.html.parser.ParserDelegator;
 
 /**
  * HTML 解析标签文字
+ * 
  * @author luna
  */
 public class Html2Text extends HTMLEditorKit.ParserCallback {
 
-    private static final Html2Text html2Text = new Html2Text();
-    StringBuffer                   s;
+    private static final Html2Text HTML_2_TEXT = new Html2Text();
+    private StringBuffer           content;
 
     public Html2Text() {}
 
@@ -26,8 +30,8 @@ public class Html2Text extends HTMLEditorKit.ParserCallback {
      * @return
      */
     public static String getContent(String str) {
-        html2Text.parse(str);
-        return html2Text.getText();
+        HTML_2_TEXT.parse(str);
+        return HTML_2_TEXT.getText();
     }
 
     public void parse(String str) {
@@ -36,11 +40,11 @@ public class Html2Text extends HTMLEditorKit.ParserCallback {
         try {
             iin = new ByteArrayInputStream(str.getBytes());
             in = new InputStreamReader(iin);
-            s = new StringBuffer();
+            content = new StringBuffer();
             ParserDelegator delegator = new ParserDelegator();
             delegator.parse(in, this, Boolean.TRUE);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new BaseException(ResultCode.ERROR_SYSTEM_EXCEPTION, ResultCode.MSG_ERROR_SYSTEM_EXCEPTION);
         } finally {
             try {
                 iin.close();
@@ -53,11 +57,11 @@ public class Html2Text extends HTMLEditorKit.ParserCallback {
 
     @Override
     public void handleText(char[] text, int pos) {
-        s.append(text);
+        content.append(text);
     }
 
     public String getText() {
-        return s.toString();
+        return content.toString();
     }
 
 }

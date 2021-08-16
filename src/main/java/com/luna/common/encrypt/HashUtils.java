@@ -20,7 +20,7 @@ public class HashUtils {
      * @return
      */
     public static String md5(String data) {
-        return EncryptUtils.dataEncryptByJdk(data, "MD5");
+        return EncryptUtils.dataEncryptByJdk(data,  HashMode.MODE_0.getName());
     }
 
     public static String md5WithFile(String path) {
@@ -32,11 +32,11 @@ public class HashUtils {
     }
 
     public static String md5(InputStream inputStream) {
-        return EncryptUtils.streamEncryptByJdk(inputStream, "MD5");
+        return EncryptUtils.streamEncryptByJdk(inputStream,  HashMode.MODE_0.getName());
     }
 
     public static String sha256(String data) {
-        return EncryptUtils.dataEncryptByJdk(data, "SHA-256");
+        return EncryptUtils.dataEncryptByJdk(data,  HashMode.MODE_1.getName());
     }
 
     public static String sha256WithFile(String path) {
@@ -48,31 +48,46 @@ public class HashUtils {
     }
 
     public static String sha256(InputStream inputStream) {
-        return EncryptUtils.streamEncryptByJdk(inputStream, "SHA-256");
+        return EncryptUtils.streamEncryptByJdk(inputStream, HashMode.MODE_1.getName());
     }
 
+    /**
+     * 检查输入流hash
+     * @param path 文件路径
+     * @param sha256 hash值
+     * @return
+     */
     public static boolean checkFileWithSHA256(InputStream path, String sha256) {
         return StringUtils.equals(sha256(path), sha256);
     }
 
+    /**
+     * 检查文件hash
+     * @param path 文件路径
+     * @param md5 md5值
+     * @return
+     */
     public static boolean checkFileWithSHA256(String path, String md5) {
         return StringUtils.equals(sha256WithFile(path), md5);
     }
 
+    /**
+     * 检查输入流hash
+     * @param path 文件路径
+     * @param md5 md5值
+     * @return
+     */
     public static boolean checkFileWithMd5(InputStream path, String md5) {
         return StringUtils.equals(md5(path), md5);
     }
 
+    /**
+     * 检查输入流hash
+     * @param path 文件路径
+     * @param md5 md5值
+     * @return
+     */
     public static boolean checkFileWithMd5(String path, String md5) {
         return StringUtils.equals(md5WithFile(path), md5);
     }
-
-    public static void main(String[] args) {
-        String s = sha256("/Users/luna_mac/temp/settings.zip");
-        System.out.println(s);
-
-        System.out.println(checkFileWithSHA256("/Users/luna_mac/temp/settings.zip",
-            "43a1ce4d77b0c3b47af2759c337341f76f88871b2ca8a1bb8c8d2b8e89755e5e"));
-    }
-
 }

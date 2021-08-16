@@ -3,6 +3,9 @@ package com.luna.common.thread;
 import com.luna.common.dto.ResultDTO;
 import com.luna.common.dto.ResultDTOUtils;
 import com.luna.common.dto.constant.ResultCode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
@@ -35,6 +38,8 @@ public class CommonThreadPoolUtil {
                                                                              return new ArrayList<Future<?>>();
                                                                          }
                                                                      };
+
+    private static final Logger log = LoggerFactory.getLogger(CommonThreadPoolUtil.class);
 
 
     /** 初始化线程池 */
@@ -145,9 +150,9 @@ public class CommonThreadPoolUtil {
                 threadPool.setCorePoolSize(currentcorePoolSize);
                 threadPool.setMaximumPoolSize(currentcorePoolSize);
                 cacheCorePoolSize = currentcorePoolSize;
-                System.out.println("动态改变线程池大小====原核心线程池数目为：" + corePoolSize + ";现累加为：" + currentcorePoolSize);
+                log.warn("动态改变线程池大小====原核心线程池数目为：" + corePoolSize + ";现累加为：" + currentcorePoolSize);
             } else {
-                System.out.println("动态改变线程池大小====核心线程池数目已累加为：" + cacheCorePoolSize + "；不会继续无限增加");
+                log.warn("动态改变线程池大小====核心线程池数目已累加为：" + cacheCorePoolSize + "；不会继续无限增加");
             }
         }
     }

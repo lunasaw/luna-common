@@ -33,8 +33,8 @@ public class ChainHashMap<K, V> extends HashMap<K, V> {
     /**
      * 对 HashMap 的 put() 的方法进行封转返回 ChainHashMap 来实现 链式添加
      * 
-     * @param key
-     * @param value
+     * @param key k
+     * @param value v
      * @return
      */
     public ChainHashMap<K, V> putIfNull(K key, V value) {

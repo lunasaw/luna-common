@@ -11,7 +11,7 @@ public class Preconditions {
     /**
      * 校验表达式是否正确
      *
-     * @param expression
+     * @param expression 条件
      * @param baseException 异常
      */
     public static void check(boolean expression, RuntimeException baseException) {

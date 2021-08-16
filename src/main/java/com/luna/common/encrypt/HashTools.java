@@ -15,11 +15,11 @@ public class HashTools {
     /**
      * 获取文件或者字符串的MD5值
      *
-     * @param data
+     * @param data 数据
      * @return
      */
     public static String md5(String data) {
-        return EncryptUtils.encryptByCommonIo(data, "MD5");
+        return EncryptUtils.encryptByCommonIo(data, HashMode.MODE_0.getName());
     }
 
     public static String md5WithFile(String path, String charset) {
@@ -35,11 +35,11 @@ public class HashTools {
     }
 
     public static String md5(InputStream inputStream) {
-        return EncryptUtils.encryptByCommonIo(inputStream, "MD5");
+        return EncryptUtils.encryptByCommonIo(inputStream, HashMode.MODE_1.getName());
     }
 
     public static String sha256(String data) {
-        return EncryptUtils.encryptByCommonIo(data, "SHA-256");
+        return EncryptUtils.encryptByCommonIo(data, HashMode.MODE_1410.getName());
     }
 
     public static String sha256WithFile(String path, String charset) {
@@ -55,7 +55,7 @@ public class HashTools {
     }
 
     public static String sha256(InputStream inputStream) {
-        return EncryptUtils.encryptByCommonIo(inputStream, "SHA-256");
+        return EncryptUtils.encryptByCommonIo(inputStream, HashMode.MODE_1.getName());
     }
 
     public static boolean checkFileWithSHA256(InputStream path, String sha256) {

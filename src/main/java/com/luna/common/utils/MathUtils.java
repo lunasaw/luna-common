@@ -15,8 +15,8 @@ public class MathUtils {
      * 对于任何异常都不做处理
      * </p>
      *
-     * @param a
-     * @param b
+     * @param a 底数
+     * @param b 幂
      * @return
      */
     public static long pow(long a, long b) {
@@ -24,20 +24,12 @@ public class MathUtils {
     }
 
     /**
-     * 分转化成元
-     *
-     * @param totalPrice
+     * 大数相减 四舍五入
+     * 
+     * @param b1 big-1
+     * @param b2 big-2
      * @return
      */
-    public static BigDecimal divide2Yuan(Long totalPrice) {
-
-        if (null == totalPrice) {
-            return BigDecimal.ZERO;
-        }
-
-        return BigDecimal.valueOf(totalPrice).divide(HUNDRED_B);
-    }
-
     public static BigDecimal substract(BigDecimal b1, BigDecimal b2) {
         if (null == b1 || null == b2) {
             return null;
@@ -49,8 +41,8 @@ public class MathUtils {
     /**
      * 两个百分比相乘
      *
-     * @param b1
-     * @param b2
+     * @param b1 percent—1
+     * @param b2 percent-2
      * @return
      */
     public static BigDecimal percentMultiply(BigDecimal b1, BigDecimal b2) {

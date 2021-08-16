@@ -1,13 +1,14 @@
 package com.luna.common.text;
 
+import com.luna.common.constant.Constant;
+import com.luna.common.dto.constant.ResultCode;
+import com.luna.common.exception.BaseException;
+
 import java.math.BigDecimal;
 
 /**
- * com.util.AmountUtils
- * 
- * @description 金额元分之间转换工具类
- * @author zcm0708@sina.com
- * @2012-2-7下午12:58:00
+ * @author Luna@win10
+ * @date 2020/4/28 20:33
  */
 public class AmountUtil {
 
@@ -17,38 +18,38 @@ public class AmountUtil {
     /**
      * 将分为单位的转换为元并返回金额格式的字符串 （除100）
      * 
-     * @param amount
+     * @param amount 分
      * @return
      * @throws Exception
      */
     public static String changeF2Y(Long amount) throws Exception {
         if (!amount.toString().matches(CURRENCY_FEN_REGEX)) {
-            throw new Exception("金额格式有误");
+            throw new BaseException(ResultCode.PARAMETER_INVALID, "金额格式有误");
         }
 
         int flag = 0;
         String amString = amount.toString();
-        if (amString.charAt(0) == '-') {
+        if (amString.charAt(0) == Constant.MIDDLELINE_CHAR) {
             flag = 1;
             amString = amString.substring(1);
         }
         StringBuffer result = new StringBuffer();
         if (amString.length() == 1) {
-            result.append("0.0").append(amString);
+            result.append(Constant.PLUS).append(amString);
         } else if (amString.length() == 2) {
-            result.append("0.").append(amString);
+            result.append(Constant.ONE_POINT).append(amString);
         } else {
             String intString = amString.substring(0, amString.length() - 2);
             for (int i = 1; i <= intString.length(); i++) {
                 if ((i - 1) % 3 == 0 && i != 1) {
-                    result.append(",");
+                    result.append(Constant.COMMA);
                 }
-                result.append(intString.substring(intString.length() - i, intString.length() - i + 1));
+                result.append(intString.charAt(intString.length() - i));
             }
-            result.reverse().append(".").append(amString.substring(amString.length() - 2));
+            result.reverse().append(Constant.DOT).append(amString.substring(amString.length() - 2));
         }
         if (flag == 1) {
-            return "-" + result.toString();
+            return Constant.MIDDLELINE + result.toString();
         } else {
             return result.toString();
         }
@@ -57,7 +58,7 @@ public class AmountUtil {
     /**
      * 将分为单位的转换为元 （除100）
      * 
-     * @param amount
+     * @param amount 分
      * @return
      * @throws Exception
      */
@@ -71,7 +72,7 @@ public class AmountUtil {
     /**
      * 将元为单位的转换为分 （乘100）
      * 
-     * @param amount
+     * @param amount 元
      * @return
      */
     public static String changeY2F(Long amount) {
@@ -81,7 +82,7 @@ public class AmountUtil {
     /**
      * 将元为单位的转换为分 替换小数点，支持以逗号区分的金额
      * 
-     * @param amount
+     * @param amount 元
      * @return
      */
     public static String changeY2F(String amount) {
@@ -89,16 +90,16 @@ public class AmountUtil {
         // 处理包含, ￥ 或者$的金额
         int index = currency.indexOf(".");
         int length = currency.length();
-        Long amLong = 0L;
+        long amLong = 0L;
         if (index == -1) {
-            amLong = Long.valueOf(currency + "00");
+            amLong = Long.parseLong(currency + "00");
         } else if (length - index >= 3) {
-            amLong = Long.valueOf((currency.substring(0, index + 3)).replace(".", ""));
+            amLong = Long.parseLong((currency.substring(0, index + 3)).replace(".", ""));
         } else if (length - index == 2) {
-            amLong = Long.valueOf((currency.substring(0, index + 2)).replace(".", "") + 0);
+            amLong = Long.parseLong((currency.substring(0, index + 2)).replace(".", "") + 0);
         } else {
-            amLong = Long.valueOf((currency.substring(0, index + 1)).replace(".", "") + "00");
+            amLong = Long.parseLong((currency.substring(0, index + 1)).replace(".", "") + "00");
         }
-        return amLong.toString();
+        return Long.toString(amLong);
     }
 }

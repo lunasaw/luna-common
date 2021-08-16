@@ -5,6 +5,11 @@
 
 package com.luna.common.text;
 
+import com.luna.common.dto.constant.ResultCode;
+import com.luna.common.exception.BaseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,14 +22,31 @@ import java.util.List;
 import java.util.Random;
 
 public class ByteUtils {
+
+    private static final Logger log = LoggerFactory.getLogger(ByteUtils.class);
+
     public ByteUtils() {}
 
+    /**
+     * 字节截取
+     * 
+     * @param bs 原始数据
+     * @param startIndex 开始
+     * @param length 长度
+     * @return
+     */
     public static byte[] subBytes(byte[] bs, int startIndex, int length) {
         byte[] sub = new byte[length];
         System.arraycopy(bs, startIndex, sub, 0, length);
         return sub;
     }
 
+    /**
+     * 字节拷贝 以来native方法
+     * 
+     * @param bs 原始数据
+     * @return
+     */
     public static byte[] copy(byte[] bs) {
         return Arrays.copyOf(bs, bs.length);
     }
@@ -77,13 +99,13 @@ public class ByteUtils {
                 }
             }
         } catch (IOException var14) {
-            System.err.println("Unexpected IOException: " + var14.getMessage());
+           throw  new BaseException(ResultCode.ERROR_SYSTEM_EXCEPTION,"Unexpected IOException: " + var14.getMessage());
         } finally {
             try {
                 inputStream.close();
-            } catch (Exception var13) {
+            } catch (Exception ignored) {
+                log.warn("inputStream clone error ignored={}",ignored);
             }
-
         }
 
         return list;

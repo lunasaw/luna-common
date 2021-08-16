@@ -1,16 +1,19 @@
 package com.luna.common.text;
 
+import com.luna.common.constant.Constant;
+
 import java.security.SecureRandom;
 import java.util.Random;
 import java.util.UUID;
 
 /**
  * 随机字符串
+ * 
  * @author luna
  */
 public class RandomStrUtil {
 
-    private static final String SYMBOLS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private static final String SYMBOLS = Constant.SYMBOLS;
 
     private static final Random RANDOM  = new SecureRandom();
 
@@ -19,7 +22,7 @@ public class RandomStrUtil {
     }
 
     public static String getUUID() {
-        return UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
+        return UUID.randomUUID().toString().replaceAll(Constant.MIDDLELINE, Constant.EMPTY).toUpperCase();
     }
 
     /**

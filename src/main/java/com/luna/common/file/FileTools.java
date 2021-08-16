@@ -101,15 +101,15 @@ public class FileTools {
     /**
      * 计算文件中行数
      *
-     * @param fileName
+     * @param filePath 文件地址
      * @return
      * @throws Exception
      */
-    public static long count(String fileName) {
+    public static long count(String filePath) {
         LineNumberReader reader = null;
         try {
-            reader = new LineNumberReader(new FileReader(fileName));
-            reader.skip(Long.MAX_VALUE);
+            reader = new LineNumberReader(new FileReader(filePath));
+            long skip = reader.skip(Long.MAX_VALUE);
             return reader.getLineNumber();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -131,8 +131,8 @@ public class FileTools {
      * 有异常时抛出异常
      * </p>
      *
-     * @param url
-     * @param file
+     * @param url 网络地址
+     * @param file 文件地址
      */
     public static void download(String url, String file) {
         try {
@@ -145,9 +145,9 @@ public class FileTools {
     /**
      * 下载文件，失败在优先次数内重试
      *
-     * @param url
-     * @param file
-     * @param maxRetry
+     * @param url 网络路径
+     * @param file 保存文件地址
+     * @param maxRetry 重试次数
      */
     public static void downloadWithRetry(String url, String file, int maxRetry) {
         for (int i = 0; i < maxRetry - 1; i++) {
@@ -162,10 +162,10 @@ public class FileTools {
     }
 
     /**
-     * 读取文件
+     * 写入文件
      * 
-     * @param path
-     * @param content
+     * @param path 文件路径
+     * @param content 写入内容
      */
     public static void writeStringToFile(String path, String content) {
         writeStringToFile(path, content, true);
@@ -174,7 +174,7 @@ public class FileTools {
     /**
      * 路径创建文件夹
      * 
-     * @param pathDir
+     * @param pathDir 文件夹路径
      */
     public static void createDirectory(String pathDir) {
         try {
