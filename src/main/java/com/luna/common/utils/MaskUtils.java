@@ -1,8 +1,10 @@
 package com.luna.common.utils;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.commons.validator.routines.EmailValidator;
 
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -11,7 +13,14 @@ import java.util.regex.Pattern;
  */
 public class MaskUtils {
     /** 中国大陆手机号正则 */
-    private static final String  CHINA_MAINLAND_MOBILE_PHONE_REGEX = "0?(13|14|15|17|18|19)[0-9]{9}";
+    private static final String  CHINA_MAINLAND_MOBILE_PHONE_REGEX =
+        "^((13[0-9])|(14[0,1,4-9])|(15[0-3,5-9])|(16[2,5,6,7])|(17[0-8])|(18[0-9])|(19[0-3,5-9]))\\d{8}$";
+
+    /**
+     * 邮箱有效性正则
+     */
+    private static final String  EMAIL_PHONE_REGEX                 =
+        "^([a-z0-9A-Z]+[-|\\.]?)+[a-z0-9A-Z]@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-zA-Z]{2,}$";
 
     /** 11位整数支持 */
     private static final Pattern PHONE_PATTERN                     =
@@ -26,6 +35,18 @@ public class MaskUtils {
     public static boolean isEmailAddress(String outUser) {
         EmailValidator validator = EmailValidator.getInstance();
         return validator.isValid(outUser);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param email
+     */
+    public static boolean isEmail(String email) {
+        if (Objects.isNull(email)) {
+            return false;
+        }
+        return email.matches(EMAIL_PHONE_REGEX);
     }
 
     /**

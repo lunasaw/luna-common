@@ -2,10 +2,8 @@ package com.luna.common.os;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomUtils;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import oshi.SystemInfo;
+import oshi.software.os.OSProcess;
 import java.net.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,7 +14,19 @@ import java.util.stream.Collectors;
  * @author luna
  */
 public class SystemInfoUtil {
-    public static final String STR       = "卷的序列号是 ";
+
+    private static final SystemInfo SI                = new SystemInfo();
+
+    /**
+     * 获取所有进程
+     *
+     * @return
+     */
+    public static List<OSProcess> getProcesses() {
+        return Arrays.asList(SI.getOperatingSystem().getProcesses(0, null));
+    }
+
+
     private static InetAddress localHost = null;
 
     public static InetAddress getLocalHost() {
@@ -46,42 +56,6 @@ public class SystemInfoUtil {
      */
     public static String getHostName() {
         return getLocalHost().getHostName();
-    }
-
-    /**
-     * 获取C盘卷 序列号
-     *
-     * @return
-     */
-    public static String getDiskNumber() {
-        String line = "";
-        String HdSerial = "";
-        // 记录硬盘序列号
-
-        try {
-
-            Process proces = Runtime.getRuntime().exec("cmd /c dir c:");
-            // 获取命令行参数
-            BufferedReader buffreader = new BufferedReader(
-                new InputStreamReader(proces.getInputStream()));
-
-            while ((line = buffreader.readLine()) != null) {
-
-                if (line.contains(STR)) {
-                    // 读取参数并获取硬盘序列号
-
-                    HdSerial = line.substring(line.indexOf(STR)
-                        + STR.length(), line.length());
-                    break;
-                }
-            }
-
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        return HdSerial;
     }
 
     /**
@@ -168,5 +142,28 @@ public class SystemInfoUtil {
             first = true;
         }
         return mac.toString().toUpperCase();
+    }
+
+    /**
+     * 字节转换
+     *
+     * @param size 字节大小
+     * @return 转换后值
+     */
+    public String convertFileSize(long size) {
+        long kb = 1024;
+        long mb = kb * 1024;
+        long gb = mb * 1024;
+        if (size >= gb) {
+            return String.format("%.1f GB" , (float) size / gb);
+        } else if (size >= mb) {
+            float f = (float) size / mb;
+            return String.format(f > 100 ? "%.0f MB" : "%.1f MB" , f);
+        } else if (size >= kb) {
+            float f = (float) size / kb;
+            return String.format(f > 100 ? "%.0f KB" : "%.1f KB" , f);
+        } else {
+            return String.format("%d B" , size);
+        }
     }
 }

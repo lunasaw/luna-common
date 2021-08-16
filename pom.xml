@@ -7,7 +7,7 @@
     <groupId>io.github.lunasaw</groupId>
     <artifactId>luna-common</artifactId>
     <name>luna-common</name>
-    <version>1.4.4</version>
+    <version>1.4.5</version>
     <description>common is project which contains common utils</description>
     <url>https://github.com/lunasaw/luna-common</url>
 
@@ -94,6 +94,12 @@
             <artifactId>junit</artifactId>
             <version>4.13.1</version>
             <scope>test</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.github.oshi/oshi-core -->
+        <dependency>
+            <groupId>com.github.oshi</groupId>
+            <artifactId>oshi-core</artifactId>
+            <version>3.9.1</version> <!-- 这个版本不要随便升级，和JNA的环境有关 -->
         </dependency>
     </dependencies>
 

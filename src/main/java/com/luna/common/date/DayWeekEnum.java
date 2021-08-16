@@ -3,7 +3,7 @@ package com.luna.common.date;
 import org.joda.time.DateTimeConstants;
 
 /**
- * @author liuyi
+ * @author Luna
  * @since 2020/1/14
  */
 public enum DayWeekEnum {

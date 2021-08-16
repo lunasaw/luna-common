@@ -14,8 +14,6 @@ public class ZipUtil {
 
     private static final int BUFFER_SIZE = 1024 * 5;
 
-
-
     /**
      * 压缩成ZIP 方法1
      * 
@@ -80,8 +78,6 @@ public class ZipUtil {
             }
         }
     }
-
-
 
     /**
      * 递归压缩方法
