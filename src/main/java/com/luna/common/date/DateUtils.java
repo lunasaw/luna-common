@@ -1,8 +1,6 @@
 package com.luna.common.date;
 
 import com.luna.common.constant.Constant;
-import org.joda.time.DateTime;
-import org.joda.time.Days;
 
 import java.lang.management.ManagementFactory;
 import java.text.ParseException;
@@ -194,63 +192,6 @@ public class DateUtils {
         }
     }
 
-    /**
-     * 获取当前时间前几天时间,按指定格式返回
-     *
-     * @param days 日s
-     * @return
-     */
-    public static String forwardDay(Integer days, String format) {
-        DateTime dt = new DateTime();
-        DateTime y = dt.minusDays(days);
-        return y.toString(format);
-    }
-
-    /**
-     * 获取当前时间前几天时间
-     *
-     * @param days 日s
-     * @return
-     */
-    public static Date forwardDay(Integer days) {
-        DateTime dt = new DateTime();
-        DateTime y = dt.minusDays(days);
-        return y.toDate();
-    }
-
-    /**
-     * 计算两个时间相差多少天
-     *
-     * @param startDate
-     * @param endDate
-     * @return
-     */
-    public static Integer diffDay(Date startDate, Date endDate) {
-        if (startDate == null || endDate == null) {
-            return null;
-        }
-        DateTime dt1 = new DateTime(startDate);
-        DateTime dt2 = new DateTime(endDate);
-        int day = Days.daysBetween(dt1, dt2).getDays();
-        return Math.abs(day);
-    }
-
-    /**
-     * 获取指定间隔天数的日期
-     *
-     * @param date 日期
-     * @param offset
-     * @return
-     */
-    public static Date addDay(Date date, int offset) {
-        DateTime dt1;
-        if (date == null) {
-            dt1 = new DateTime().plusDays(offset);
-            return dt1.toDate();
-        }
-        dt1 = new DateTime(date).plusDays(offset);
-        return dt1.toDate();
-    }
 
     /**
      * 获取日期的开始时间
@@ -399,7 +340,7 @@ public class DateUtils {
 
     public static String nextDate(String strdate) throws ParseException {
         Date temp = parse(FORMAT_YYYY_MM_DD, strdate);
-        Date next = new Date(temp.getTime() + 1 * 24 * 3600 * 1000);
+        Date next = new Date(temp.getTime() + 24 * 3600 * 1000);
         return formatDate(next);
     }
 
@@ -492,7 +433,6 @@ public class DateUtils {
     /**
      * 得两个日期之间的相差多少天
      */
-
     public static long getDaysBetween(Date beginDate, Date endDate) {
         // 86400000=3600*24*1000
         long daysBetween = (beginDate.getTime() - endDate.getTime() + 1000000) / 86400000;

@@ -1,19 +1,17 @@
 package com.luna.common.date;
-
-import org.joda.time.DateTimeConstants;
-
 /**
  * @author Luna
  * @since 2020/1/14
  */
 public enum DayWeekEnum {
-    SUNDAY(DateTimeConstants.SUNDAY, "星期日"),
-    SATURDAY(DateTimeConstants.SATURDAY, "星期六"),
-    FRIDAY(DateTimeConstants.FRIDAY, "星期五"),
-    THURSDAY(DateTimeConstants.THURSDAY, "星期四"),
-    WEDNESDAY(DateTimeConstants.WEDNESDAY, "星期三"),
-    TUESDAY(DateTimeConstants.TUESDAY, "星期二"),
-    MONDAY(DateTimeConstants.MONDAY, "星期一");
+    /** 星期 */
+    SUNDAY(7, "星期日"),
+    SATURDAY(6, "星期六"),
+    FRIDAY(5, "星期五"),
+    THURSDAY(4, "星期四"),
+    WEDNESDAY(3, "星期三"),
+    TUESDAY(2, "星期二"),
+    MONDAY(1, "星期一");
 
     private int    code;
     private String name;

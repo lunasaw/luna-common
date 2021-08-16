@@ -5,7 +5,7 @@ import com.google.common.collect.Lists;
 import com.luna.common.constant.Constant;
 import com.luna.common.net.method.HttpDelete;
 import com.luna.common.text.CharsetKit;
-import org.apache.commons.collections4.MapUtils;
+import com.luna.common.text.MapUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.*;
@@ -30,7 +30,6 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.util.EntityUtils;
 
