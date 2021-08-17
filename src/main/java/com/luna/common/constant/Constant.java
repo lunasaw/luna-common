@@ -21,6 +21,7 @@ public interface Constant {
     String    XING                         = "*";
     String    MONEY                        = "￥";
     String    SPRIT                        = "/";
+    String    BACKSLASH                    = "\\";
     String    QUESTION                     = "?";
 
     Character MIDDLELINE_CHAR              = '-';
@@ -113,6 +114,11 @@ public interface Constant {
     int       NUMBER_TWELVE                = 12;
 
     /**
+     * 数字常量 20
+     */
+    int       NUMBER_TWENTY                = 20;
+
+    /**
      * 数字常量 28
      */
     int       NUMBER_TWENTY_EIGHT          = 28;
@@ -133,6 +139,11 @@ public interface Constant {
     int       NUMBER_THIRTY_ONE            = 31;
 
     /**
+     * 数字常量 40
+     */
+    int       NUMBER_FOUTY                 = 40;
+
+    /**
      * 数字常量 50
      */
     int       NUMBER_FIFTY                 = 50;
@@ -143,9 +154,24 @@ public interface Constant {
     int       NUMBER_SIXTY                 = 60;
 
     /**
+     * 数字常量 70
+     */
+    int       NUMBER_SEVENTY               = 70;
+
+    /**
+     * 数字常量 80
+     */
+    int       NUMBER_EIGHTY                = 80;
+
+    /**
      * 数字常量 90
      */
     int       NUMBER_NINETY                = 90;
+
+    /**
+     * 数字常量 100
+     */
+    int       NUMBER_HUNDERD               = 100;
 
     /**
      * 常量360F
@@ -158,7 +184,7 @@ public interface Constant {
     int       FIVE_THOUSAND                = 5000;
 
     /** 随机字符串 */
-    String    SYMBOLS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    String    SYMBOLS                      = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     String    TABLE                        =
         "0123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz!@#$";
     String    TABLE_TWO                    =

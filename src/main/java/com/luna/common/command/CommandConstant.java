@@ -6,17 +6,25 @@ package com.luna.common.command;
  */
 public interface CommandConstant {
 
-    String FILE_NAME   = "fileName";
+    String FILE_NAME       = "fileName";
 
-    String FILE_PATH   = "filePath";
+    String FILE_PATH       = "filePath";
 
-    String ZIP         = "zip -q -r ${fileName} ${filePath}";
+    String PROCESS_ID      = "processId";
 
-    String UN_ZIP      = "unzip ${fileName} -d ${filePath}";
+    String ZIP             = "zip -q -r ${fileName} ${filePath}";
 
-    String MKDIR       = "mkdir ${filePath}";
+    String UN_ZIP          = "unzip ${fileName} -d ${filePath}";
 
-    String TOUCH       = "touch ${fileName}";
+    String MKDIR           = "mkdir ${filePath}";
 
-    String DELETE_PATH = "rm -rf ${filePath}";
+    String TOUCH           = "touch ${fileName}";
+
+    String DELETE_PATH     = "rm -rf ${filePath}";
+
+    /** win task kill */
+    String WIN_TASK_KILL   = "taskkill /F /T /PID ${processId}";
+
+    /** linux task kill */
+    String LINUX_TASK_KILL = "kill -9 ${processId}";
 }

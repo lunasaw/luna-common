@@ -169,11 +169,11 @@ public class ProcessUtils {
      * @return
      */
     public static String formatPath(String path) {
-        return path.replace("\\", "/");
+        return path.replace(Constant.BACKSLASH, Constant.SPRIT);
     }
 
     public static String removeExtension(String filename) {
-        int idx = filename.lastIndexOf(".");
+        int idx = filename.lastIndexOf(Constant.DOT);
         if (idx == -1) {
             return filename;
         }
@@ -232,23 +232,23 @@ public class ProcessUtils {
      * @param processId
      */
     public static void osKill(int processId) {
-        try {
-            if (SystemUtils.IS_OS_WINDOWS) {
-                Runtime.getRuntime().exec("taskkill /F /T /PID " + processId);
-                return;
-            }
-            if (SystemUtils.IS_OS_LINUX) {
-                Runtime.getRuntime().exec("kill -9 " + processId);
-                return;
-            }
-            if (SystemUtils.IS_OS_MAC_OSX) {
-                Runtime.getRuntime().exec("kill -9 " + processId);
-                return;
-            }
-        } catch (IOException e) {
-            // ignore
+        if (SystemUtils.IS_OS_WINDOWS) {
+            runCommand(
+                processBuild(CommandConstant.WIN_TASK_KILL,
+                    ImmutableMap.of(CommandConstant.PROCESS_ID, processId)));
+            return;
         }
-        throw new BaseException(ResultCode.ERROR_SYSTEM_EXCEPTION, ResultCode.MSG_ERROR_SYSTEM_EXCEPTION);
+        if (SystemUtils.IS_OS_LINUX) {
+            runCommand(
+                processBuild(CommandConstant.LINUX_TASK_KILL,
+                    ImmutableMap.of(CommandConstant.PROCESS_ID, processId)));
+            return;
+        }
+        if (SystemUtils.IS_OS_MAC_OSX) {
+            runCommand(
+                processBuild(CommandConstant.LINUX_TASK_KILL,
+                    ImmutableMap.of(CommandConstant.PROCESS_ID, processId)));
+        }
     }
 
     /**
