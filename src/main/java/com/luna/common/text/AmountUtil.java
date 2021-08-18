@@ -1,6 +1,8 @@
 package com.luna.common.text;
 
+import com.luna.common.constant.CharPoolConstant;
 import com.luna.common.constant.Constant;
+import com.luna.common.constant.StrPoolConstant;
 import com.luna.common.dto.constant.ResultCode;
 import com.luna.common.exception.BaseException;
 
@@ -22,34 +24,34 @@ public class AmountUtil {
      * @return
      * @throws Exception
      */
-    public static String changeF2Y(Long amount) throws Exception {
+    public static String changeF2Y(Long amount) {
         if (!amount.toString().matches(CURRENCY_FEN_REGEX)) {
             throw new BaseException(ResultCode.PARAMETER_INVALID, "金额格式有误");
         }
 
         int flag = 0;
         String amString = amount.toString();
-        if (amString.charAt(0) == Constant.MIDDLELINE_CHAR) {
+        if (amString.charAt(0) == CharPoolConstant.DASHED) {
             flag = 1;
             amString = amString.substring(1);
         }
         StringBuffer result = new StringBuffer();
         if (amString.length() == 1) {
-            result.append(Constant.PLUS).append(amString);
+            result.append(StrPoolConstant.ADD).append(amString);
         } else if (amString.length() == 2) {
             result.append(Constant.ONE_POINT).append(amString);
         } else {
             String intString = amString.substring(0, amString.length() - 2);
             for (int i = 1; i <= intString.length(); i++) {
                 if ((i - 1) % 3 == 0 && i != 1) {
-                    result.append(Constant.COMMA);
+                    result.append(CharPoolConstant.COMMA);
                 }
                 result.append(intString.charAt(intString.length() - i));
             }
-            result.reverse().append(Constant.DOT).append(amString.substring(amString.length() - 2));
+            result.reverse().append(StrPoolConstant.DOT).append(amString.substring(amString.length() - 2));
         }
         if (flag == 1) {
-            return Constant.MIDDLELINE + result.toString();
+            return StrPoolConstant.DASHED + result;
         } else {
             return result.toString();
         }

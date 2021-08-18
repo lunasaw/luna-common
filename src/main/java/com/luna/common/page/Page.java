@@ -40,9 +40,9 @@ public class Page<T> implements Serializable {
 
     /****
      *
-     * @param currentpage
-     * @param total
-     * @param pagesize
+     * @param currentpage 页码
+     * @param total 总计
+     * @param pagesize 每页多少个
      */
     public void setCurrentpage(long currentpage, long total, long pagesize) {
         // 可以整除的情况下
@@ -85,11 +85,11 @@ public class Page<T> implements Serializable {
 
     /****
      * 带有偏移量设置的分页
-     * 
-     * @param total
-     * @param currentpage
-     * @param pagesize
-     * @param offsize
+     *
+     * @param currentpage 页码
+     * @param total 总计
+     * @param pagesize 每页多少个
+     * @param offsize 偏移量
      */
     public Page(long total, int currentpage, int pagesize, int offsize) {
         this.offsize = offsize;
@@ -108,10 +108,10 @@ public class Page<T> implements Serializable {
 
     /****
      * 初始化分页
-     * 
-     * @param total
-     * @param currentpage
-     * @param pagesize
+     *
+     * @param currentpage 页码
+     * @param total 总计
+     * @param pagesize 每页多少个
      */
     public void initPage(long total, int currentpage, int pagesize) {
         // 总记录数

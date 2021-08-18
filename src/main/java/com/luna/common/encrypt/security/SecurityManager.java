@@ -1,6 +1,7 @@
 package com.luna.common.encrypt.security;
 
 import com.luna.common.constant.Constant;
+import com.luna.common.constant.StrPoolConstant;
 import com.luna.common.encrypt.EncryptUtils;
 
 /**
@@ -25,7 +26,7 @@ public class SecurityManager {
 
     public String buildCheckSum(String content) {
         String checkSum = EncryptUtils.md5Checksum(CHECKSUM_PREFIX, CHECKSUM_POSTFIX, content);
-        return checkSum.replace(Constant.MIDDLELINE, Constant.EMPTY);
+        return checkSum.replace(StrPoolConstant.DASHED, StrPoolConstant.EMPTY);
     }
 
     public String encrypt(String content) {

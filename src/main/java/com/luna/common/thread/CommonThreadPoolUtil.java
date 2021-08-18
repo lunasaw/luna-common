@@ -18,7 +18,7 @@ import java.util.concurrent.*;
 public class CommonThreadPoolUtil {
 
     /** 核心线程数(默认初始化为10) */
-    private int                                cacheCorePoolSize     = 8;
+    private int                                cacheCorePoolSize     = 10;
 
     /** 核心线程控制的最大数目 */
     private int                                maxCorePoolSize       = 160;

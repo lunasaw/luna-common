@@ -5,27 +5,6 @@ package com.luna.common.constant;
  * 2021/7/30
  */
 public interface Constant {
-    String    PERCENT                      = "%";
-    String    UTF8                         = "UTF-8";
-    String    COMMA                        = ",";
-    String    COLON                        = ":";
-    String    SEMICOLON                    = ";";
-    String    ENTER                        = "\n";
-    String    EMPTY                        = "";
-    String    BLANK                        = " ";
-    String    MIDDLELINE                   = "-";
-    String    UNDERLINE                    = "_";
-    String    DOT                          = ".";
-    String    NULL                         = "null";
-    String    PLUS                         = "+";
-    String    XING                         = "*";
-    String    MONEY                        = "￥";
-    String    SPRIT                        = "/";
-    String    BACKSLASH                    = "\\";
-    String    QUESTION                     = "?";
-
-    Character MIDDLELINE_CHAR              = '-';
-
     /** 0.0 */
     String    ONE_POINT_ONE                = "0.0";
     /** 0. */

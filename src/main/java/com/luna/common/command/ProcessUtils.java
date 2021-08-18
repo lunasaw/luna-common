@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableMap;
 import com.luna.common.constant.Constant;
+import com.luna.common.constant.StrPoolConstant;
 import com.luna.common.dto.constant.ResultCode;
 import com.luna.common.exception.BaseException;
 import com.luna.common.os.SystemInfoUtil;
@@ -130,7 +131,7 @@ public class ProcessUtils {
                 if (StringUtils.isBlank(line)) {
                     break;
                 }
-                stringBuilder.append(line).append(Constant.ENTER);
+                stringBuilder.append(line).append(StrPoolConstant.LF);
             }
             return stringBuilder.toString();
         } catch (IOException e) {
@@ -169,11 +170,11 @@ public class ProcessUtils {
      * @return
      */
     public static String formatPath(String path) {
-        return path.replace(Constant.BACKSLASH, Constant.SPRIT);
+        return path.replace(StrPoolConstant.BACKSLASH, StrPoolConstant.SLASH);
     }
 
     public static String removeExtension(String filename) {
-        int idx = filename.lastIndexOf(Constant.DOT);
+        int idx = filename.lastIndexOf(StrPoolConstant.DOT);
         if (idx == -1) {
             return filename;
         }

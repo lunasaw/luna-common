@@ -1,6 +1,7 @@
 package com.luna.common.text;
 
 import com.luna.common.constant.Constant;
+import com.luna.common.constant.StrPoolConstant;
 
 import java.security.SecureRandom;
 import java.util.Random;
@@ -22,7 +23,7 @@ public class RandomStrUtil {
     }
 
     public static String getUUID() {
-        return UUID.randomUUID().toString().replaceAll(Constant.MIDDLELINE, Constant.EMPTY).toUpperCase();
+        return UUID.randomUUID().toString().replaceAll(StrPoolConstant.DASHED, StrPoolConstant.EMPTY).toUpperCase();
     }
 
     /**

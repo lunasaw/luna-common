@@ -1,6 +1,6 @@
 package com.luna.common.encrypt;
 
-import com.luna.common.text.CharsetKit;
+import com.luna.common.text.CharsetUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,7 +25,7 @@ public class HashUtils {
 
     public static String md5WithFile(String path) {
         try {
-            return md5(IOUtils.toInputStream(path, CharsetKit.UTF_8));
+            return md5(IOUtils.toInputStream(path, CharsetUtil.UTF_8));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -41,7 +41,7 @@ public class HashUtils {
 
     public static String sha256WithFile(String path) {
         try {
-            return sha256(IOUtils.toInputStream(path, CharsetKit.UTF_8));
+            return sha256(IOUtils.toInputStream(path, CharsetUtil.UTF_8));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

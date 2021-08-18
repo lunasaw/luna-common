@@ -3,7 +3,10 @@ package com.luna.common.encrypt.security;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.luna.common.constant.Constant;
+import com.luna.common.constant.StrPoolConstant;
 import com.luna.common.net.HttpUtils;
+import com.luna.common.text.CharsetUtil;
+import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -60,14 +63,14 @@ public class SharingParamManager {
         }
 
         // 拼接字符串
-        String plaintext = Joiner.on(Constant.UNDERLINE).join(param);
+        String plaintext = Joiner.on(StrPoolConstant.UNDERLINE).join(param);
 
         // 生成校验和
         String checkSum = securityManager.buildCheckSum(plaintext);
         // 报文加密
         String encrypted = securityManager.encrypt(plaintext);
         // 做urlencode
-        String body = HttpUtils.urlEncode(encrypted + Constant.MIDDLELINE + checkSum, Constant.UTF8);
+        String body = HttpUtils.urlEncode(encrypted + StrPoolConstant.DASHED + checkSum, CharsetUtil.UTF_8);
 
         return body;
     }
@@ -83,8 +86,8 @@ public class SharingParamManager {
         }
 
         try {
-            String decode = URLDecoder.decode(body, Constant.UTF8);
-            int index = StringUtils.lastIndexOf(decode, Constant.MIDDLELINE);
+            String decode = URLDecoder.decode(body, CharsetUtil.UTF_8);
+            int index = StringUtils.lastIndexOf(decode, StrPoolConstant.DASHED);
             if (-1 == index) {
                 return false;
             }
@@ -98,7 +101,8 @@ public class SharingParamManager {
                 return false;
             }
 
-            String[] elements = StringUtils.splitByWholeSeparatorPreserveAllTokens(decrypted, Constant.UNDERLINE);
+            String[] elements =
+                StringUtils.splitByWholeSeparatorPreserveAllTokens(decrypted, StrPoolConstant.UNDERLINE);
 
             if (StringUtils.isBlank(version)) {
                 return false;

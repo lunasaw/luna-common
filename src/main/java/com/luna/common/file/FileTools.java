@@ -3,15 +3,14 @@ package com.luna.common.file;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
 import com.luna.common.constant.Constant;
-import com.luna.common.net.base.HttpBaseUtils;
-import com.luna.common.text.CharsetKit;
+import com.luna.common.text.CharsetUtil;
+import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
 
 /**
@@ -168,7 +167,7 @@ public class FileTools {
      * @param content 写入内容
      */
     public static void writeStringToFile(String path, String content) {
-        writeStringToFile(path, content, true);
+        writeStringToFile(path, content, CharsetUtil.defaultCharset(), true);
     }
 
     /**
@@ -195,19 +194,42 @@ public class FileTools {
      * @param content 文件内容
      * @param override 不存在是否创建
      */
-    public static void writeStringToFile(String path, String content, boolean override) {
+    public static void writeStringToFile(String path, String content, Charset destCharset, boolean override) {
         try {
             Path filePath = Paths.get(path);
             if (Files.notExists(filePath)) {
                 if (!override) {
-                    return;
+                    throw new FileNotFoundException();
                 }
                 Files.createFile(filePath);
             }
-            FileUtils.writeStringToFile(new File(path), content, CharsetKit.UTF_8);
+            FileUtils.writeStringToFile(new File(path), content, destCharset);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * 写入文件
+     *
+     * @param file 文件路径
+     * @param content 文件内容
+     * @param override 不存在是否创建
+     */
+    public static void writeStringToFile(File file, String content, Charset destCharset, boolean override) {
+        String path = file.getAbsolutePath();
+        writeStringToFile(path, content, destCharset, override);
+    }
+
+    /**
+     * 写入文件 不存在抛出异常
+     *
+     * @param file 文件路径
+     * @param content 文件内容
+     * @param
+     */
+    public static void writeStringToFile(File file, String content, Charset destCharset) {
+        writeStringToFile(file, content, destCharset, false);
     }
 
     /**
@@ -216,8 +238,28 @@ public class FileTools {
      * @param path 文件全路径
      */
     public static String readFileToString(String path) {
+        return readFileToString(path, Charset.defaultCharset());
+    }
+
+    /**
+     * 读取文件
+     *
+     * @param path 文件全路径
+     * @param destCharset 文件编码
+     */
+    public static String readFileToString(String path, Charset destCharset) {
+        return readFileToString(new File(path), destCharset);
+    }
+
+    /**
+     * 读取文件
+     *
+     * @param file 文件
+     * @param destCharset 文件编码
+     */
+    public static String readFileToString(File file, Charset destCharset) {
         try {
-            return FileUtils.readFileToString(new File(path), Charset.defaultCharset());
+            return FileUtils.readFileToString(file, destCharset);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

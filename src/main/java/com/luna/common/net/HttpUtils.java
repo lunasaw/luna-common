@@ -1,10 +1,10 @@
 package com.luna.common.net;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.luna.common.constant.Constant;
+import com.luna.common.constant.StrPoolConstant;
 import com.luna.common.net.method.HttpDelete;
-import com.luna.common.text.CharsetKit;
+import com.luna.common.text.CharsetUtil;
 import com.luna.common.text.MapUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -297,8 +297,8 @@ public class HttpUtils {
         StringBuilder sbUrl = new StringBuilder();
         sbUrl.append(host);
         if (StringUtils.isNotBlank(path)) {
-            if (!path.startsWith(Constant.SPRIT)) {
-                path += Constant.SPRIT;
+            if (!path.startsWith(StrPoolConstant.SLASH)) {
+                path += StrPoolConstant.SLASH;
             }
             sbUrl.append(path);
         }
@@ -346,7 +346,7 @@ public class HttpUtils {
         }
         String sbQuery = urlEncode(queries);
         if (StringUtils.isNotBlank(sbQuery)) {
-            sbUrl.append(Constant.QUESTION).append(sbQuery);
+            sbUrl.append(StrPoolConstant.QUESTION).append(sbQuery);
         }
         return sbUrl.toString();
     }
@@ -411,8 +411,8 @@ public class HttpUtils {
             try {
                 if (ObjectUtils.isNotEmpty(k) && ObjectUtils.isNotEmpty(v)) {
                     sb.append(String.format("%s=%s",
-                        URLEncoder.encode(k.toString(), CharsetKit.UTF_8),
-                        URLEncoder.encode(v.toString(), CharsetKit.UTF_8)));
+                        URLEncoder.encode(k.toString(), CharsetUtil.UTF_8),
+                        URLEncoder.encode(v.toString(), CharsetUtil.UTF_8)));
                 }
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
@@ -423,7 +423,7 @@ public class HttpUtils {
     }
 
     public static String urlEncodeWithUtf8(String s) {
-        return urlEncode(s, CharsetKit.UTF_8);
+        return urlEncode(s, CharsetUtil.UTF_8);
     }
 
     public static String urlEncode(String s, String chareset) {

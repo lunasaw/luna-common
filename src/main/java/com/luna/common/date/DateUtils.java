@@ -1,6 +1,7 @@
 package com.luna.common.date;
 
 import com.luna.common.constant.Constant;
+import com.luna.common.constant.StrPoolConstant;
 
 import java.lang.management.ManagementFactory;
 import java.text.ParseException;
@@ -355,7 +356,7 @@ public class DateUtils {
         if (date != null) {
             // 2014-07-01
             if (date.length() >= eight && date.length() <= ten
-                && date.indexOf(Constant.MIDDLELINE) != date.lastIndexOf(Constant.MIDDLELINE)) {
+                && date.indexOf(StrPoolConstant.DASHED) != date.lastIndexOf(StrPoolConstant.DASHED)) {
                 date = date + " 23:59:59.999";
             }
         }
@@ -387,7 +388,7 @@ public class DateUtils {
      * @return
      */
     public static String getMorningStr(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat(FORMAT_YYYY_MM_DD + Constant.BLANK + START_TIME);
+        SimpleDateFormat sdf = new SimpleDateFormat(FORMAT_YYYY_MM_DD + StrPoolConstant.BLANK + START_TIME);
         return sdf.format(date);
     }
 
@@ -398,7 +399,7 @@ public class DateUtils {
      * @return
      */
     public static String getNightStr(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat(FORMAT_YYYY_MM_DD + Constant.BLANK + END_TIME);
+        SimpleDateFormat sdf = new SimpleDateFormat(FORMAT_YYYY_MM_DD + StrPoolConstant.BLANK + END_TIME);
         return sdf.format(date);
     }
 
