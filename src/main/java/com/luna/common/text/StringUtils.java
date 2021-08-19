@@ -1,7 +1,11 @@
 package com.luna.common.text;
 
+import com.luna.common.anno.Func1;
+import com.luna.common.anno.Matcher;
 import com.luna.common.constant.CharPoolConstant;
 import com.luna.common.constant.StrPoolConstant;
+import com.luna.common.regex.DesensitizedUtil;
+import com.luna.common.regex.ReUtil;
 import org.apache.commons.collections.CollectionUtils;
 
 import javax.annotation.Nullable;
@@ -14,6 +18,480 @@ import java.util.*;
  * 2021/8/18
  */
 public class StringUtils extends org.apache.commons.lang3.StringUtils {
+
+    /**
+     * 是否为数字，支持包括：
+     *
+     * <pre>
+     * 1、10进制
+     * 2、16进制数字（0x开头）
+     * 3、科学计数法形式（1234E3）
+     * 4、类型标识形式（123D）
+     * 5、正负数标识形式（+123、-234）
+     * </pre>
+     *
+     * @param str 字符串值
+     * @return 是否为数字
+     */
+    public static boolean isNumber(CharSequence str) {
+        if (StringUtils.isBlank(str)) {
+            return false;
+        }
+        char[] chars = str.toString().toCharArray();
+        int sz = chars.length;
+        boolean hasExp = false;
+        boolean hasDecPoint = false;
+        boolean allowSigns = false;
+        boolean foundDigit = false;
+        // deal with any possible sign up front
+        int start = (chars[0] == '-' || chars[0] == '+') ? 1 : 0;
+        if (sz > start + 1) {
+            if (chars[start] == '0' && (chars[start + 1] == 'x' || chars[start + 1] == 'X')) {
+                int i = start + 2;
+                if (i == sz) {
+                    return false; // str == "0x"
+                }
+                // checking hex (it can't be anything else)
+                for (; i < chars.length; i++) {
+                    if ((chars[i] < '0' || chars[i] > '9') && (chars[i] < 'a' || chars[i] > 'f')
+                        && (chars[i] < 'A' || chars[i] > 'F')) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+        sz--; // don't want to loop to the last char, check it afterwords
+        // for type qualifiers
+        int i = start;
+        // loop to the next to last char or to the last char if we need another digit to
+        // make a valid number (e.g. chars[0..5] = "1234E")
+        while (i < sz || (i < sz + 1 && allowSigns && !foundDigit)) {
+            if (chars[i] >= '0' && chars[i] <= '9') {
+                foundDigit = true;
+                allowSigns = false;
+
+            } else if (chars[i] == '.') {
+                if (hasDecPoint || hasExp) {
+                    // two decimal points or dec in exponent
+                    return false;
+                }
+                hasDecPoint = true;
+            } else if (chars[i] == 'e' || chars[i] == 'E') {
+                // we've already taken care of hex.
+                if (hasExp) {
+                    // two E's
+                    return false;
+                }
+                if (false == foundDigit) {
+                    return false;
+                }
+                hasExp = true;
+                allowSigns = true;
+            } else if (chars[i] == '+' || chars[i] == '-') {
+                if (!allowSigns) {
+                    return false;
+                }
+                allowSigns = false;
+                foundDigit = false; // we need a digit after the E
+            } else {
+                return false;
+            }
+            i++;
+        }
+        if (i < chars.length) {
+            if (chars[i] >= '0' && chars[i] <= '9') {
+                // no type qualifier, OK
+                return true;
+            }
+            if (chars[i] == 'e' || chars[i] == 'E') {
+                // can't have an E at the last byte
+                return false;
+            }
+            if (chars[i] == '.') {
+                if (hasDecPoint || hasExp) {
+                    // two decimal points or dec in exponent
+                    return false;
+                }
+                // single trailing decimal point after non-exponent is ok
+                return foundDigit;
+            }
+            if (!allowSigns && (chars[i] == 'd' || chars[i] == 'D' || chars[i] == 'f' || chars[i] == 'F')) {
+                return foundDigit;
+            }
+            if (chars[i] == 'l' || chars[i] == 'L') {
+                // not allowing L with an exponent
+                return foundDigit && !hasExp;
+            }
+            // last character is illegal
+            return false;
+        }
+        // allowSigns is true iff the val ends in 'E'
+        // found digit it to make sure weird stuff like '.' and '1E-' doesn't pass
+        return false == allowSigns && foundDigit;
+    }
+
+    /**
+     * 截取两个字符串的不同部分（长度一致），判断截取的子串是否相同<br>
+     * 任意一个字符串为null返回false
+     *
+     * @param str1 第一个字符串
+     * @param start1 第一个字符串开始的位置
+     * @param str2 第二个字符串
+     * @param start2 第二个字符串开始的位置
+     * @param length 截取长度
+     * @param ignoreCase 是否忽略大小写
+     * @return 子串是否相同
+     * @since 3.2.1
+     */
+    public static boolean isSubEquals(CharSequence str1, int start1, CharSequence str2, int start2, int length,
+        boolean ignoreCase) {
+        if (null == str1 || null == str2) {
+            return false;
+        }
+
+        return str1.toString().regionMatches(ignoreCase, start1, str2.toString(), start2, length);
+    }
+
+    /**
+     * 指定范围内查找字符串
+     *
+     * @param str 字符串
+     * @param searchStr 需要查找位置的字符串
+     * @param fromIndex 起始位置
+     * @param ignoreCase 是否忽略大小写
+     * @return 位置
+     * @since 3.2.1
+     */
+    public static int indexOf(final CharSequence str, CharSequence searchStr, int fromIndex, boolean ignoreCase) {
+        if (str == null || searchStr == null) {
+            return INDEX_NOT_FOUND;
+        }
+        if (fromIndex < 0) {
+            fromIndex = 0;
+        }
+
+        final int endLimit = str.length() - searchStr.length() + 1;
+        if (fromIndex > endLimit) {
+            return INDEX_NOT_FOUND;
+        }
+        if (searchStr.length() == 0) {
+            return fromIndex;
+        }
+
+        if (!ignoreCase) {
+            // 不忽略大小写调用JDK方法
+            return str.toString().indexOf(searchStr.toString(), fromIndex);
+        }
+
+        for (int i = fromIndex; i < endLimit; i++) {
+            if (isSubEquals(str, i, searchStr, 0, searchStr.length(), true)) {
+                return i;
+            }
+        }
+        return INDEX_NOT_FOUND;
+    }
+
+    /**
+     * 切割指定位置之后部分的字符串
+     *
+     * @param string 字符串
+     * @param fromIndex 切割开始的位置（包括）
+     * @return 切割后后剩余的后半部分字符串
+     */
+    public static String subSuf(CharSequence string, int fromIndex) {
+        if (isEmpty(string)) {
+            return null;
+        }
+        return sub(string, fromIndex, string.length());
+    }
+
+    /**
+     * {@link CharSequence} 转为字符串，null安全
+     *
+     * @param cs {@link CharSequence}
+     * @return 字符串
+     */
+    public static String str(CharSequence cs) {
+        return null == cs ? null : cs.toString();
+    }
+
+    /**
+     * 替换字符串中的指定字符串，忽略大小写
+     *
+     * @param str 字符串
+     * @param searchStr 被查找的字符串
+     * @param replacement 被替换的字符串
+     * @return 替换后的字符串
+     * @since 4.0.3
+     */
+    public static String replaceIgnoreCase(CharSequence str, CharSequence searchStr, CharSequence replacement) {
+        return replace(str, 0, searchStr, replacement, true);
+    }
+
+    /**
+     * 替换字符串中的指定字符串
+     *
+     * @param str 字符串
+     * @param searchStr 被查找的字符串
+     * @param replacement 被替换的字符串
+     * @return 替换后的字符串
+     * @since 4.0.3
+     */
+    public static String replace(CharSequence str, CharSequence searchStr, CharSequence replacement) {
+        return replace(str, 0, searchStr, replacement, false);
+    }
+
+    /**
+     * 替换字符串中的指定字符串
+     *
+     * @param str 字符串
+     * @param searchStr 被查找的字符串
+     * @param replacement 被替换的字符串
+     * @param ignoreCase 是否忽略大小写
+     * @return 替换后的字符串
+     * @since 4.0.3
+     */
+    public static String replace(CharSequence str, CharSequence searchStr, CharSequence replacement,
+        boolean ignoreCase) {
+        return replace(str, 0, searchStr, replacement, ignoreCase);
+    }
+
+    /**
+     * 替换字符串中的指定字符串
+     *
+     * @param str 字符串
+     * @param fromIndex 开始位置（包括）
+     * @param searchStr 被查找的字符串
+     * @param replacement 被替换的字符串
+     * @param ignoreCase 是否忽略大小写
+     * @return 替换后的字符串
+     * @since 4.0.3
+     */
+    public static String replace(CharSequence str, int fromIndex, CharSequence searchStr, CharSequence replacement,
+        boolean ignoreCase) {
+        if (isEmpty(str) || isEmpty(searchStr)) {
+            return str(str);
+        }
+        if (null == replacement) {
+            replacement = EMPTY;
+        }
+
+        final int strLength = str.length();
+        final int searchStrLength = searchStr.length();
+        if (fromIndex > strLength) {
+            return str(str);
+        } else if (fromIndex < 0) {
+            fromIndex = 0;
+        }
+
+        StringBuilder result = new StringBuilder(strLength + 16);
+        if (0 != fromIndex) {
+            result.append(str.subSequence(0, fromIndex));
+        }
+
+        int preIndex = fromIndex;
+        int index;
+        while ((index = indexOf(str, searchStr, preIndex, ignoreCase)) > -1) {
+            result.append(str.subSequence(preIndex, index));
+            result.append(replacement);
+            preIndex = index + searchStrLength;
+        }
+
+        if (preIndex < strLength) {
+            // 结尾部分
+            result.append(str.subSequence(preIndex, strLength));
+        }
+        return result.toString();
+    }
+
+    /**
+     * 替换指定字符串的指定区间内字符为固定字符
+     *
+     * @param str 字符串
+     * @param startInclude 开始位置（包含）
+     * @param endExclude 结束位置（不包含）
+     * @param replacedChar 被替换的字符
+     * @return 替换后的字符串
+     * @since 3.2.1
+     */
+    public static String replace(CharSequence str, int startInclude, int endExclude, char replacedChar) {
+        if (isEmpty(str)) {
+            return str(str);
+        }
+        final int strLength = str.length();
+        if (startInclude > strLength) {
+            return str(str);
+        }
+        if (endExclude > strLength) {
+            endExclude = strLength;
+        }
+        if (startInclude > endExclude) {
+            // 如果起始位置大于结束位置，不替换
+            return str(str);
+        }
+
+        final char[] chars = new char[strLength];
+        for (int i = 0; i < strLength; i++) {
+            if (i >= startInclude && i < endExclude) {
+                chars[i] = replacedChar;
+            } else {
+                chars[i] = str.charAt(i);
+            }
+        }
+        return new String(chars);
+    }
+
+    /**
+     * 替换所有正则匹配的文本，并使用自定义函数决定如何替换<br>
+     * replaceFun可以通过{@link Matcher}提取出匹配到的内容的不同部分，然后经过重新处理、组装变成新的内容放回原位。
+     *
+     * <pre class="code">
+     * replaceAll(this.content, "(\\d+)", parameters -&gt; "-" + parameters.group(1) + "-")
+     * // 结果为："ZZZaaabbbccc中文-1234-"
+     * </pre>
+     *
+     * @param str 要替换的字符串
+     * @param pattern 用于匹配的正则式
+     * @param replaceFun 决定如何替换的函数
+     * @return 替换后的字符串
+     * @see ReUtil#replaceAll(CharSequence, java.util.regex.Pattern, Func1)
+     * @since 4.2.2
+     */
+    public static String replace(CharSequence str, java.util.regex.Pattern pattern,
+        Func1<java.util.regex.Matcher, String> replaceFun) {
+        return ReUtil.replaceAll(str, pattern, replaceFun);
+    }
+
+    /**
+     * 替换所有正则匹配的文本，并使用自定义函数决定如何替换
+     *
+     * @param str 要替换的字符串
+     * @param regex 用于匹配的正则式
+     * @param replaceFun 决定如何替换的函数
+     * @return 替换后的字符串
+     * @see ReUtil#replaceAll(CharSequence, String, Func1)
+     * @since 4.2.2
+     */
+    public static String replace(CharSequence str, String regex, Func1<java.util.regex.Matcher, String> replaceFun) {
+        return ReUtil.replaceAll(str, regex, replaceFun);
+    }
+
+    /**
+     * 替换指定字符串的指定区间内字符为"*"
+     * 俗称：脱敏功能，后面其他功能，可以见：DesensitizedUtils(脱敏工具类)
+     *
+     * <pre>
+     * StrUtil.hide(null,*,*)=null
+     * StrUtil.hide("",0,*)=""
+     * StrUtil.hide("jackduan@163.com",-1,4)   ****duan@163.com
+     * StrUtil.hide("jackduan@163.com",2,3)    ja*kduan@163.com
+     * StrUtil.hide("jackduan@163.com",3,2)    jackduan@163.com
+     * StrUtil.hide("jackduan@163.com",16,16)  jackduan@163.com
+     * StrUtil.hide("jackduan@163.com",16,17)  jackduan@163.com
+     * </pre>
+     *
+     * @param str 字符串
+     * @param startInclude 开始位置（包含）
+     * @param endExclude 结束位置（不包含）
+     * @return 替换后的字符串
+     * @since 4.1.14
+     */
+    public static String hide(CharSequence str, int startInclude, int endExclude) {
+        return replace(str, startInclude, endExclude, '*');
+    }
+
+    /**
+     * 脱敏，使用默认的脱敏策略
+     *
+     * <pre>
+     * StrUtil.desensitized("100", DesensitizedUtils.DesensitizedType.USER_ID)) =  "0"
+     * StrUtil.desensitized("段正淳", DesensitizedUtils.DesensitizedType.CHINESE_NAME)) = "段**"
+     * StrUtil.desensitized("51343620000320711X", DesensitizedUtils.DesensitizedType.ID_CARD)) = "5***************1X"
+     * StrUtil.desensitized("09157518479", DesensitizedUtils.DesensitizedType.FIXED_PHONE)) = "0915*****79"
+     * StrUtil.desensitized("18049531999", DesensitizedUtils.DesensitizedType.MOBILE_PHONE)) = "180****1999"
+     * StrUtil.desensitized("北京市海淀区马连洼街道289号", DesensitizedUtils.DesensitizedType.ADDRESS)) = "北京市海淀区马********"
+     * StrUtil.desensitized("duandazhi-jack@gmail.com.cn", DesensitizedUtils.DesensitizedType.EMAIL)) = "d*************@gmail.com.cn"
+     * StrUtil.desensitized("1234567890", DesensitizedUtils.DesensitizedType.PASSWORD)) = "**********"
+     * StrUtil.desensitized("苏D40000", DesensitizedUtils.DesensitizedType.CAR_LICENSE)) = "苏D4***0"
+     * StrUtil.desensitized("11011111222233333256", DesensitizedType.BANK_CARD)) = "1101 **** **** **** 3256"
+     * </pre>
+     *
+     * @param str 字符串
+     * @param desensitizedType 脱敏类型;可以脱敏：用户id、中文名、身份证号、座机号、手机号、地址、电子邮件、密码
+     * @return 脱敏之后的字符串
+     * @author dazer and neusoft and qiaomu
+     * @see DesensitizedUtil 如果需要自定义，脱敏规则，请使用该工具类；
+     * @since 5.6.2
+     */
+    public static String desensitized(CharSequence str, DesensitizedUtil.DesensitizedType desensitizedType) {
+        return DesensitizedUtil.desensitized(str, desensitizedType);
+    }
+
+    /**
+     * 替换字符字符数组中所有的字符为replacedStr<br>
+     * 提供的chars为所有需要被替换的字符，例如："\r\n"，则"\r"和"\n"都会被替换，哪怕他们单独存在
+     *
+     * @param str 被检查的字符串
+     * @param chars 需要替换的字符列表，用一个字符串表示这个字符列表
+     * @param replacedStr 替换成的字符串
+     * @return 新字符串
+     * @since 3.2.2
+     */
+    public static String replaceChars(CharSequence str, String chars, CharSequence replacedStr) {
+        if (isEmpty(str) || isEmpty(chars)) {
+            return str(str);
+        }
+        return replaceChars(str, chars.toCharArray(), replacedStr);
+    }
+
+    /**
+     * 替换字符字符数组中所有的字符为replacedStr
+     *
+     * @param str 被检查的字符串
+     * @param chars 需要替换的字符列表
+     * @param replacedStr 替换成的字符串
+     * @return 新字符串
+     * @since 3.2.2
+     */
+    public static String replaceChars(CharSequence str, char[] chars, CharSequence replacedStr) {
+        if (isEmpty(str) || ObjectUtils.isEmpty(chars)) {
+            return str(str);
+        }
+
+        final Set<Character> set = new HashSet<>(chars.length);
+        for (char c : chars) {
+            set.add(c);
+        }
+        int strLen = str.length();
+        final StringBuilder builder = new StringBuilder();
+        char c;
+        for (int i = 0; i < strLen; i++) {
+            c = str.charAt(i);
+            builder.append(set.contains(c) ? replacedStr : c);
+        }
+        return builder.toString();
+    }
+
+    /**
+     * 字符串的每一个字符是否都与定义的匹配器匹配
+     *
+     * @param value 字符串
+     * @param matcher 匹配器
+     * @return 是否全部匹配
+     * @since 3.2.3
+     */
+    public static boolean isAllCharMatch(CharSequence value, Matcher<Character> matcher) {
+        if (isBlank(value)) {
+            return false;
+        }
+        for (int i = value.length(); --i >= 0;) {
+            if (!matcher.match(value.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     /**
      * 数组或集合转String
@@ -52,6 +530,57 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         }
 
         return obj.toString();
+    }
+
+    /**
+     * 查找指定字符串是否包含指定字符串列表中的任意一个字符串，如果包含返回找到的第一个字符串
+     *
+     * @param str 指定字符串
+     * @param testStrs 需要检查的字符串数组
+     * @return 被包含的第一个字符串
+     * @since 3.2.0
+     */
+    public static String getContainsStr(CharSequence str, CharSequence... testStrs) {
+        if (isEmpty(str) || ObjectUtils.isEmpty(testStrs)) {
+            return null;
+        }
+        for (CharSequence checkStr : testStrs) {
+            if (str.toString().contains(checkStr)) {
+                return checkStr.toString();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 查找指定字符串是否包含指定字符串列表中的任意一个字符串
+     *
+     * @param str 指定字符串
+     * @param testStrs 需要检查的字符串数组
+     * @return 是否包含任意一个字符串
+     * @since 3.2.0
+     */
+    public static boolean containsAny(CharSequence str, CharSequence... testStrs) {
+        return null != getContainsStr(str, testStrs);
+    }
+
+    /**
+     * 查找指定字符串是否包含指定字符列表中的任意一个字符
+     *
+     * @param str 指定字符串
+     * @param testChars 需要检查的字符数组
+     * @return 是否包含任意一个字符
+     * @since 4.1.11
+     */
+    public static boolean containsAny(CharSequence str, char... testChars) {
+        int index = -1;
+        if (!isEmpty(str)) {
+            String s = CharsetUtil.str(str);
+            for (char testChar : testChars) {
+                index = s.indexOf(testChar);
+            }
+        }
+        return index == -1;
     }
 
     /**
@@ -574,7 +1103,6 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         return sb.toString();
     }
 
-
     // ---------------------------------------------------------------------
     // Convenience methods for working with formatted Strings
     // ---------------------------------------------------------------------
@@ -1009,7 +1537,6 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         }
         return timeZone;
     }
-
 
     // ---------------------------------------------------------------------
     // Convenience methods for working with String arrays

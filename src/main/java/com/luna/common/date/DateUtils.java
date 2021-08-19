@@ -6,10 +6,7 @@ import com.luna.common.constant.StrPoolConstant;
 import java.lang.management.ManagementFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class DateUtils {
 
@@ -37,6 +34,8 @@ public class DateUtils {
 
     private static final SimpleDateFormat              SDF_DATE                   =
         new SimpleDateFormat(FORMAT_YYYY_MM_DD);
+    private static final SimpleDateFormat              PURE_DATE_FORMAT           =
+        new SimpleDateFormat(FORMAT_YYYYMMDD);
     private static final SimpleDateFormat              SDF_DATETIME               =
         new SimpleDateFormat(FORMAT_YYYY_MM_DD_HH_MM_SS);
     private static final SimpleDateFormat              SDF_SHORTDATETIME          =
@@ -122,7 +121,18 @@ public class DateUtils {
      */
     public static Date parseDateTime(String strDate) {
         try {
-            return parse("yyyy-MM-dd HH:mm:ss", strDate);
+            return parse(FORMAT_YYYY_MM_DD_HH_MM_SS, strDate);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 只支持格式yyMMdd
+     */
+    public static Date parseDateDay(String strDate) {
+        try {
+            return parse(FORMAT_YYYYMMDD, strDate);
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
@@ -132,7 +142,7 @@ public class DateUtils {
      * 只支持格式HH:mm:ss
      */
     public static Date parseTime(String timeOnly) {
-        timeOnly = formatDate(new Date()) + " " + timeOnly;
+        timeOnly = formatDate(new Date()) + StrPoolConstant.BLANK + timeOnly;
         try {
             return parse(FORMAT_YYYY_MM_DD_HH_MM_SS, timeOnly);
         } catch (ParseException e) {
@@ -271,6 +281,10 @@ public class DateUtils {
      */
     public static long getCurrentTimestampMs() {
         return System.currentTimeMillis();
+    }
+
+    public static Date getCurrentDate() {
+        return new Date(getCurrentTimestampMs());
     }
 
     public static String getTimeInteval(Date date) {
@@ -505,4 +519,22 @@ public class DateUtils {
         return calendar.getTime().getTime();
     }
 
+    /**
+     * 当前年份
+     * 
+     * @return
+     */
+    public static int thisYear() {
+        return getYear(getCurrentDate());
+    }
+
+    /**
+     * 是否闰年
+     *
+     * @param year 年
+     * @return 是否闰年
+     */
+    public static boolean isLeapYear(int year) {
+        return new GregorianCalendar().isLeapYear(year);
+    }
 }

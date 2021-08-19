@@ -7,7 +7,7 @@ import java.util.Random;
 /**
  * @author luna
  */
-public class RandomIDCardUtil {
+public class RandomIDCardUtil extends IdcardUtil {
 
     static final int[] CITIES = {
             350602, 370782, 513431, 532624, 530426, 370203, 350128, 421002, 350624, 430225, 360300, 350203, 220211, 420822,

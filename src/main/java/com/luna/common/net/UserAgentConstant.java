@@ -1,10 +1,7 @@
 package com.luna.common.net;
 
 /**
- * @author luna@mac
- * @className UserAgentConstant.java
- * @description TODO
- * @createTime 2021年03月28日 14:07:00
+ * @author Luna
  */
 public interface UserAgentConstant {
     /** Chrome(谷歌) */

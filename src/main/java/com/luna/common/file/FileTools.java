@@ -3,15 +3,21 @@ package com.luna.common.file;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.List;
 
 import com.luna.common.constant.Constant;
+import com.luna.common.exception.BaseException;
+import com.luna.common.file.visitor.MoveVisitor;
+import com.luna.common.text.Assert;
 import com.luna.common.text.CharsetUtil;
-import org.apache.commons.io.FileExistsException;
+import com.luna.common.text.StringUtils;
 import org.apache.commons.io.FileUtils;
+import oshi.util.FileUtil;
+
+import static com.luna.common.file.PathUtil.del;
+import static com.luna.common.i18n.LanguageAlpha3Code.del;
+import static java.nio.file.Files.isDirectory;
 
 /**
  * @author Luna
@@ -178,7 +184,7 @@ public class FileTools {
     public static void createDirectory(String pathDir) {
         try {
             Path path = Paths.get(pathDir);
-            if (!Files.isDirectory(path)) {
+            if (!isDirectory(path)) {
                 path = path.getParent();
             }
             Files.createDirectories(path);
@@ -266,13 +272,143 @@ public class FileTools {
     }
 
     /**
+     * 修改文件或目录的文件名，不变更路径，只是简单修改文件名，不保留扩展名。<br>
+     *
+     * <pre>
+     * FileUtil.rename(file, "aaa.png", true) xx/xx.png =》xx/aaa.png
+     * </pre>
+     *
+     * @param file 被修改的文件
+     * @param newName 新的文件名，如需扩展名，需自行在此参数加上，原文件名的扩展名不会被保留
+     * @param isOverride 是否覆盖目标文件
+     * @return 目标文件
+     * @since 5.3.6
+     */
+    public static File rename(File file, String newName, boolean isOverride) {
+        return rename(file, newName, false, isOverride);
+    }
+
+    /**
+     * 修改文件或目录的文件名，不变更路径，只是简单修改文件名<br>
+     * 重命名有两种模式：<br>
+     * 1、isRetainExt为true时，保留原扩展名：
+     *
+     * <pre>
+     * FileUtil.rename(file, "aaa", true) xx/xx.png =》xx/aaa.png
+     * </pre>
+     *
+     * <p>
+     * 2、isRetainExt为false时，不保留原扩展名，需要在newName中
+     *
+     * <pre>
+     * FileUtil.rename(file, "aaa.jpg", false) xx/xx.png =》xx/aaa.jpg
+     * </pre>
+     *
+     * @param file 被修改的文件
+     * @param newName 新的文件名，包括扩展名
+     * @param isRetainExt 是否保留原文件的扩展名，如果保留，则newName不需要加扩展名
+     * @param isOverride 是否覆盖目标文件
+     * @return 目标文件
+     * @see PathUtil#rename(Path, String, boolean)
+     * @since 3.0.9
+     */
+    public static File rename(File file, String newName, boolean isRetainExt, boolean isOverride) {
+        if (isRetainExt) {
+            final String extName = FileNameUtil.extName(file);
+            if (StringUtils.isNotBlank(extName)) {
+                newName = newName.concat(".").concat(extName);
+            }
+        }
+        return rename(file.toPath(), newName, isOverride).toFile();
+    }
+
+    /**
+     * 修改文件或目录的文件名，不变更路径，只是简单修改文件名<br>
+     *
+     * <pre>
+     * FileUtil.rename(file, "aaa.jpg", false) xx/xx.png =》xx/aaa.jpg
+     * </pre>
+     *
+     * @param path 被修改的文件
+     * @param newName 新的文件名，包括扩展名
+     * @param isOverride 是否覆盖目标文件
+     * @return 目标文件Path
+     * @since 5.4.1
+     */
+    public static Path rename(Path path, String newName, boolean isOverride) {
+        return move(path, path.resolveSibling(newName), isOverride);
+    }
+
+    /**
+     * 移动文件或目录<br>
+     * 当目标是目录时，会将源文件或文件夹整体移动至目标目录下<br>
+     * 例如：move("/usr/aaa", "/usr/bbb")结果为："/usr/bbb/aaa"
+     *
+     * @param src 源文件或目录路径
+     * @param target 目标路径，如果为目录，则移动到此目录下
+     * @param isOverride 是否覆盖目标文件
+     * @return 目标文件Path
+     * @since 5.5.1
+     */
+    public static Path move(Path src, Path target, boolean isOverride) {
+        Assert.notNull(src, "Src path must be not null !");
+        Assert.notNull(target, "Target path must be not null !");
+        final CopyOption[] options =
+            isOverride ? new CopyOption[] {StandardCopyOption.REPLACE_EXISTING} : new CopyOption[] {};
+        if (isDirectory(target)) {
+            target = target.resolve(src.getFileName());
+        }
+        // 自动创建目标的父目录
+        createDirectory(target.toString());
+        try {
+            return Files.move(src, target, options);
+        } catch (IOException e) {
+            // 移动失败，可能是跨分区移动导致的，采用递归移动方式
+            try {
+                Files.walkFileTree(src, new MoveVisitor(src, target, options));
+                // 移动后空目录没有删除，
+                del(src);
+            } catch (IOException e2) {
+                throw new RuntimeException(e2);
+            }
+            return target;
+        }
+    }
+
+    /**
      * 清空目录下所有文件
      * 
-     * @param path
+     * @param path 目录路径
      */
     public static void cleanDirectory(String path) {
+        cleanDirectory(new File(path), false);
+    }
+
+    /**
+     * 清空目录下所有文件
+     *
+     * @param path 目录路径
+     * @param parent 路径为文件时，是否从父路径清除
+     */
+    public static void cleanDirectory(String path, boolean parent) {
+        cleanDirectory(new File(path), parent);
+    }
+
+    /**
+     * 清空目录下所有文件
+     *
+     * @param file 文件系统
+     * @param parent 路径为文件时，是否从父路径清除
+     */
+    public static void cleanDirectory(File file, boolean parent) {
         try {
-            FileUtils.cleanDirectory(new File(path));
+            if (file.isFile()) {
+                if (!parent) {
+                    throw new BaseException("文件不是目录");
+                }
+                file = file.getParentFile();
+            }
+            FileUtils.cleanDirectory(file);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
