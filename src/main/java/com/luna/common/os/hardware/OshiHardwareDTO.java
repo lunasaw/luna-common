@@ -1,5 +1,6 @@
 package com.luna.common.os.hardware;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -7,45 +8,79 @@ import java.util.Set;
  */
 public class OshiHardwareDTO {
     /** hostname */
-    private String               hostName;
+    private String         hostName;
 
     /** 制造商 */
-    private String               manufacturer;
+    private String         manufacturer;
 
     /** 型号 */
-    private String               model;
+    private String         model;
 
     /** 序列号 */
-    private String               serialNumber;
+    private String         serialNumber;
 
     /** 固件信息 */
-    private FirmwareDTO firmwareDTO;
+    private FirmwareDTO    firmwareDTO;
 
     /** 主板信息 */
     private MotherboardDTO motherboardDTO;
 
     /** MAC地址List */
-    private Set<String> macAddressSet;
+    private Set<String>    macAddressSet;
 
     /** 处理器信息 */
-    private ProcessorDTO processorDTO;
+    private ProcessorDTO   processorDTO;
 
     /** 内存信息 */
-    private MemoryDTO memoryDTO;
+    private MemoryDTO      memoryDTO;
+
+    /** JVM */
+    private JvmDTO         jvmDTO;
+
+    private List<SysFile>  sysFiles;
+
+    private SystemInfoDTO  systemInfoDTO;
 
     @Override
     public String toString() {
         return "OshiHardwareDTO{" +
-                "hostName='" + hostName + '\'' +
-                ", manufacturer='" + manufacturer + '\'' +
-                ", model='" + model + '\'' +
-                ", serialNumber='" + serialNumber + '\'' +
-                ", firmwareDTO=" + firmwareDTO +
-                ", motherboardDTO=" + motherboardDTO +
-                ", macAddressSet=" + macAddressSet +
-                ", processorDTO=" + processorDTO +
-                ", memoryDTO=" + memoryDTO +
-                '}';
+            "hostName='" + hostName + '\'' +
+            ", manufacturer='" + manufacturer + '\'' +
+            ", model='" + model + '\'' +
+            ", serialNumber='" + serialNumber + '\'' +
+            ", firmwareDTO=" + firmwareDTO +
+            ", motherboardDTO=" + motherboardDTO +
+            ", macAddressSet=" + macAddressSet +
+            ", processorDTO=" + processorDTO +
+            ", memoryDTO=" + memoryDTO +
+            ", jvmDTO=" + jvmDTO +
+            ", sysFiles=" + sysFiles +
+            ", systemInfoDTO=" + systemInfoDTO +
+            '}';
+    }
+
+    public SystemInfoDTO getSystemInfoDTO() {
+        return systemInfoDTO;
+    }
+
+    public void setSystemInfoDTO(SystemInfoDTO systemInfoDTO) {
+        this.systemInfoDTO = systemInfoDTO;
+    }
+
+    public List<SysFile> getSysFiles() {
+        return sysFiles;
+    }
+
+    public void setSysFiles(List<SysFile> sysFiles) {
+        this.sysFiles = sysFiles;
+    }
+
+    public JvmDTO getJvmDTO() {
+        return jvmDTO;
+    }
+
+    public void setJvmDTO(JvmDTO jvmDTO) {
+        this.jvmDTO = jvmDTO;
     }
 
     public String getHostName() {

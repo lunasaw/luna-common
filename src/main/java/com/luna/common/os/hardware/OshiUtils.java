@@ -1,15 +1,23 @@
 package com.luna.common.os.hardware;
 
-import java.util.Set;
+import java.util.*;
 
+import com.luna.common.os.SystemInfoUtil;
+import com.luna.common.text.Calculator;
+import com.luna.common.text.NumberUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.common.collect.Sets;
 
-
 import oshi.SystemInfo;
+import oshi.hardware.CentralProcessor;
+import oshi.hardware.GlobalMemory;
 import oshi.hardware.HardwareAbstractionLayer;
 import oshi.hardware.NetworkIF;
+import oshi.software.os.FileSystem;
+import oshi.software.os.OSFileStore;
+import oshi.software.os.OperatingSystem;
+import oshi.util.Util;
 
 /**
  * @author Luna
@@ -17,9 +25,13 @@ import oshi.hardware.NetworkIF;
 public class OshiUtils {
 
     public static void main(String[] args) {
+        new OshiUtils().setCpuInfo(si.getHardware().getProcessor());
         System.out.println(oshiHardwareDTO);
     }
-    private final static Logger    logger = LoggerFactory.getLogger(OshiUtils.class);
+
+    private final static Logger    logger           = LoggerFactory.getLogger(OshiUtils.class);
+
+    private static final int       OSHI_WAIT_SECOND = 1000;
 
     private static OshiHardwareDTO oshiHardwareDTO;
 
@@ -27,9 +39,17 @@ public class OshiUtils {
         return oshiHardwareDTO;
     }
 
+    private static SystemInfo si = new SystemInfo();
+
+    public SystemInfo getInstance() {
+        if (si == null) {
+            si = new SystemInfo();
+        }
+        return si;
+    }
+
     static {
         // oshi
-        SystemInfo si = new SystemInfo();
         HardwareAbstractionLayer hal = si.getHardware();
 
         oshiHardwareDTO = new OshiHardwareDTO();
@@ -64,13 +84,13 @@ public class OshiUtils {
         processorDTO.setPhysicalPackageCount(hal.getProcessor().getPhysicalPackageCount());
         processorDTO.setPhysicalProcessorCount(hal.getProcessor().getPhysicalProcessorCount());
         processorDTO.setLogicalProcessorCount(hal.getProcessor().getLogicalProcessorCount());
-        processorDTO.setProcessorId(hal.getProcessor().getProcessorID());
+        processorDTO.setProcessorId(hal.getProcessor().getProcessorIdentifier().getProcessorID());
         oshiHardwareDTO.setProcessorDTO(processorDTO);
 
         // 获取内存有关的信息
         MemoryDTO memoryDTO = new MemoryDTO();
-        memoryDTO.setMemeryTotal(hal.getMemory().getTotal());
-        memoryDTO.setSwapTotal(hal.getMemory().getSwapTotal());
+        memoryDTO.setMemeryTotal(Calculator.getPrintSize(hal.getMemory().getTotal()));
+        memoryDTO.setSwapTotal(Calculator.getPrintSize(hal.getMemory().getVirtualMemory().getSwapTotal()));
         oshiHardwareDTO.setMemoryDTO(memoryDTO);
 
         logger.info("init oshiHardwareDTO success, oshiHardwareDTO={}", oshiHardwareDTO);
@@ -87,7 +107,7 @@ public class OshiUtils {
     private static Set<String> acquireMACAddressSet(HardwareAbstractionLayer hal) {
         Set<String> macAddressSet = Sets.newHashSet();
 
-        NetworkIF[] networkIFs = hal.getNetworkIFs();
+        List<NetworkIF> networkIFs = hal.getNetworkIFs();
         for (NetworkIF net : networkIFs) {
             // 排除几种常见的虚拟网卡
             if (!net.getDisplayName().startsWith("Microsoft Wi-Fi Direct Virtual") &&
@@ -101,5 +121,110 @@ public class OshiUtils {
         }
 
         return macAddressSet;
+    }
+
+    /**
+     * 设置CPU信息
+     */
+    private void setCpuInfo(CentralProcessor processor) {
+        // CPU信息
+        ProcessorDTO processorDTO = new ProcessorDTO();
+        processorDTO.setName(processor.toString());
+        processorDTO.setPhysicalPackageCount(processor.getPhysicalPackageCount());
+        processorDTO.setPhysicalProcessorCount(processor.getPhysicalProcessorCount());
+        processorDTO.setLogicalProcessorCount(processor.getLogicalProcessorCount());
+        processorDTO.setProcessorId(processor.getProcessorIdentifier().getProcessorID());
+        long[] prevTicks = processor.getSystemCpuLoadTicks();
+        Util.sleep(OSHI_WAIT_SECOND);
+        long[] ticks = processor.getSystemCpuLoadTicks();
+        long nice =
+            ticks[CentralProcessor.TickType.NICE.getIndex()] - prevTicks[CentralProcessor.TickType.NICE.getIndex()];
+        long irq =
+            ticks[CentralProcessor.TickType.IRQ.getIndex()] - prevTicks[CentralProcessor.TickType.IRQ.getIndex()];
+        long softirq = ticks[CentralProcessor.TickType.SOFTIRQ.getIndex()]
+            - prevTicks[CentralProcessor.TickType.SOFTIRQ.getIndex()];
+        long steal =
+            ticks[CentralProcessor.TickType.STEAL.getIndex()] - prevTicks[CentralProcessor.TickType.STEAL.getIndex()];
+        long cSys =
+            ticks[CentralProcessor.TickType.SYSTEM.getIndex()] - prevTicks[CentralProcessor.TickType.SYSTEM.getIndex()];
+        long user =
+            ticks[CentralProcessor.TickType.USER.getIndex()] - prevTicks[CentralProcessor.TickType.USER.getIndex()];
+        long iowait =
+            ticks[CentralProcessor.TickType.IOWAIT.getIndex()] - prevTicks[CentralProcessor.TickType.IOWAIT.getIndex()];
+        long idle =
+            ticks[CentralProcessor.TickType.IDLE.getIndex()] - prevTicks[CentralProcessor.TickType.IDLE.getIndex()];
+        long totalCpu = user + nice + cSys + idle + iowait + irq + softirq + steal;
+        processorDTO.setUser(NumberUtil.decimalFormat("0.##%", NumberUtil.div(user, totalCpu)));
+        processorDTO.setNice(NumberUtil.decimalFormat("0.##%", NumberUtil.div(nice, totalCpu)));
+        processorDTO.setSystem(NumberUtil.decimalFormat("0.##%", NumberUtil.div(cSys, totalCpu)));
+        processorDTO.setIdle(NumberUtil.decimalFormat("0.##%", NumberUtil.div(idle, totalCpu)));
+        processorDTO.setWait(NumberUtil.decimalFormat("0.##%", NumberUtil.div(iowait, totalCpu)));
+        oshiHardwareDTO.setProcessorDTO(processorDTO);
+    }
+
+    /**
+     * 设置内存信息
+     */
+    private void setMemInfo(GlobalMemory memory) {
+        MemoryDTO memoryDTO = new MemoryDTO();
+        memoryDTO.setMemeryTotal(Calculator.getPrintSize(memory.getTotal()));
+        memoryDTO.setSwapTotal(Calculator.getPrintSize(memory.getVirtualMemory().getSwapTotal()));
+        memoryDTO.setUsed(Calculator.getPrintSize(memory.getTotal() - memory.getAvailable()));
+        memoryDTO.setFree(Calculator.getPrintSize(memory.getAvailable()));
+        oshiHardwareDTO.setMemoryDTO(memoryDTO);
+    }
+
+    /**
+     * 设置Java虚拟机
+     */
+    private void setJvmInfo() {
+        Properties props = System.getProperties();
+        JvmDTO jvmDTO = new JvmDTO();
+        jvmDTO.setTotal(Calculator.getPrintSize(Runtime.getRuntime().totalMemory()));
+        jvmDTO.setMax(Calculator.getPrintSize(Runtime.getRuntime().maxMemory()));
+        jvmDTO.setFree(Calculator.getPrintSize(Runtime.getRuntime().freeMemory()));
+        jvmDTO.setVersion(props.getProperty("java.version"));
+        jvmDTO.setHome(props.getProperty("java.home"));
+        jvmDTO.setRunTime(JvmDTO.getRunTime());
+        jvmDTO.setStartTime(JvmDTO.getStartTime());
+        oshiHardwareDTO.setJvmDTO(jvmDTO);
+    }
+
+    /**
+     * 设置磁盘信息
+     */
+    private void setSysFiles(OperatingSystem os) {
+        FileSystem fileSystem = os.getFileSystem();
+        List<OSFileStore> fileStores = fileSystem.getFileStores();
+        List<SysFile> list = new ArrayList<>();
+        for (OSFileStore fs : fileStores) {
+            long free = fs.getUsableSpace();
+            long total = fs.getTotalSpace();
+            long used = total - free;
+            SysFile sysFile = new SysFile();
+            sysFile.setDirName(fs.getMount());
+            sysFile.setSysTypeName(fs.getType());
+            sysFile.setTypeName(fs.getName());
+            sysFile.setTotal(Calculator.getPrintSize(total));
+            sysFile.setFree(Calculator.getPrintSize(free));
+            sysFile.setUsed(Calculator.getPrintSize(used));
+            sysFile.setUsage(NumberUtil.decimalFormat("0.##%", NumberUtil.div(used, total)));
+            list.add(sysFile);
+        }
+        oshiHardwareDTO.setSysFiles(list);
+    }
+
+    /**
+     * 设置服务器信息
+     */
+    private void setSysInfo() {
+        Properties props = System.getProperties();
+        SystemInfoDTO systemInfoDTO = new SystemInfoDTO();
+        systemInfoDTO.setComputerName(SystemInfoUtil.getHostName());
+        systemInfoDTO.setComputerIp(systemInfoDTO.getComputerIp());
+        systemInfoDTO.setOsName(props.getProperty("os.name"));
+        systemInfoDTO.setOsArch(props.getProperty("os.arch"));
+        systemInfoDTO.setUserDir(props.getProperty("user.dir"));
+        oshiHardwareDTO.setSystemInfoDTO(systemInfoDTO);
     }
 }

@@ -87,7 +87,7 @@
         <dependency>
             <groupId>com.github.oshi</groupId>
             <artifactId>oshi-core</artifactId>
-            <version>3.9.1</version> <!-- 这个版本不要随便升级，和JNA的环境有关 -->
+            <version>5.8.1</version> <!-- 这个版本不要随便升级，和JNA的环境有关 -->
         </dependency>
     </dependencies>
 

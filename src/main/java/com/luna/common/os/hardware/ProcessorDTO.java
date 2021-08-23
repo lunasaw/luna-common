@@ -15,6 +15,31 @@ public class ProcessorDTO {
     /** 逻辑核心数量 */
     private Integer    logicalProcessorCount;
 
+    /**
+     * 总计使用
+     */
+    private String  nice;
+
+    /**
+     * 系统使用
+     */
+    private String  system;
+
+    /**
+     * 用户使用
+     */
+    private String  user;
+
+    /**
+     * IO等待
+     */
+    private String  wait;
+
+    /**
+     * 闲
+     */
+    private String  idle;
+
     public String getName() {
         return name;
     }
@@ -55,6 +80,46 @@ public class ProcessorDTO {
         this.processorId = processorId;
     }
 
+    public String getNice() {
+        return nice;
+    }
+
+    public void setNice(String nice) {
+        this.nice = nice;
+    }
+
+    public String getSystem() {
+        return system;
+    }
+
+    public void setSystem(String system) {
+        this.system = system;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public String getWait() {
+        return wait;
+    }
+
+    public void setWait(String wait) {
+        this.wait = wait;
+    }
+
+    public String getIdle() {
+        return idle;
+    }
+
+    public void setIdle(String idle) {
+        this.idle = idle;
+    }
+
     @Override
     public String toString() {
         return "ProcessorDTO{" +
@@ -63,6 +128,11 @@ public class ProcessorDTO {
                 ", physicalPackageCount=" + physicalPackageCount +
                 ", physicalProcessorCount=" + physicalProcessorCount +
                 ", logicalProcessorCount=" + logicalProcessorCount +
+            ", nice='" + nice + '\'' +
+            ", system='" + system + '\'' +
+            ", user='" + user + '\'' +
+            ", wait='" + wait + '\'' +
+            ", idle='" + idle + '\'' +
                 '}';
     }
 }

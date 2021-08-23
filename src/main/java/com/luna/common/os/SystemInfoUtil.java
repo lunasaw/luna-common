@@ -23,7 +23,7 @@ public class SystemInfoUtil {
      * @return
      */
     public static List<OSProcess> getProcesses() {
-        return Arrays.asList(SI.getOperatingSystem().getProcesses(0, null));
+        return SI.getOperatingSystem().getProcesses();
     }
 
 

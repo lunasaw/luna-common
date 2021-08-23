@@ -20,6 +20,41 @@ import java.util.*;
 public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
     /**
+     * 清理空白字符
+     *
+     * @param str 被清理的字符串
+     * @return 清理后的字符串
+     */
+    public static String cleanBlank(CharSequence str) {
+        return filter(str, c -> !CharsetUtil.isBlankChar(c));
+    }
+
+    /**
+     * 过滤字符串
+     *
+     * @param str 字符串
+     * @param filter 过滤器，{@link Filter#accept(Object)}返回为{@code true}的保留字符
+     * @return 过滤后的字符串
+     * @since 5.4.0
+     */
+    public static String filter(CharSequence str, final Filter<Character> filter) {
+        if (str == null || filter == null) {
+            return str(str);
+        }
+
+        int len = str.length();
+        final StringBuilder sb = new StringBuilder(len);
+        char c;
+        for (int i = 0; i < len; i++) {
+            c = str.charAt(i);
+            if (filter.accept(c)) {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
      * 是否为数字，支持包括：
      *
      * <pre>
@@ -131,6 +166,129 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         return false == allowSigns && foundDigit;
     }
 
+    // ------------------------------------------------------------------------ startWith
+
+    /**
+     * 字符串是否以给定字符开始
+     *
+     * @param str 字符串
+     * @param c 字符
+     * @return 是否开始
+     */
+    public static boolean startWith(CharSequence str, char c) {
+        if (isEmpty(str)) {
+            return false;
+        }
+        return c == str.charAt(0);
+    }
+
+    /**
+     * 是否以指定字符串开头<br>
+     * 如果给定的字符串和开头字符串都为null则返回true，否则任意一个值为null返回false
+     *
+     * @param str 被监测字符串
+     * @param prefix 开头字符串
+     * @param ignoreCase 是否忽略大小写
+     * @return 是否以指定字符串开头
+     * @since 5.4.3
+     */
+    public static boolean startWith(CharSequence str, CharSequence prefix, boolean ignoreCase) {
+        return startWith(str, prefix, ignoreCase, false);
+    }
+
+    /**
+     * 是否以指定字符串开头<br>
+     * 如果给定的字符串和开头字符串都为null则返回true，否则任意一个值为null返回false
+     *
+     * @param str 被监测字符串
+     * @param prefix 开头字符串
+     * @param ignoreCase 是否忽略大小写
+     * @param ignoreEquals 是否忽略字符串相等的情况
+     * @return 是否以指定字符串开头
+     * @since 5.4.3
+     */
+    public static boolean startWith(CharSequence str, CharSequence prefix, boolean ignoreCase, boolean ignoreEquals) {
+        if (null == str || null == prefix) {
+            if (!ignoreEquals) {
+                return false;
+            }
+            return null == str && null == prefix;
+        }
+
+        boolean isStartWith;
+        if (ignoreCase) {
+            isStartWith = str.toString().toLowerCase().startsWith(prefix.toString().toLowerCase());
+        } else {
+            isStartWith = str.toString().startsWith(prefix.toString());
+        }
+
+        if (isStartWith) {
+            boolean b = false;
+            if (ignoreCase) {
+                b = str.toString().equalsIgnoreCase(prefix.toString());
+            } else {
+                b = str.toString().contentEquals(prefix);
+            }
+            return (!ignoreEquals) || (!b);
+        }
+        return false;
+    }
+
+    /**
+     * 是否以指定字符串开头
+     *
+     * @param str 被监测字符串
+     * @param prefix 开头字符串
+     * @return 是否以指定字符串开头
+     */
+    public static boolean startWith(CharSequence str, CharSequence prefix) {
+        return startWith(str, prefix, false);
+    }
+
+    /**
+     * 是否以指定字符串开头，忽略相等字符串的情况
+     *
+     * @param str 被监测字符串
+     * @param prefix 开头字符串
+     * @return 是否以指定字符串开头并且两个字符串不相等
+     */
+    public static boolean startWithIgnoreEquals(CharSequence str, CharSequence prefix) {
+        return startWith(str, prefix, false, true);
+    }
+
+    /**
+     * 是否以指定字符串开头，忽略大小写
+     *
+     * @param str 被监测字符串
+     * @param prefix 开头字符串
+     * @return 是否以指定字符串开头
+     */
+    public static boolean startWithIgnoreCase(CharSequence str, CharSequence prefix) {
+        return startWith(str, prefix, true);
+    }
+
+    /**
+     * 给定字符串是否以任何一个字符串开始<br>
+     * 给定字符串和数组为空都返回false
+     *
+     * @param str 给定字符串
+     * @param prefixes 需要检测的开始字符串
+     * @return 给定字符串是否以任何一个字符串开始
+     * @since 3.0.6
+     */
+    public static boolean startWithAny(CharSequence str, CharSequence... prefixes) {
+        if (isEmpty(str) || ObjectUtils.isEmpty(prefixes)) {
+            return false;
+        }
+
+        for (CharSequence suffix : prefixes) {
+            if (startWith(str, suffix, false)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * 截取两个字符串的不同部分（长度一致），判断截取的子串是否相同<br>
      * 任意一个字符串为null返回false
@@ -190,6 +348,25 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
             }
         }
         return INDEX_NOT_FOUND;
+    }
+
+    /**
+     * 去掉指定后缀
+     *
+     * @param str 字符串
+     * @param suffix 后缀
+     * @return 切掉后的字符串，若后缀不是 suffix， 返回原字符串
+     */
+    public static String removeSuffix(CharSequence str, CharSequence suffix) {
+        if (isEmpty(str) || isEmpty(suffix)) {
+            return str(str);
+        }
+
+        final String str2 = str.toString();
+        if (str2.endsWith(suffix.toString())) {
+            return subPre(str2, str2.length() - suffix.length());// 截取前半段
+        }
+        return str2;
     }
 
     /**
