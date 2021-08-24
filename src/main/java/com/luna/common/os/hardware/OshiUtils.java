@@ -26,44 +26,26 @@ import oshi.util.Util;
  */
 public class OshiUtils {
 
-    public static void main(String[] args) {
-        cpuInfo(getInstance().getHardware().getProcessor());
-        memoryInfo(getInstance().getHardware().getMemory());
-        jvmInfo();
-        sysFiles(getInstance().getOperatingSystem());
-        sysInfo();
-        System.out.println(oshiHardwareDTO);
-    }
-
     private final static Logger    logger           = LoggerFactory.getLogger(OshiUtils.class);
 
     private static final int       OSHI_WAIT_SECOND = 1000;
 
-    private static OshiHardwareDTO oshiHardwareDTO;
 
-    public static OshiHardwareDTO getOshiHardwareDTO() {
-        return oshiHardwareDTO;
+    public static void refresh(OshiHardwareDTO oshiHardwareDTO, SystemInfo si) {
+        ProcessorDTO processorDTO = cpuInfo(si.getHardware().getProcessor());
+        MemoryDTO memoryDTO = memoryInfo(si.getHardware().getMemory());
+        JvmDTO jvmDTO = jvmInfo();
+        List<SysFile> list = sysFiles(si.getOperatingSystem());
+        SystemInfoDTO systemInfoDTO = sysInfo();
+        oshiHardwareDTO.setSystemInfoDTO(systemInfoDTO);
+        oshiHardwareDTO.setJvmDTO(jvmDTO);
+        oshiHardwareDTO.setSysFiles(list);
+        oshiHardwareDTO.setProcessorDTO(processorDTO);
+        oshiHardwareDTO.setMemoryDTO(memoryDTO);
     }
 
-    private static SystemInfo si = new SystemInfo();
-
-    public static SystemInfo getInstance() {
-        if (si == null) {
-            si = new SystemInfo();
-        }
-        return si;
-    }
-
-    public OshiHardwareDTO refresh() {
-        cpuInfo(getInstance().getHardware().getProcessor());
-        memoryInfo(getInstance().getHardware().getMemory());
-        jvmInfo();
-        sysFiles(getInstance().getOperatingSystem());
-        sysInfo();
-        return oshiHardwareDTO;
-    }
-
-    static {
+    public static OshiHardwareDTO baseInfo(SystemInfo si) {
+        OshiHardwareDTO oshiHardwareDTO = new OshiHardwareDTO();
         // oshi
         HardwareAbstractionLayer hal = si.getHardware();
 
@@ -109,6 +91,7 @@ public class OshiUtils {
         oshiHardwareDTO.setMemoryDTO(memoryDTO);
 
         logger.info("init oshiHardwareDTO success, oshiHardwareDTO={}", oshiHardwareDTO);
+        return oshiHardwareDTO;
     }
 
     /**
@@ -119,7 +102,7 @@ public class OshiUtils {
      *
      * @return
      */
-    private static Set<String> acquireMACAddressSet(HardwareAbstractionLayer hal) {
+    public static Set<String> acquireMACAddressSet(HardwareAbstractionLayer hal) {
         Set<String> macAddressSet = Sets.newHashSet();
 
         List<NetworkIF> networkIFs = hal.getNetworkIFs();
@@ -141,7 +124,7 @@ public class OshiUtils {
     /**
      * 设置CPU信息
      */
-    private static void cpuInfo(CentralProcessor processor) {
+    public static ProcessorDTO cpuInfo(CentralProcessor processor) {
         // CPU信息
         ProcessorDTO processorDTO = new ProcessorDTO();
         processorDTO.setName(processor.toString());
@@ -174,25 +157,25 @@ public class OshiUtils {
         processorDTO.setSystem(NumberUtil.decimalFormat("0.##%", NumberUtil.div(cSys, totalCpu)));
         processorDTO.setIdle(NumberUtil.decimalFormat("0.##%", NumberUtil.div(idle, totalCpu)));
         processorDTO.setWait(NumberUtil.decimalFormat("0.##%", NumberUtil.div(iowait, totalCpu)));
-        oshiHardwareDTO.setProcessorDTO(processorDTO);
+        return processorDTO;
     }
 
     /**
      * 设置内存信息
      */
-    private static void memoryInfo(GlobalMemory memory) {
+    public static MemoryDTO memoryInfo(GlobalMemory memory) {
         MemoryDTO memoryDTO = new MemoryDTO();
         memoryDTO.setMemeryTotal(Calculator.getPrintSize(memory.getTotal()));
         memoryDTO.setSwapTotal(Calculator.getPrintSize(memory.getVirtualMemory().getSwapTotal()));
         memoryDTO.setUsed(Calculator.getPrintSize(memory.getTotal() - memory.getAvailable()));
         memoryDTO.setFree(Calculator.getPrintSize(memory.getAvailable()));
-        oshiHardwareDTO.setMemoryDTO(memoryDTO);
+        return memoryDTO;
     }
 
     /**
      * 设置Java虚拟机
      */
-    private static void jvmInfo() {
+    public static JvmDTO jvmInfo() {
         Properties props = System.getProperties();
         JvmDTO jvmDTO = new JvmDTO();
         jvmDTO.setTotal(Calculator.getPrintSize(Runtime.getRuntime().totalMemory()));
@@ -202,7 +185,7 @@ public class OshiUtils {
         jvmDTO.setHome(props.getProperty("java.home"));
         jvmDTO.setRunTime(getRunTime());
         jvmDTO.setStartTime(getStartTime());
-        oshiHardwareDTO.setJvmDTO(jvmDTO);
+        return jvmDTO;
     }
 
     /**
@@ -223,7 +206,7 @@ public class OshiUtils {
     /**
      * 设置磁盘信息
      */
-    private static void sysFiles(OperatingSystem os) {
+    public static List<SysFile> sysFiles(OperatingSystem os) {
         FileSystem fileSystem = os.getFileSystem();
         List<OSFileStore> fileStores = fileSystem.getFileStores(true);
         List<SysFile> list = new ArrayList<>();
@@ -241,13 +224,13 @@ public class OshiUtils {
             sysFile.setUsage(NumberUtil.decimalFormat("0.##%", NumberUtil.div(used, total)));
             list.add(sysFile);
         }
-        oshiHardwareDTO.setSysFiles(list);
+        return list;
     }
 
     /**
      * 设置服务器信息
      */
-    private static void sysInfo() {
+    public static SystemInfoDTO sysInfo() {
         Properties props = System.getProperties();
         SystemInfoDTO systemInfoDTO = new SystemInfoDTO();
         systemInfoDTO.setComputerName(SystemInfoUtil.getHostName());
@@ -255,6 +238,6 @@ public class OshiUtils {
         systemInfoDTO.setOsName(props.getProperty("os.name"));
         systemInfoDTO.setOsArch(props.getProperty("os.arch"));
         systemInfoDTO.setUserDir(props.getProperty("user.dir"));
-        oshiHardwareDTO.setSystemInfoDTO(systemInfoDTO);
+        return systemInfoDTO;
     }
 }

@@ -7,7 +7,7 @@
     <groupId>io.github.lunasaw</groupId>
     <artifactId>luna-common</artifactId>
     <name>luna-common</name>
-    <version>1.5.4</version>
+    <version>1.5.7</version>
     <description>common is project which contains common utils</description>
     <url>https://github.com/lunasaw/luna-common</url>
 
@@ -87,7 +87,7 @@
         <dependency>
             <groupId>com.github.oshi</groupId>
             <artifactId>oshi-core</artifactId>
-            <version>5.8.1</version> <!-- 这个版本不要随便升级，和JNA的环境有关 -->
+            <version>5.8.0</version> <!-- 这个版本不要随便升级，和JNA的环境有关 -->
         </dependency>
     </dependencies>
 
