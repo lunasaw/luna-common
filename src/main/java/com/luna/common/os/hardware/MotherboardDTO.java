@@ -41,4 +41,13 @@ public class MotherboardDTO {
         this.serialNumber = serialNumber;
     }
 
+    @Override
+    public String toString() {
+        return "MotherboardDTO{" +
+            "manufacturer='" + manufacturer + '\'' +
+            ", model='" + model + '\'' +
+            ", version='" + version + '\'' +
+            ", serialNumber='" + serialNumber + '\'' +
+            '}';
+    }
 }

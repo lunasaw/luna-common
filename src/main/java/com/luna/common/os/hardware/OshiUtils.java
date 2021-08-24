@@ -2,6 +2,8 @@ package com.luna.common.os.hardware;
 
 import java.util.*;
 
+import com.luna.common.date.DateUnit;
+import com.luna.common.date.DateUtils;
 import com.luna.common.os.SystemInfoUtil;
 import com.luna.common.text.Calculator;
 import com.luna.common.text.NumberUtil;
@@ -25,7 +27,11 @@ import oshi.util.Util;
 public class OshiUtils {
 
     public static void main(String[] args) {
-        new OshiUtils().setCpuInfo(si.getHardware().getProcessor());
+        cpuInfo(getInstance().getHardware().getProcessor());
+        memoryInfo(getInstance().getHardware().getMemory());
+        jvmInfo();
+        sysFiles(getInstance().getOperatingSystem());
+        sysInfo();
         System.out.println(oshiHardwareDTO);
     }
 
@@ -41,7 +47,7 @@ public class OshiUtils {
 
     private static SystemInfo si = new SystemInfo();
 
-    public SystemInfo getInstance() {
+    public static SystemInfo getInstance() {
         if (si == null) {
             si = new SystemInfo();
         }
@@ -69,12 +75,12 @@ public class OshiUtils {
         firmwareDTO.setDescription(hal.getComputerSystem().getFirmware().getDescription());
         firmwareDTO.setVersion(hal.getComputerSystem().getFirmware().getVersion());
         oshiHardwareDTO.setFirmwareDTO(firmwareDTO);
-        MotherboardDTO motherboardDO = new MotherboardDTO();
-        motherboardDO.setManufacturer(hal.getComputerSystem().getBaseboard().getManufacturer());
-        motherboardDO.setModel(hal.getComputerSystem().getBaseboard().getModel());
-        motherboardDO.setVersion(hal.getComputerSystem().getBaseboard().getVersion());
-        motherboardDO.setSerialNumber(hal.getComputerSystem().getBaseboard().getSerialNumber());
-
+        MotherboardDTO motherboardDTO = new MotherboardDTO();
+        motherboardDTO.setManufacturer(hal.getComputerSystem().getBaseboard().getManufacturer());
+        motherboardDTO.setModel(hal.getComputerSystem().getBaseboard().getModel());
+        motherboardDTO.setVersion(hal.getComputerSystem().getBaseboard().getVersion());
+        motherboardDTO.setSerialNumber(hal.getComputerSystem().getBaseboard().getSerialNumber());
+        oshiHardwareDTO.setMotherboardDTO(motherboardDTO);
         // MAC地址s
         oshiHardwareDTO.setMacAddressSet(acquireMACAddressSet(hal));
 
@@ -126,7 +132,7 @@ public class OshiUtils {
     /**
      * 设置CPU信息
      */
-    private void setCpuInfo(CentralProcessor processor) {
+    private static void cpuInfo(CentralProcessor processor) {
         // CPU信息
         ProcessorDTO processorDTO = new ProcessorDTO();
         processorDTO.setName(processor.toString());
@@ -165,7 +171,7 @@ public class OshiUtils {
     /**
      * 设置内存信息
      */
-    private void setMemInfo(GlobalMemory memory) {
+    private static void memoryInfo(GlobalMemory memory) {
         MemoryDTO memoryDTO = new MemoryDTO();
         memoryDTO.setMemeryTotal(Calculator.getPrintSize(memory.getTotal()));
         memoryDTO.setSwapTotal(Calculator.getPrintSize(memory.getVirtualMemory().getSwapTotal()));
@@ -177,7 +183,7 @@ public class OshiUtils {
     /**
      * 设置Java虚拟机
      */
-    private void setJvmInfo() {
+    private static void jvmInfo() {
         Properties props = System.getProperties();
         JvmDTO jvmDTO = new JvmDTO();
         jvmDTO.setTotal(Calculator.getPrintSize(Runtime.getRuntime().totalMemory()));
@@ -185,17 +191,32 @@ public class OshiUtils {
         jvmDTO.setFree(Calculator.getPrintSize(Runtime.getRuntime().freeMemory()));
         jvmDTO.setVersion(props.getProperty("java.version"));
         jvmDTO.setHome(props.getProperty("java.home"));
-        jvmDTO.setRunTime(JvmDTO.getRunTime());
-        jvmDTO.setStartTime(JvmDTO.getStartTime());
+        jvmDTO.setRunTime(getRunTime());
+        jvmDTO.setStartTime(getStartTime());
         oshiHardwareDTO.setJvmDTO(jvmDTO);
+    }
+
+    /**
+     * JDK启动时间
+     */
+    public static String getStartTime() {
+        return DateUtils.formatDateTime(DateUtils.getServerStartDate());
+    }
+
+    /**
+     * JDK运行时间
+     */
+    public static String getRunTime() {
+        return String
+            .valueOf(DateUtils.between(DateUtils.getCurrentDate(), DateUtils.getServerStartDate(), DateUnit.HOUR));
     }
 
     /**
      * 设置磁盘信息
      */
-    private void setSysFiles(OperatingSystem os) {
+    private static void sysFiles(OperatingSystem os) {
         FileSystem fileSystem = os.getFileSystem();
-        List<OSFileStore> fileStores = fileSystem.getFileStores();
+        List<OSFileStore> fileStores = fileSystem.getFileStores(true);
         List<SysFile> list = new ArrayList<>();
         for (OSFileStore fs : fileStores) {
             long free = fs.getUsableSpace();
@@ -217,11 +238,11 @@ public class OshiUtils {
     /**
      * 设置服务器信息
      */
-    private void setSysInfo() {
+    private static void sysInfo() {
         Properties props = System.getProperties();
         SystemInfoDTO systemInfoDTO = new SystemInfoDTO();
         systemInfoDTO.setComputerName(SystemInfoUtil.getHostName());
-        systemInfoDTO.setComputerIp(systemInfoDTO.getComputerIp());
+        systemInfoDTO.setComputerIp(SystemInfoUtil.getIP());
         systemInfoDTO.setOsName(props.getProperty("os.name"));
         systemInfoDTO.setOsArch(props.getProperty("os.arch"));
         systemInfoDTO.setUserDir(props.getProperty("user.dir"));

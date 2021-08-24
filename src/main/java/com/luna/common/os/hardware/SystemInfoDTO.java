@@ -66,4 +66,15 @@ public class SystemInfoDTO {
     public void setOsArch(String osArch) {
         this.osArch = osArch;
     }
+
+    @Override
+    public String toString() {
+        return "SystemInfoDTO{" +
+            "computerName='" + computerName + '\'' +
+            ", computerIp='" + computerIp + '\'' +
+            ", userDir='" + userDir + '\'' +
+            ", osName='" + osName + '\'' +
+            ", osArch='" + osArch + '\'' +
+            '}';
+    }
 }

@@ -6,6 +6,8 @@ import com.luna.common.constant.StrPoolConstant;
 import java.lang.management.ManagementFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.*;
 
 public class DateUtils {
@@ -453,6 +455,18 @@ public class DateUtils {
         long daysBetween = (beginDate.getTime() - endDate.getTime() + 1000000) / 86400000;
         // 用立即数，减少乘法计算的开销
         return daysBetween;
+    }
+
+    /**
+     * 判断两个日期相差的时长<br>
+     * 返回 给定单位的时长差
+     *
+     * @param unit 相差的单位：相差 天{@link DateUnit#DAY}、小时{@link DateUnit#HOUR} 等
+     * @return 时长差
+     */
+    public static long between(Date end, Date begin, DateUnit unit) {
+        long diff = end.getTime() - begin.getTime();
+        return diff / unit.getMillis();
     }
 
     /**

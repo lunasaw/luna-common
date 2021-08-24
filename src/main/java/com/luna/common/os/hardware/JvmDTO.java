@@ -1,9 +1,5 @@
 package com.luna.common.os.hardware;
-
-import com.luna.common.date.DateUtils;
-
 import java.lang.management.ManagementFactory;
-import java.util.Date;
 
 /**
  * JVM相关信息
@@ -35,9 +31,12 @@ public class JvmDTO {
      */
     private String home;
 
+    /** 运行时间 多少小时 */
     private String runTime;
 
+    /** 开始时间 */
     private String startTime;
+
 
     public String getTotal() {
         return total;
@@ -61,6 +60,14 @@ public class JvmDTO {
 
     public void setFree(String free) {
         this.free = free;
+    }
+
+    public String getRunTime() {
+        return runTime;
+    }
+
+    public String getStartTime() {
+        return startTime;
     }
 
     public void setRunTime(String runTime) {
@@ -94,19 +101,17 @@ public class JvmDTO {
         this.home = home;
     }
 
-    /**
-     * JDK启动时间
-     */
-    public static String getStartTime() {
-        return DateUtils.formatDateTime(DateUtils.getServerStartDate());
-    }
 
-    /**
-     * JDK运行时间
-     */
-    public static String getRunTime() {
-        return DateUtils.formatDateTime(
-            new Date(DateUtils.getDaysBetween(DateUtils.getCurrentDate(), DateUtils.getServerStartDate())));
+    @Override
+    public String toString() {
+        return "JvmDTO{" +
+            "total='" + total + '\'' +
+            ", max='" + max + '\'' +
+            ", free='" + free + '\'' +
+            ", version='" + version + '\'' +
+            ", home='" + home + '\'' +
+            ", runTime='" + runTime + '\'' +
+            ", startTime='" + startTime + '\'' +
+            '}';
     }
-
 }
