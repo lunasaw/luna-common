@@ -48,6 +48,14 @@ public class NumberUtil {
         87178291200L, 1307674368000L, 20922789888000L, 355687428096000L, 6402373705728000L, 121645100408832000L,
         2432902008176640000L};
 
+    public static Double percentToDouble(String percent) {
+        try {
+            return (Double)NumberFormat.getInstance().parse(percent);
+        } catch (ParseException e) {
+            throw new UtilException("number format exception");
+        }
+    }
+
     /**
      * 提供精确的加法运算
      *
