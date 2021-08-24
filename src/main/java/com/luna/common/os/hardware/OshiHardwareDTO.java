@@ -37,8 +37,10 @@ public class OshiHardwareDTO {
     /** JVM */
     private JvmDTO         jvmDTO;
 
+    /** 磁盘 */
     private List<SysFile>  sysFiles;
 
+    /** 系统信息 */
     private SystemInfoDTO  systemInfoDTO;
 
     @Override

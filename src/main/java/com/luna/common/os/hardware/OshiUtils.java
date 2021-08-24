@@ -54,6 +54,15 @@ public class OshiUtils {
         return si;
     }
 
+    public OshiHardwareDTO refresh() {
+        cpuInfo(getInstance().getHardware().getProcessor());
+        memoryInfo(getInstance().getHardware().getMemory());
+        jvmInfo();
+        sysFiles(getInstance().getOperatingSystem());
+        sysInfo();
+        return oshiHardwareDTO;
+    }
+
     static {
         // oshi
         HardwareAbstractionLayer hal = si.getHardware();
