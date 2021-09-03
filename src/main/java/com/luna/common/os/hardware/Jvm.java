@@ -1,25 +1,27 @@
 package com.luna.common.os.hardware;
+
 import java.lang.management.ManagementFactory;
+import java.util.Date;
 
 /**
  * JVM相关信息
  */
-public class JvmDTO {
+public class Jvm {
 
     /**
      * 当前JVM占用的内存总数(M)
      */
-    private String total;
+    private Long   total;
 
     /**
      * JVM最大可用内存总数(M)
      */
-    private String max;
+    private Long   max;
 
     /**
      * JVM空闲内存(M)
      */
-    private String free;
+    private Long   free;
 
     /**
      * JDK版本
@@ -32,49 +34,48 @@ public class JvmDTO {
     private String home;
 
     /** 运行时间 多少小时 */
-    private String runTime;
+    private Long   runTime;
 
     /** 开始时间 */
-    private String startTime;
+    private Date   startTime;
 
-
-    public String getTotal() {
+    public Long getTotal() {
         return total;
     }
 
-    public void setTotal(String total) {
+    public void setTotal(Long total) {
         this.total = total;
     }
 
-    public String getMax() {
+    public Long getMax() {
         return max;
     }
 
-    public void setMax(String max) {
+    public void setMax(Long max) {
         this.max = max;
     }
 
-    public String getFree() {
+    public Long getFree() {
         return free;
     }
 
-    public void setFree(String free) {
+    public void setFree(Long free) {
         this.free = free;
     }
 
-    public String getRunTime() {
+    public Long getRunTime() {
         return runTime;
     }
 
-    public String getStartTime() {
-        return startTime;
-    }
-
-    public void setRunTime(String runTime) {
+    public void setRunTime(Long runTime) {
         this.runTime = runTime;
     }
 
-    public void setStartTime(String startTime) {
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
 
@@ -100,7 +101,6 @@ public class JvmDTO {
     public void setHome(String home) {
         this.home = home;
     }
-
 
     @Override
     public String toString() {

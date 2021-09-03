@@ -3,7 +3,7 @@ package com.luna.common.os.hardware;
 /**
  * @author Tony
  */
-public class ProcessorDTO {
+public class Processor {
     /** 名字 */
     private String name;
     /** 处理器id */
@@ -18,27 +18,27 @@ public class ProcessorDTO {
     /**
      * 总计使用
      */
-    private String  nice;
+    private Double  nice;
 
     /**
      * 系统使用
      */
-    private String  system;
+    private Double  system;
 
     /**
      * 用户使用
      */
-    private String  user;
+    private Double  user;
 
     /**
      * IO等待
      */
-    private String  wait;
+    private Double  wait;
 
     /**
      * 闲
      */
-    private String  idle;
+    private Double  idle;
 
     public String getName() {
         return name;
@@ -46,30 +46,6 @@ public class ProcessorDTO {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public int getPhysicalPackageCount() {
-        return physicalPackageCount;
-    }
-
-    public void setPhysicalPackageCount(int physicalPackageCount) {
-        this.physicalPackageCount = physicalPackageCount;
-    }
-
-    public int getPhysicalProcessorCount() {
-        return physicalProcessorCount;
-    }
-
-    public void setPhysicalProcessorCount(int physicalProcessorCount) {
-        this.physicalProcessorCount = physicalProcessorCount;
-    }
-
-    public int getLogicalProcessorCount() {
-        return logicalProcessorCount;
-    }
-
-    public void setLogicalProcessorCount(int logicalProcessorCount) {
-        this.logicalProcessorCount = logicalProcessorCount;
     }
 
     public String getProcessorId() {
@@ -80,43 +56,67 @@ public class ProcessorDTO {
         this.processorId = processorId;
     }
 
-    public String getNice() {
+    public Integer getPhysicalPackageCount() {
+        return physicalPackageCount;
+    }
+
+    public void setPhysicalPackageCount(Integer physicalPackageCount) {
+        this.physicalPackageCount = physicalPackageCount;
+    }
+
+    public Integer getPhysicalProcessorCount() {
+        return physicalProcessorCount;
+    }
+
+    public void setPhysicalProcessorCount(Integer physicalProcessorCount) {
+        this.physicalProcessorCount = physicalProcessorCount;
+    }
+
+    public Integer getLogicalProcessorCount() {
+        return logicalProcessorCount;
+    }
+
+    public void setLogicalProcessorCount(Integer logicalProcessorCount) {
+        this.logicalProcessorCount = logicalProcessorCount;
+    }
+
+    public Double getNice() {
         return nice;
     }
 
-    public void setNice(String nice) {
+    public void setNice(Double nice) {
         this.nice = nice;
     }
 
-    public String getSystem() {
+    public Double getSystem() {
         return system;
     }
 
-    public void setSystem(String system) {
+    public void setSystem(Double system) {
         this.system = system;
     }
 
-    public String getUser() {
+    public Double getUser() {
         return user;
     }
 
-    public void setUser(String user) {
+    public void setUser(Double user) {
         this.user = user;
     }
 
-    public String getWait() {
+    public Double getWait() {
         return wait;
     }
 
-    public void setWait(String wait) {
+    public void setWait(Double wait) {
         this.wait = wait;
     }
 
-    public String getIdle() {
+    public Double getIdle() {
         return idle;
     }
 
-    public void setIdle(String idle) {
+    public void setIdle(Double idle) {
         this.idle = idle;
     }
 

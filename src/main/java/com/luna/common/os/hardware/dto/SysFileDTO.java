@@ -1,9 +1,9 @@
-package com.luna.common.os.hardware;
+package com.luna.common.os.hardware.dto;
 
 /**
  * 系统文件相关信息
  */
-public class SysFile {
+public class SysFileDTO {
 
     /**
      * 盘符路径
@@ -23,17 +23,22 @@ public class SysFile {
     /**
      * 总大小
      */
-    private Long   total;
+    private String total;
 
     /**
      * 剩余大小
      */
-    private Long   free;
+    private String free;
 
     /**
      * 已经使用量
      */
-    private Long   used;
+    private String used;
+
+    /**
+     * 资源的使用率
+     */
+    private String usage;
 
     public String getDirName() {
         return dirName;
@@ -59,30 +64,37 @@ public class SysFile {
         this.typeName = typeName;
     }
 
-    public Long getTotal() {
+    public String getTotal() {
         return total;
     }
 
-    public void setTotal(Long total) {
+    public void setTotal(String total) {
         this.total = total;
     }
 
-    public Long getFree() {
+    public String getFree() {
         return free;
     }
 
-    public void setFree(Long free) {
+    public void setFree(String free) {
         this.free = free;
     }
 
-    public Long getUsed() {
+    public String getUsed() {
         return used;
     }
 
-    public void setUsed(Long used) {
+    public void setUsed(String used) {
         this.used = used;
     }
 
+    public String getUsage() {
+        return usage;
+    }
+
+    public void setUsage(String usage) {
+        this.usage = usage;
+    }
 
     @Override
     public String toString() {
@@ -93,6 +105,7 @@ public class SysFile {
             ", total='" + total + '\'' +
             ", free='" + free + '\'' +
             ", used='" + used + '\'' +
+            ", usage='" + usage + '\'' +
             '}';
     }
 }

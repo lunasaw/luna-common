@@ -7,7 +7,7 @@
     <groupId>io.github.lunasaw</groupId>
     <artifactId>luna-common</artifactId>
     <name>luna-common</name>
-    <version>1.5.8</version>
+    <version>1.5.9</version>
     <description>common is project which contains common utils</description>
     <url>https://github.com/lunasaw/luna-common</url>
 

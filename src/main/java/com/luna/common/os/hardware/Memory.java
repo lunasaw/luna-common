@@ -1,9 +1,9 @@
-package com.luna.common.os.hardware.vo;
+package com.luna.common.os.hardware;
 
 /**
  * @author Tony
  */
-public class MemoryVO {
+public class Memory {
     /** 总物理内存 */
     private Long memeryTotal;
 
@@ -49,10 +49,10 @@ public class MemoryVO {
     @Override
     public String toString() {
         return "MemoryDTO{" +
-            "memeryTotal=" + memeryTotal +
-            ", swapTotal=" + swapTotal +
+                "memeryTotal=" + memeryTotal +
+                ", swapTotal=" + swapTotal +
             ", used=" + used +
             ", free=" + free +
-            '}';
+                '}';
     }
 }

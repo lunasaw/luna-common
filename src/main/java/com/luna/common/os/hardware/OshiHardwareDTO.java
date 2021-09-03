@@ -1,5 +1,10 @@
 package com.luna.common.os.hardware;
 
+import com.luna.common.os.hardware.dto.JvmDTO;
+import com.luna.common.os.hardware.dto.MemoryDTO;
+import com.luna.common.os.hardware.dto.ProcessorDTO;
+import com.luna.common.os.hardware.dto.SysFileDTO;
+
 import java.util.List;
 import java.util.Set;
 
@@ -29,16 +34,16 @@ public class OshiHardwareDTO {
     private Set<String>    macAddressSet;
 
     /** 处理器信息 */
-    private ProcessorDTO   processorDTO;
+    private ProcessorDTO     processorDTO;
 
     /** 内存信息 */
-    private MemoryDTO      memoryDTO;
+    private MemoryDTO        memoryDTO;
 
     /** JVM */
-    private JvmDTO         jvmDTO;
+    private JvmDTO           jvmDTO;
 
     /** 磁盘 */
-    private List<SysFile>  sysFiles;
+    private List<SysFileDTO> sysFiles;
 
     /** 系统信息 */
     private SystemInfoDTO  systemInfoDTO;
@@ -69,20 +74,16 @@ public class OshiHardwareDTO {
         this.systemInfoDTO = systemInfoDTO;
     }
 
-    public List<SysFile> getSysFiles() {
+    public List<SysFileDTO> getSysFiles() {
         return sysFiles;
     }
 
-    public void setSysFiles(List<SysFile> sysFiles) {
+    public void setSysFiles(List<SysFileDTO> sysFiles) {
         this.sysFiles = sysFiles;
     }
 
-    public JvmDTO getJvmDTO() {
-        return jvmDTO;
-    }
-
-    public void setJvmDTO(JvmDTO jvmDTO) {
-        this.jvmDTO = jvmDTO;
+    public void setProcessorDTO(ProcessorDTO processorDTO) {
+        this.processorDTO = processorDTO;
     }
 
     public String getHostName() {
@@ -137,16 +138,20 @@ public class OshiHardwareDTO {
         return macAddressSet;
     }
 
-    public void setMacAddressSet(Set<String> macAddressSet) {
-        this.macAddressSet = macAddressSet;
-    }
-
     public ProcessorDTO getProcessorDTO() {
         return processorDTO;
     }
 
-    public void setProcessorDTO(ProcessorDTO processorDTO) {
-        this.processorDTO = processorDTO;
+    public void setMacAddressSet(Set<String> macAddressSet) {
+        this.macAddressSet = macAddressSet;
+    }
+
+    public JvmDTO getJvmDTO() {
+        return jvmDTO;
+    }
+
+    public void setJvmDTO(JvmDTO jvmDTO) {
+        this.jvmDTO = jvmDTO;
     }
 
     public MemoryDTO getMemoryDTO() {

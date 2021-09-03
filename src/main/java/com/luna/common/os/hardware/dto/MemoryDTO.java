@@ -1,4 +1,4 @@
-package com.luna.common.os.hardware;
+package com.luna.common.os.hardware.dto;
 
 /**
  * @author Tony
@@ -49,10 +49,10 @@ public class MemoryDTO {
     @Override
     public String toString() {
         return "MemoryDTO{" +
-                "memeryTotal=" + memeryTotal +
-                ", swapTotal=" + swapTotal +
+            "memeryTotal=" + memeryTotal +
+            ", swapTotal=" + swapTotal +
             ", used=" + used +
             ", free=" + free +
-                '}';
+            '}';
     }
 }

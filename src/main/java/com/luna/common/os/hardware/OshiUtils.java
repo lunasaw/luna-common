@@ -1,10 +1,15 @@
 package com.luna.common.os.hardware;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.luna.common.date.DateUnit;
 import com.luna.common.date.DateUtils;
 import com.luna.common.os.SystemInfoUtil;
+import com.luna.common.os.hardware.dto.JvmDTO;
+import com.luna.common.os.hardware.dto.MemoryDTO;
+import com.luna.common.os.hardware.dto.ProcessorDTO;
+import com.luna.common.os.hardware.dto.SysFileDTO;
 import com.luna.common.text.Calculator;
 import com.luna.common.text.NumberUtil;
 import org.slf4j.Logger;
@@ -26,22 +31,28 @@ import oshi.util.Util;
  */
 public class OshiUtils {
 
-    private final static Logger    logger           = LoggerFactory.getLogger(OshiUtils.class);
+    private final static Logger logger           = LoggerFactory.getLogger(OshiUtils.class);
 
-    private static final int       OSHI_WAIT_SECOND = 1000;
+    private static final int    OSHI_WAIT_SECOND = 1000;
 
-
+    /**
+     * 刷新系统状态
+     * 
+     * @param oshiHardwareDTO
+     * @param si
+     */
     public static void refresh(OshiHardwareDTO oshiHardwareDTO, SystemInfo si) {
-        ProcessorDTO processorDTO = cpuInfo(si.getHardware().getProcessor());
-        MemoryDTO memoryDTO = memoryInfo(si.getHardware().getMemory());
-        JvmDTO jvmDTO = jvmInfo();
+        Processor processor = cpuInfo(si.getHardware().getProcessor());
+        Memory memory = memoryInfo(si.getHardware().getMemory());
+        Jvm jvmDTO = jvmInfo();
         List<SysFile> list = sysFiles(si.getOperatingSystem());
         SystemInfoDTO systemInfoDTO = sysInfo();
         oshiHardwareDTO.setSystemInfoDTO(systemInfoDTO);
-        oshiHardwareDTO.setJvmDTO(jvmDTO);
-        oshiHardwareDTO.setSysFiles(list);
-        oshiHardwareDTO.setProcessorDTO(processorDTO);
-        oshiHardwareDTO.setMemoryDTO(memoryDTO);
+        oshiHardwareDTO.setJvmDTO(convertJvm(jvmDTO));
+        List<SysFileDTO> sysFileDTOS = list.stream().map(OshiUtils::convertSysFile).collect(Collectors.toList());
+        oshiHardwareDTO.setSysFiles(sysFileDTOS);
+        oshiHardwareDTO.setProcessorDTO(converProcessor(processor));
+        oshiHardwareDTO.setMemoryDTO(convertMemory(memory));
     }
 
     public static OshiHardwareDTO baseInfo(SystemInfo si) {
@@ -76,19 +87,13 @@ public class OshiUtils {
         oshiHardwareDTO.setMacAddressSet(acquireMACAddressSet(hal));
 
         // 获取CPU有关信息
-        ProcessorDTO processorDTO = new ProcessorDTO();
-        processorDTO.setName(hal.getProcessor().toString());
-        processorDTO.setPhysicalPackageCount(hal.getProcessor().getPhysicalPackageCount());
-        processorDTO.setPhysicalProcessorCount(hal.getProcessor().getPhysicalProcessorCount());
-        processorDTO.setLogicalProcessorCount(hal.getProcessor().getLogicalProcessorCount());
-        processorDTO.setProcessorId(hal.getProcessor().getProcessorIdentifier().getProcessorID());
-        oshiHardwareDTO.setProcessorDTO(processorDTO);
-
-        // 获取内存有关的信息
-        MemoryDTO memoryDTO = new MemoryDTO();
-        memoryDTO.setMemeryTotal(Calculator.getPrintSize(hal.getMemory().getTotal()));
-        memoryDTO.setSwapTotal(Calculator.getPrintSize(hal.getMemory().getVirtualMemory().getSwapTotal()));
-        oshiHardwareDTO.setMemoryDTO(memoryDTO);
+        Processor processor = new Processor();
+        processor.setName(hal.getProcessor().toString());
+        processor.setPhysicalPackageCount(hal.getProcessor().getPhysicalPackageCount());
+        processor.setPhysicalProcessorCount(hal.getProcessor().getPhysicalProcessorCount());
+        processor.setLogicalProcessorCount(hal.getProcessor().getLogicalProcessorCount());
+        processor.setProcessorId(hal.getProcessor().getProcessorIdentifier().getProcessorID());
+        oshiHardwareDTO.setProcessorDTO(converProcessor(processor));
 
         logger.info("init oshiHardwareDTO success, oshiHardwareDTO={}", oshiHardwareDTO);
         return oshiHardwareDTO;
@@ -124,9 +129,9 @@ public class OshiUtils {
     /**
      * 设置CPU信息
      */
-    public static ProcessorDTO cpuInfo(CentralProcessor processor) {
+    public static Processor cpuInfo(CentralProcessor processor) {
         // CPU信息
-        ProcessorDTO processorDTO = new ProcessorDTO();
+        Processor processorDTO = new Processor();
         processorDTO.setName(processor.toString());
         processorDTO.setPhysicalPackageCount(processor.getPhysicalPackageCount());
         processorDTO.setPhysicalProcessorCount(processor.getPhysicalProcessorCount());
@@ -152,55 +157,55 @@ public class OshiUtils {
         long idle =
             ticks[CentralProcessor.TickType.IDLE.getIndex()] - prevTicks[CentralProcessor.TickType.IDLE.getIndex()];
         long totalCpu = user + nice + cSys + idle + iowait + irq + softirq + steal;
-        processorDTO.setUser(NumberUtil.decimalFormat("0.##%", NumberUtil.div(user, totalCpu)));
-        processorDTO.setNice(NumberUtil.decimalFormat("0.##%", NumberUtil.div(nice, totalCpu)));
-        processorDTO.setSystem(NumberUtil.decimalFormat("0.##%", NumberUtil.div(cSys, totalCpu)));
-        processorDTO.setIdle(NumberUtil.decimalFormat("0.##%", NumberUtil.div(idle, totalCpu)));
-        processorDTO.setWait(NumberUtil.decimalFormat("0.##%", NumberUtil.div(iowait, totalCpu)));
+        processorDTO.setUser(NumberUtil.div(user, totalCpu));
+        processorDTO.setNice(NumberUtil.div(nice, totalCpu));
+        processorDTO.setSystem(NumberUtil.div(cSys, totalCpu));
+        processorDTO.setIdle(NumberUtil.div(idle, totalCpu));
+        processorDTO.setWait(NumberUtil.div(iowait, totalCpu));
         return processorDTO;
     }
 
     /**
      * 设置内存信息
      */
-    public static MemoryDTO memoryInfo(GlobalMemory memory) {
-        MemoryDTO memoryDTO = new MemoryDTO();
-        memoryDTO.setMemeryTotal(Calculator.getPrintSize(memory.getTotal()));
-        memoryDTO.setSwapTotal(Calculator.getPrintSize(memory.getVirtualMemory().getSwapTotal()));
-        memoryDTO.setUsed(Calculator.getPrintSize(memory.getTotal() - memory.getAvailable()));
-        memoryDTO.setFree(Calculator.getPrintSize(memory.getAvailable()));
+    public static Memory memoryInfo(GlobalMemory memory) {
+        Memory memoryDTO = new Memory();
+        memoryDTO.setMemeryTotal(memory.getTotal());
+        memoryDTO.setSwapTotal(memory.getVirtualMemory().getSwapTotal());
+        memoryDTO.setUsed(memory.getTotal() - memory.getAvailable());
+        memoryDTO.setFree(memory.getAvailable());
         return memoryDTO;
     }
 
     /**
      * 设置Java虚拟机
      */
-    public static JvmDTO jvmInfo() {
+    public static Jvm jvmInfo() {
         Properties props = System.getProperties();
-        JvmDTO jvmDTO = new JvmDTO();
-        jvmDTO.setTotal(Calculator.getPrintSize(Runtime.getRuntime().totalMemory()));
-        jvmDTO.setMax(Calculator.getPrintSize(Runtime.getRuntime().maxMemory()));
-        jvmDTO.setFree(Calculator.getPrintSize(Runtime.getRuntime().freeMemory()));
-        jvmDTO.setVersion(props.getProperty("java.version"));
-        jvmDTO.setHome(props.getProperty("java.home"));
-        jvmDTO.setRunTime(getRunTime());
-        jvmDTO.setStartTime(getStartTime());
-        return jvmDTO;
+        Jvm jvm = new Jvm();
+        jvm.setTotal(Runtime.getRuntime().totalMemory());
+        jvm.setMax(Runtime.getRuntime().maxMemory());
+        jvm.setFree(Runtime.getRuntime().freeMemory());
+        jvm.setVersion(props.getProperty("java.version"));
+        jvm.setHome(props.getProperty("java.home"));
+        jvm.setRunTime(getRunTime(DateUnit.HOUR));
+        jvm.setStartTime(getStartTime());
+        return jvm;
     }
 
     /**
      * JDK启动时间
      */
-    public static String getStartTime() {
-        return DateUtils.formatDateTime(DateUtils.getServerStartDate());
+    public static Date getStartTime() {
+        return DateUtils.getServerStartDate();
     }
 
     /**
      * JDK运行时间
      */
-    public static String getRunTime() {
-        return String
-            .valueOf(DateUtils.between(DateUtils.getCurrentDate(), DateUtils.getServerStartDate(), DateUnit.HOUR));
+    public static Long getRunTime(DateUnit unit) {
+        return DateUtils.between(DateUtils.getCurrentDate(), DateUtils.getServerStartDate(),
+            Optional.of(unit).orElse(DateUnit.HOUR));
     }
 
     /**
@@ -218,10 +223,9 @@ public class OshiUtils {
             sysFile.setDirName(fs.getMount());
             sysFile.setSysTypeName(fs.getType());
             sysFile.setTypeName(fs.getName());
-            sysFile.setTotal(Calculator.getPrintSize(total));
-            sysFile.setFree(Calculator.getPrintSize(free));
-            sysFile.setUsed(Calculator.getPrintSize(used));
-            sysFile.setUsage(NumberUtil.decimalFormat("0.##%", NumberUtil.div(used, total)));
+            sysFile.setTotal(total);
+            sysFile.setFree(free);
+            sysFile.setUsed(used);
             list.add(sysFile);
         }
         return list;
@@ -239,5 +243,65 @@ public class OshiUtils {
         systemInfoDTO.setOsArch(props.getProperty("os.arch"));
         systemInfoDTO.setUserDir(props.getProperty("user.dir"));
         return systemInfoDTO;
+    }
+
+    public static SysFileDTO convertSysFile(SysFile sysFile) {
+        if (sysFile == null) {
+            return null;
+        }
+        SysFileDTO sysFileDTO = new SysFileDTO();
+        sysFileDTO.setDirName(sysFile.getDirName());
+        sysFileDTO.setSysTypeName(sysFile.getSysTypeName());
+        sysFileDTO.setTypeName(sysFile.getTypeName());
+        sysFileDTO.setTotal(Calculator.getPrintSize(sysFile.getTotal()));
+        sysFileDTO.setFree(Calculator.getPrintSize(sysFile.getFree()));
+        sysFileDTO.setUsed(Calculator.getPrintSize(sysFile.getUsed()));
+        sysFileDTO.setUsage(NumberUtil.decimalFormat("0.##%", NumberUtil.div(sysFile.getUsed(), sysFile.getTotal())));
+        return sysFileDTO;
+    }
+
+    public static MemoryDTO convertMemory(Memory memory) {
+        if (memory == null) {
+            return null;
+        }
+        MemoryDTO memoryDTO = new MemoryDTO();
+        memoryDTO.setMemeryTotal(Calculator.getPrintSize(memory.getMemeryTotal()));
+        memoryDTO.setSwapTotal(Calculator.getPrintSize(memory.getSwapTotal()));
+        memoryDTO.setUsed(Calculator.getPrintSize(memory.getUsed()));
+        memoryDTO.setFree(Calculator.getPrintSize(memory.getFree()));
+        return memoryDTO;
+    }
+
+    public static ProcessorDTO converProcessor(Processor processor) {
+        if (processor == null) {
+            return null;
+        }
+        ProcessorDTO processorDTO = new ProcessorDTO();
+        processorDTO.setName(processor.getName());
+        processorDTO.setPhysicalPackageCount(processor.getPhysicalPackageCount());
+        processorDTO.setPhysicalProcessorCount(processor.getPhysicalProcessorCount());
+        processorDTO.setLogicalProcessorCount(processor.getLogicalProcessorCount());
+        processorDTO.setProcessorId(processor.getProcessorId());
+        processorDTO.setUser(NumberUtil.decimalFormat("0.##%", processor.getUser()));
+        processorDTO.setNice(NumberUtil.decimalFormat("0.##%", processor.getNice()));
+        processorDTO.setSystem(NumberUtil.decimalFormat("0.##%", processor.getSystem()));
+        processorDTO.setIdle(NumberUtil.decimalFormat("0.##%", processor.getIdle()));
+        processorDTO.setWait(NumberUtil.decimalFormat("0.##%", processor.getWait()));
+        return processorDTO;
+    }
+
+    public static JvmDTO convertJvm(Jvm jvm) {
+        if (jvm == null) {
+            return null;
+        }
+        JvmDTO jvmDTO = new JvmDTO();
+        jvmDTO.setTotal(Calculator.getPrintSize(jvm.getTotal()));
+        jvmDTO.setMax(Calculator.getPrintSize(jvm.getMax()));
+        jvmDTO.setFree(Calculator.getPrintSize(jvm.getFree()));
+        jvmDTO.setVersion(jvm.getVersion());
+        jvmDTO.setHome(jvm.getHome());
+        jvmDTO.setRunTime(getRunTime(null).toString());
+        jvmDTO.setStartTime(DateUtils.formatDateTime(getStartTime()));
+        return jvmDTO;
     }
 }
