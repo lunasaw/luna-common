@@ -1,37 +1,36 @@
-package com.luna.common.os.hardware;
-
-import com.luna.common.os.hardware.dto.JvmDTO;
-import com.luna.common.os.hardware.dto.MemoryDTO;
-import com.luna.common.os.hardware.dto.ProcessorDTO;
-import com.luna.common.os.hardware.dto.SysFileDTO;
+package com.luna.common.os.hardware.dto;
 
 import java.util.List;
 import java.util.Set;
+
+import com.luna.common.os.hardware.FirmwareDTO;
+import com.luna.common.os.hardware.MotherboardDTO;
+import com.luna.common.os.hardware.SystemInfoDTO;
 
 /**
  * @author Luna
  */
 public class OshiHardwareDTO {
     /** hostname */
-    private String         hostName;
+    private String           hostName;
 
     /** 制造商 */
-    private String         manufacturer;
+    private String           manufacturer;
 
     /** 型号 */
-    private String         model;
+    private String           model;
 
     /** 序列号 */
-    private String         serialNumber;
+    private String           serialNumber;
 
     /** 固件信息 */
-    private FirmwareDTO    firmwareDTO;
+    private FirmwareDTO      firmwareDTO;
 
     /** 主板信息 */
-    private MotherboardDTO motherboardDTO;
+    private MotherboardDTO   motherboardDTO;
 
     /** MAC地址List */
-    private Set<String>    macAddressSet;
+    private Set<String>      macAddressSet;
 
     /** 处理器信息 */
     private ProcessorDTO     processorDTO;
@@ -46,7 +45,7 @@ public class OshiHardwareDTO {
     private List<SysFileDTO> sysFiles;
 
     /** 系统信息 */
-    private SystemInfoDTO  systemInfoDTO;
+    private SystemInfoDTO    systemInfoDTO;
 
     @Override
     public String toString() {

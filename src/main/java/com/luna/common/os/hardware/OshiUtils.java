@@ -6,10 +6,7 @@ import java.util.stream.Collectors;
 import com.luna.common.date.DateUnit;
 import com.luna.common.date.DateUtils;
 import com.luna.common.os.SystemInfoUtil;
-import com.luna.common.os.hardware.dto.JvmDTO;
-import com.luna.common.os.hardware.dto.MemoryDTO;
-import com.luna.common.os.hardware.dto.ProcessorDTO;
-import com.luna.common.os.hardware.dto.SysFileDTO;
+import com.luna.common.os.hardware.dto.*;
 import com.luna.common.text.Calculator;
 import com.luna.common.text.NumberUtil;
 import org.slf4j.Logger;
@@ -38,53 +35,52 @@ public class OshiUtils {
     /**
      * 刷新系统状态
      * 
-     * @param oshiHardwareDTO
+     * @param oshiHardware
      * @param si
      */
-    public static void refresh(OshiHardwareDTO oshiHardwareDTO, SystemInfo si) {
+    public static void refresh(OshiHardware oshiHardware, SystemInfo si) {
         Processor processor = cpuInfo(si.getHardware().getProcessor());
         Memory memory = memoryInfo(si.getHardware().getMemory());
-        Jvm jvmDTO = jvmInfo();
+        Jvm jvm = jvmInfo();
         List<SysFile> list = sysFiles(si.getOperatingSystem());
         SystemInfoDTO systemInfoDTO = sysInfo();
-        oshiHardwareDTO.setSystemInfoDTO(systemInfoDTO);
-        oshiHardwareDTO.setJvmDTO(convertJvm(jvmDTO));
-        List<SysFileDTO> sysFileDTOS = list.stream().map(OshiUtils::convertSysFile).collect(Collectors.toList());
-        oshiHardwareDTO.setSysFiles(sysFileDTOS);
-        oshiHardwareDTO.setProcessorDTO(converProcessor(processor));
-        oshiHardwareDTO.setMemoryDTO(convertMemory(memory));
+        oshiHardware.setSystemInfoDTO(systemInfoDTO);
+        oshiHardware.setJvm(jvm);
+        oshiHardware.setSysFiles(list);
+        oshiHardware.setProcessor(processor);
+        oshiHardware.setMemory(memory);
     }
 
-    public static OshiHardwareDTO baseInfo(SystemInfo si) {
-        OshiHardwareDTO oshiHardwareDTO = new OshiHardwareDTO();
+    public static OshiHardware baseInfo(SystemInfo si) {
+        OshiHardware oshiHardware = new OshiHardware();
         // oshi
         HardwareAbstractionLayer hal = si.getHardware();
 
-        oshiHardwareDTO = new OshiHardwareDTO();
+        oshiHardware = new OshiHardware();
 
         // 计算机名
         // 这儿设置一个默认值的原因是当操作系统的dns设置不对时，可能拿不到hostname
-        oshiHardwareDTO.setHostName("UNKNOWN-HOSTNAME");
-        oshiHardwareDTO.setHostName(si.getOperatingSystem().getNetworkParams().getHostName());
+        oshiHardware.setHostName("UNKNOWN-HOSTNAME");
+        oshiHardware.setHostName(si.getOperatingSystem().getNetworkParams().getHostName());
 
         // 主板、固件、制造商相关信息
-        oshiHardwareDTO.setManufacturer(hal.getComputerSystem().getManufacturer());
-        oshiHardwareDTO.setModel(hal.getComputerSystem().getModel());
-        oshiHardwareDTO.setSerialNumber(hal.getComputerSystem().getSerialNumber());
+        oshiHardware.setManufacturer(hal.getComputerSystem().getManufacturer());
+        oshiHardware.setModel(hal.getComputerSystem().getModel());
+        oshiHardware.setSerialNumber(hal.getComputerSystem().getSerialNumber());
         FirmwareDTO firmwareDTO = new FirmwareDTO();
         firmwareDTO.setManufacturer(hal.getComputerSystem().getFirmware().getManufacturer());
         firmwareDTO.setName(hal.getComputerSystem().getFirmware().getName());
         firmwareDTO.setDescription(hal.getComputerSystem().getFirmware().getDescription());
         firmwareDTO.setVersion(hal.getComputerSystem().getFirmware().getVersion());
-        oshiHardwareDTO.setFirmwareDTO(firmwareDTO);
+        oshiHardware.setFirmwareDTO(firmwareDTO);
         MotherboardDTO motherboardDTO = new MotherboardDTO();
         motherboardDTO.setManufacturer(hal.getComputerSystem().getBaseboard().getManufacturer());
         motherboardDTO.setModel(hal.getComputerSystem().getBaseboard().getModel());
         motherboardDTO.setVersion(hal.getComputerSystem().getBaseboard().getVersion());
         motherboardDTO.setSerialNumber(hal.getComputerSystem().getBaseboard().getSerialNumber());
-        oshiHardwareDTO.setMotherboardDTO(motherboardDTO);
+        oshiHardware.setMotherboardDTO(motherboardDTO);
         // MAC地址s
-        oshiHardwareDTO.setMacAddressSet(acquireMACAddressSet(hal));
+        oshiHardware.setMacAddressSet(acquireMACAddressSet(hal));
 
         // 获取CPU有关信息
         Processor processor = new Processor();
@@ -93,10 +89,10 @@ public class OshiUtils {
         processor.setPhysicalProcessorCount(hal.getProcessor().getPhysicalProcessorCount());
         processor.setLogicalProcessorCount(hal.getProcessor().getLogicalProcessorCount());
         processor.setProcessorId(hal.getProcessor().getProcessorIdentifier().getProcessorID());
-        oshiHardwareDTO.setProcessorDTO(converProcessor(processor));
+        oshiHardware.setProcessor(processor);
 
-        logger.info("init oshiHardwareDTO success, oshiHardwareDTO={}", oshiHardwareDTO);
-        return oshiHardwareDTO;
+        logger.info("init oshiHardwareDTO success, oshiHardwareDTO={}", oshiHardware);
+        return oshiHardware;
     }
 
     /**
@@ -303,5 +299,26 @@ public class OshiUtils {
         jvmDTO.setRunTime(getRunTime(null).toString());
         jvmDTO.setStartTime(DateUtils.formatDateTime(getStartTime()));
         return jvmDTO;
+    }
+
+    public static OshiHardwareDTO oshiHardware2oshiHardwareDTO(OshiHardware oshiHardware) {
+        if (oshiHardware == null) {
+            return null;
+        }
+        OshiHardwareDTO oshiHardwareDTO = new OshiHardwareDTO();
+        oshiHardwareDTO.setSystemInfoDTO(oshiHardware.getSystemInfoDTO());
+        oshiHardwareDTO.setSysFiles(
+            oshiHardware.getSysFiles().stream().map(OshiUtils::convertSysFile).collect(Collectors.toList()));
+        oshiHardwareDTO.setProcessorDTO(converProcessor(oshiHardware.getProcessor()));
+        oshiHardwareDTO.setHostName(oshiHardware.getHostName());
+        oshiHardwareDTO.setManufacturer(oshiHardware.getManufacturer());
+        oshiHardwareDTO.setModel(oshiHardware.getModel());
+        oshiHardwareDTO.setSerialNumber(oshiHardware.getSerialNumber());
+        oshiHardwareDTO.setFirmwareDTO(oshiHardware.getFirmwareDTO());
+        oshiHardwareDTO.setMotherboardDTO(oshiHardware.getMotherboardDTO());
+        oshiHardwareDTO.setMacAddressSet(oshiHardware.getMacAddressSet());
+        oshiHardwareDTO.setJvmDTO(convertJvm(oshiHardware.getJvm()));
+        oshiHardwareDTO.setMemoryDTO(convertMemory(oshiHardware.getMemory()));
+        return oshiHardwareDTO;
     }
 }
