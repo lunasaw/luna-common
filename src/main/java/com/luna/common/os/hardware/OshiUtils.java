@@ -201,7 +201,7 @@ public class OshiUtils {
      */
     public static Long getRunTime(DateUnit unit) {
         return DateUtils.between(DateUtils.getCurrentDate(), DateUtils.getServerStartDate(),
-            Optional.of(unit).orElse(DateUnit.HOUR));
+            Optional.ofNullable(unit).orElse(DateUnit.HOUR));
     }
 
     /**
