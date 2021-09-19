@@ -114,7 +114,7 @@ public class EncryptUtils {
      * @param byteArray
      * @return
      */
-    private static String byteArrayToHex(byte[] byteArray) {
+    public static String byteArrayToHex(byte[] byteArray) {
         // new一个字符数组，这个就是用来组成结果字符串的（解释一下：一个byte是八位二进制，也就是2位十六进制字符（2的8次方等于16的2次方））
         char[] resultCharArray = new char[byteArray.length * 2];
         // 遍历字节数组，通过位运算（位运算效率高），转换成字符放到字符数组中去

@@ -9,6 +9,7 @@ import java.util.Arrays;
 public enum HashMode {
     MODE_0("MD5", 11095L * 1000 * 1000),
     MODE_1("SHA-256", 11095L * 10000 * 1000),
+    MODE_2("SHA-512", 11095L * 10000 * 1000),
     MODE_10("md5($pass.$salt)", 11086L * 1000 * 1000),
     MODE_11("Joomla < 2.5.18", 11032L * 1000 * 1000),
     MODE_12("PostgreSQL", 11033L * 1000 * 1000),

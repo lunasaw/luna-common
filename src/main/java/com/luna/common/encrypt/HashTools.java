@@ -12,6 +12,10 @@ import java.io.InputStream;
  */
 public class HashTools {
 
+    public static void main(String[] args) {
+        System.out.println(md5("hello…"));
+    }
+
     /**
      * 获取文件或者字符串的MD5值
      *
@@ -34,12 +38,33 @@ public class HashTools {
         return md5WithFile(path, CharsetUtil.UTF_8);
     }
 
-    public static String md5(InputStream inputStream) {
-        return EncryptUtils.encryptByCommonIo(inputStream, HashMode.MODE_1.getName());
+    public static String sha512(InputStream inputStream) {
+        return EncryptUtils.encryptByCommonIo(inputStream, HashMode.MODE_2.getName());
     }
 
+    public static String sha512(String data) {
+        return EncryptUtils.encryptByCommonIo(data, HashMode.MODE_2.getName());
+    }
+
+    public static String sha512WithFile(String path, String charset) {
+        try {
+            return sha512(IOUtils.toInputStream(path, charset));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String sha512WithFile(String path) {
+        return sha512WithFile(path, CharsetUtil.UTF_8);
+    }
+
+    public static String md5(InputStream inputStream) {
+        return EncryptUtils.encryptByCommonIo(inputStream, HashMode.MODE_0.getName());
+    }
+
+
     public static String sha256(String data) {
-        return EncryptUtils.encryptByCommonIo(data, HashMode.MODE_1410.getName());
+        return EncryptUtils.encryptByCommonIo(data, HashMode.MODE_1.getName());
     }
 
     public static String sha256WithFile(String path, String charset) {

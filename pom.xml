@@ -7,7 +7,7 @@
     <groupId>io.github.lunasaw</groupId>
     <artifactId>luna-common</artifactId>
     <name>luna-common</name>
-    <version>1.5.9</version>
+    <version>1.6.1-RELEASE</version>
     <description>common is project which contains common utils</description>
     <url>https://github.com/lunasaw/luna-common</url>
 
@@ -25,6 +25,9 @@
         <httpmime.version>4.5.11</httpmime.version>
         <guava.version>30.1.1-jre</guava.version>
         <joda-time.version>2.10.6</joda-time.version>
+        <fast-json.version>1.2.75</fast-json.version>
+        <oshi.version>5.8.0</oshi.version>
+        <junit.version>4.13.1</junit.version>
     </properties>
     <developers>
         <developer>
@@ -80,14 +83,19 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.13.1</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.github.oshi/oshi-core -->
         <dependency>
             <groupId>com.github.oshi</groupId>
             <artifactId>oshi-core</artifactId>
-            <version>5.8.0</version> <!-- 这个版本不要随便升级，和JNA的环境有关 -->
+            <version>${oshi.version}</version> <!-- 这个版本不要随便升级，和JNA的环境有关 -->
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fast-json.version}</version>
         </dependency>
     </dependencies>
 
