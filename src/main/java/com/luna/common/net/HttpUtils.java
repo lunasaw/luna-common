@@ -28,6 +28,7 @@ import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContextBuilder;
@@ -46,11 +47,17 @@ import java.util.*;
  */
 public class HttpUtils {
 
-    private static final CloseableHttpClient httpClient;
+    private static CloseableHttpClient httpClient;
 
-    private static final BasicCookieStore    cookieStore;
+    private static BasicCookieStore    cookieStore;
+
+    private static HttpHost            proxy;
 
     static {
+        refresh();
+    }
+
+    public static void refresh() {
         SSLConnectionSocketFactory socketFactory = null;
         try {
             // 信任所有
@@ -64,39 +71,51 @@ public class HttpUtils {
             .register("http", PlainConnectionSocketFactory.getSocketFactory())
             .register("https", socketFactory != null ? socketFactory : PlainConnectionSocketFactory.getSocketFactory())
             .build();
-
-        // for proxy debug
-        // HttpHost proxy = new HttpHost("localhost", 8888);
-        // RequestConfig defaultRequestConfig =
-        // RequestConfig.custom().setProxy(proxy).setSocketTimeout(5000).setConnectTimeout(5000)
-        // .setConnectionRequestTimeout(5000).build();
-
         RequestConfig defaultRequestConfig = RequestConfig.custom().setSocketTimeout(10000).setConnectTimeout(10000)
             .setConnectionRequestTimeout(10000).build();
 
         cookieStore = new BasicCookieStore();
-
         PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(registry);
         cm.setMaxTotal(200);
         cm.setDefaultMaxPerRoute(200);
-        httpClient =
-            HttpClients.custom().setConnectionManager(cm).setDefaultRequestConfig(defaultRequestConfig)
-                .setDefaultCookieStore(cookieStore).build();
+
+        HttpClientBuilder httpClientBuilder =
+            HttpClients.custom().setConnectionManager(cm)
+                .setDefaultRequestConfig(defaultRequestConfig);
+
+        if (cookieStore != null) {
+            httpClientBuilder.setDefaultCookieStore(cookieStore);
+        }
+        if (proxy != null) {
+            httpClientBuilder.setProxy(proxy);
+        }
+
+        httpClient = httpClientBuilder.build();
+    }
+
+    public static CloseableHttpClient getProxy(String host, Integer port) {
+        // for proxy debug
+        HttpHost proxy = new HttpHost(host, port);
+        RequestConfig defaultRequestConfig =
+            RequestConfig.custom().setProxy(proxy).setSocketTimeout(10000).setConnectTimeout(10000)
+                .setConnectionRequestTimeout(10000).build();
+        return HttpClients.custom().setDefaultRequestConfig(defaultRequestConfig)
+            .setDefaultCookieStore(cookieStore).build();
     }
 
     public static boolean isUrl(String str) {
         // 转换为小写
         str = str.toLowerCase();
         String regex = "^((https|http|ftp|rtsp|mms)?://)" // https、http、ftp、rtsp、mms
-                + "?(([0-9a-z_!~*'().&=+$%-]+: )?[0-9a-z_!~*'().&=+$%-]+@)?" // ftp的user@
-                + "(([0-9]{1,3}\\.){3}[0-9]{1,3}" // IP形式的URL- 例如：199.194.52.184
-                + "|" // 允许IP和DOMAIN（域名）
-                + "([0-9a-z_!~*'()-]+\\.)*" // 域名- www.
-                + "([0-9a-z][0-9a-z-]{0,61})?[0-9a-z]\\." // 二级域名
-                + "[a-z]{2,6})" // first level domain- .com or .museum
-                + "(:[0-9]{1,5})?" // 端口号最大为65535,5位数
-                + "((/?)|" // a slash isn't required if there is no file name
-                + "(/[0-9a-z_!~*'().;?:@&=+$,%#-]+)+/?)$";
+            + "?(([0-9a-z_!~*'().&=+$%-]+: )?[0-9a-z_!~*'().&=+$%-]+@)?" // ftp的user@
+            + "(([0-9]{1,3}\\.){3}[0-9]{1,3}" // IP形式的URL- 例如：199.194.52.184
+            + "|" // 允许IP和DOMAIN（域名）
+            + "([0-9a-z_!~*'()-]+\\.)*" // 域名- www.
+            + "([0-9a-z][0-9a-z-]{0,61})?[0-9a-z]\\." // 二级域名
+            + "[a-z]{2,6})" // first level domain- .com or .museum
+            + "(:[0-9]{1,5})?" // 端口号最大为65535,5位数
+            + "((/?)|" // a slash isn't required if there is no file name
+            + "(/[0-9a-z_!~*'().;?:@&=+$,%#-]+)+/?)$";
         return str.matches(regex);
     }
 
@@ -127,6 +146,10 @@ public class HttpUtils {
 
     public static void addCookie(Cookie... cookies) {
         Arrays.stream(cookies).forEach(cookie -> cookieStore.addCookie(cookie));
+    }
+
+    public static void setProxy(String host, Integer port) {
+        proxy = new HttpHost(host, port);
     }
 
     /**
@@ -414,6 +437,7 @@ public class HttpUtils {
                         URLEncoder.encode(k.toString(), CharsetUtil.UTF_8),
                         URLEncoder.encode(v.toString(), CharsetUtil.UTF_8)));
                 }
+                sb.append("&");
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
             }
