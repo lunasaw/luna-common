@@ -2,12 +2,15 @@ package com.luna.common.dto;
 
 import com.luna.common.dto.constant.ResultCode;
 
+import java.util.Objects;
+
 /**
  * @author Luna
  */
 public class ResultDTOUtils<T> {
+
     public static <T> T checkResultAndGetData(ResultDTO<T> resultDTO) {
-        if (!resultDTO.isSuccess()) {
+        if (Objects.isNull(resultDTO) || !resultDTO.isSuccess()) {
             throw new RuntimeException("code=" + resultDTO.getCode() + ", message=" + resultDTO.getMessage());
         }
         return resultDTO.getData();

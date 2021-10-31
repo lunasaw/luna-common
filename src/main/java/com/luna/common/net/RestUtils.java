@@ -24,6 +24,18 @@ public class RestUtils {
         return HttpUtils.checkResponseAndGetResult(httpResponse, false);
     }
 
+    public static String doDelete(String host, String path, Map<String, String> headers,
+                                  Map<String, String> queries, String body){
+        HttpResponse httpResponse = HttpUtils.doDelete(host, path, headers, queries,body);
+        return HttpUtils.checkResponseAndGetResult(httpResponse,false);
+    }
+
+    public static String doPut(String host, String path, Map<String, String> headers,
+                               Map<String, String> queries, String body){
+        HttpResponse httpResponse = HttpUtils.doPut(host, path, headers, queries,body);
+        return HttpUtils.checkResponseAndGetResult(httpResponse,false);
+    }
+
     public static String doPost(String host, String path, Map<String, String> headers,
         Map<String, String> queries, String body) {
         if (MapUtils.isEmpty(headers)) {

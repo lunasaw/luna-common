@@ -14,9 +14,9 @@ import java.io.Serializable;
 public class ResultDTO<T> implements Serializable {
 
     /** 是否调用以及过参数校验 */
-    private Boolean success;
+    private Boolean success = false;
     /** 业务code，见{@link ResultCode} */
-    private Integer     code;
+    private Integer     code = 0;
     /** 业务消息，见{@link ResultCode} */
     private String  message;
     /** 返回值 */
