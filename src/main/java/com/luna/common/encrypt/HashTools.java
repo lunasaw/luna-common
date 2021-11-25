@@ -11,11 +11,6 @@ import java.io.InputStream;
  * 2021年05月10日 14:11
  */
 public class HashTools {
-
-    public static void main(String[] args) {
-        System.out.println(md5("hello…"));
-    }
-
     /**
      * 获取文件或者字符串的MD5值
      *
@@ -38,6 +33,10 @@ public class HashTools {
         return md5WithFile(path, CharsetUtil.UTF_8);
     }
 
+    public static String md5(InputStream inputStream) {
+        return EncryptUtils.encryptByCommonIo(inputStream, HashMode.MODE_0.getName());
+    }
+
     public static String sha512(InputStream inputStream) {
         return EncryptUtils.encryptByCommonIo(inputStream, HashMode.MODE_2.getName());
     }
@@ -57,11 +56,6 @@ public class HashTools {
     public static String sha512WithFile(String path) {
         return sha512WithFile(path, CharsetUtil.UTF_8);
     }
-
-    public static String md5(InputStream inputStream) {
-        return EncryptUtils.encryptByCommonIo(inputStream, HashMode.MODE_0.getName());
-    }
-
 
     public static String sha256(String data) {
         return EncryptUtils.encryptByCommonIo(data, HashMode.MODE_1.getName());

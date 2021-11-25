@@ -90,6 +90,34 @@ public class DateUtils {
     }
 
     /**
+     * 返回自字符串格式为：yyyy-MM-dd
+     */
+    public static String formatDate(Long time) {
+        return formatDate(new Date(time));
+    }
+
+    /**
+     * 返回自字符串格式为：yyyy-MM-dd HH:mm:ss
+     */
+    public static String formatDateTime(Long time) {
+        return formatDateTime(new Date(time));
+    }
+
+    /**
+     * 返回自字符串格式为：yyyyMMddHHmmssSSS
+     */
+    public static String formatDateTimeStr(Long time) {
+        return formatDateTimeStr(new Date(time));
+    }
+
+    /**
+     * 返回自字符串格式为：HH:mm:ss
+     */
+    public static String formatTime(Long time) {
+        return formatTime(new Date(time));
+    }
+
+    /**
      * 返回自定义格式字符串
      */
     public static String format(String aMask, Date aDate) {
@@ -204,7 +232,6 @@ public class DateUtils {
             throw new RuntimeException(e);
         }
     }
-
 
     /**
      * 获取日期的开始时间
@@ -370,7 +397,6 @@ public class DateUtils {
     public static String appendTime(String date) {
         int eight = 8, ten = 10;
         if (date != null) {
-            // 2014-07-01
             if (date.length() >= eight && date.length() <= ten
                 && date.indexOf(StrPoolConstant.DASHED) != date.lastIndexOf(StrPoolConstant.DASHED)) {
                 date = date + " 23:59:59.999";
@@ -393,7 +419,6 @@ public class DateUtils {
         dateCalendar.set(Calendar.MINUTE, 0);
         dateCalendar.set(Calendar.SECOND, 0);
         dateCalendar.set(Calendar.MILLISECOND, 0);
-
         return dateCalendar.getTime();
     }
 
@@ -433,7 +458,6 @@ public class DateUtils {
         dateCalendar.set(Calendar.MINUTE, 59);
         dateCalendar.set(Calendar.SECOND, 59);
         dateCalendar.set(Calendar.MILLISECOND, 0);
-
         return dateCalendar.getTime();
     }
 
@@ -523,13 +547,45 @@ public class DateUtils {
      * @return long
      */
     public static long getMonthBeginStamp() {
+        return getMonthBeginStamp(new Date());
+    }
+
+    /**
+     * 获取当月月底毫秒时间
+     *
+     * @return long
+     */
+    public static long getMonthEndStamp() {
+        return getLastDayTimeOfMonth(new Date());
+    }
+
+    /**
+     * 获取指定时间当月0点毫秒时间
+     *
+     * @return long
+     */
+    public static long getMonthBeginStamp(Date date) {
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
+        calendar.setTime(date);
         calendar.set(Calendar.DAY_OF_MONTH, 1);
-        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTime().getTime();
+    }
+
+    /**
+     * 获得某月的最后一天的最后时刻
+     *
+     * @param date 要获取的月份
+     * @return
+     */
+    public static long getLastDayTimeOfMonth(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(getMonthBeginStamp(date));
+        calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH) + 1);
+        calendar.add(Calendar.SECOND, -1);
         return calendar.getTime().getTime();
     }
 

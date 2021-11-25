@@ -194,7 +194,7 @@ public class ReflectUtils {
                 makeAccessible(method);
                 return method;
             } catch (NoSuchMethodException e) {
-                continue;
+                // do nothing
             }
         }
         return null;

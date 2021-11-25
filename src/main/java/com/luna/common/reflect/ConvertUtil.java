@@ -19,8 +19,11 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import com.luna.common.text.CharsetUtil;
 import com.luna.common.xml.XmlUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -38,35 +41,35 @@ public class ConvertUtil {
      * @return XML格式的字符串
      * @throws Exception
      */
-    public static String mapToXml(Map<String, String> data) throws Exception {
-        org.w3c.dom.Document document = XmlUtil.newDocument();
-        org.w3c.dom.Element root = document.createElement("xml");
-        document.appendChild(root);
-        for (String key : data.keySet()) {
-            String value = data.get(key);
-            if (value == null) {
-                value = "";
-            }
-            value = value.trim();
-            org.w3c.dom.Element filed = document.createElement(key);
-            filed.appendChild(document.createTextNode(value));
-            root.appendChild(filed);
-        }
-        TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer transformer = tf.newTransformer();
-        DOMSource source = new DOMSource(document);
-        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        StringWriter writer = new StringWriter();
-        StreamResult result = new StreamResult(writer);
-        transformer.transform(source, result);
-        String output = writer.getBuffer().toString();
-        // .replaceAll("\n|\r", "");
+    public static String mapToXml(Map<String, String> data) {
         try {
+            Document document = XmlUtil.newDocument();
+            Element root = document.createElement("xml");
+            document.appendChild(root);
+            for (String key : data.keySet()) {
+                String value = data.get(key);
+                if (value == null) {
+                    value = StringUtils.EMPTY;
+                }
+                value = value.trim();
+                Element filed = document.createElement(key);
+                filed.appendChild(document.createTextNode(value));
+                root.appendChild(filed);
+            }
+            TransformerFactory tf = TransformerFactory.newInstance();
+            Transformer transformer = tf.newTransformer();
+            DOMSource source = new DOMSource(document);
+            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            StringWriter writer = new StringWriter();
+            StreamResult result = new StreamResult(writer);
+            transformer.transform(source, result);
+            String output = writer.getBuffer().toString();
             writer.close();
+            return output;
         } catch (Exception ex) {
+            throw new RuntimeException(ex);
         }
-        return output;
     }
 
     /**
@@ -76,11 +79,11 @@ public class ConvertUtil {
      * @return XML数据转换后的Map
      * @throws Exception
      */
-    public static Map<String, String> xmlToMap(String strXML) throws Exception {
+    public static Map<String, String> xmlToMap(String strXML) {
         try {
             Map<String, String> data = new HashMap<String, String>();
             DocumentBuilder documentBuilder = XmlUtil.newDocumentBuilder();
-            InputStream stream = new ByteArrayInputStream(strXML.getBytes("UTF-8"));
+            InputStream stream = new ByteArrayInputStream(strXML.getBytes(CharsetUtil.UTF_8));
             org.w3c.dom.Document doc = documentBuilder.parse(stream);
             doc.getDocumentElement().normalize();
             NodeList nodeList = doc.getDocumentElement().getChildNodes();
