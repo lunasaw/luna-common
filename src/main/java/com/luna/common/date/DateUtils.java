@@ -1,13 +1,12 @@
 package com.luna.common.date;
 
-import com.luna.common.constant.Constant;
 import com.luna.common.constant.StrPoolConstant;
+import com.luna.common.text.ObjectUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.lang.management.ManagementFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.Period;
 import java.util.*;
 
 public class DateUtils {
@@ -101,7 +100,7 @@ public class DateUtils {
     /**
      * 返回自字符串格式为：yyyy-MM-dd
      */
-    public static String formatDate(Long time) {
+    public static String formatDate(long time) {
         return formatDate(new Date(time));
     }
 
@@ -115,21 +114,21 @@ public class DateUtils {
     /**
      * 返回自字符串格式为：yyyy-MM-dd HH:mm:ss
      */
-    public static String formatDateTime(Long time) {
+    public static String formatDateTime(long time) {
         return formatDateTime(new Date(time));
     }
 
     /**
      * 返回自字符串格式为：yyyyMMddHHmmssSSS
      */
-    public static String formatDateTimeStr(Long time) {
+    public static String formatDateTimeStr(long time) {
         return formatDateTimeStr(new Date(time));
     }
 
     /**
      * 返回自字符串格式为：HH:mm:ss
      */
-    public static String formatTime(Long time) {
+    public static String formatTime(long time) {
         return formatTime(new Date(time));
     }
 
@@ -248,7 +247,7 @@ public class DateUtils {
      */
     public static String format(Long timestamp, String pattern) {
         String dateStr = "";
-        if (null == timestamp || timestamp.longValue() < 0) {
+        if (ObjectUtils.isEmpty(timestamp)) {
             return dateStr;
         }
         try {
@@ -350,11 +349,11 @@ public class DateUtils {
         int hours, minutes, seconds;
         long timeMillSeconds = System.currentTimeMillis() - date.getTime();
         hours = (int)(timeMillSeconds / (60 * 60 * 1000));
-        timeMillSeconds = timeMillSeconds - (hours * 60 * 60 * 1000);
+        timeMillSeconds = timeMillSeconds - ((long)hours * 60 * 60 * 1000);
         minutes = (int)(timeMillSeconds / (60 * 1000));
-        timeMillSeconds = timeMillSeconds - (minutes * 60 * 1000);
+        timeMillSeconds = timeMillSeconds - ((long)minutes * 60 * 1000);
         seconds = (int)(timeMillSeconds / 1000);
-        String inteval = "";
+        String inteval;
         if (hours > 0) {
             inteval = hours + "小时" + minutes + "分" + seconds + "秒";
         } else if (minutes > 0) {
@@ -378,7 +377,6 @@ public class DateUtils {
     }
 
     public static Date addDays(Date date, int amount) {
-        // return add(date, Calendar.MINUTE, amount);
         return add(date, Calendar.DAY_OF_YEAR, amount);
     }
 
@@ -395,7 +393,7 @@ public class DateUtils {
     }
 
     public static String getTodayString() {
-        return format("yyyyMMdd", new Date());
+        return format(FORMAT_YYYYMMDD, new Date());
     }
 
     private static Date add(Date date, int calendarField, int amount) {
@@ -441,9 +439,8 @@ public class DateUtils {
     /**
      * 获取凌晨00:00:00
      *
-     * @param date
-     * @return
-     * @author huayi
+     * @param date 任意时间
+     * @return    Date
      */
     public static Date getMorning(Date date) {
         Calendar dateCalendar = Calendar.getInstance();
@@ -458,8 +455,8 @@ public class DateUtils {
     /**
      * 获取给定日期0点时间的字符串
      * 
-     * @param date
-     * @return
+     * @param date 任意时间
+     * @return String
      */
     public static String getMorningStr(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat(FORMAT_YYYY_MM_DD + StrPoolConstant.BLANK + START_TIME);
@@ -469,8 +466,8 @@ public class DateUtils {
     /**
      * 获取给定日期23.59.59秒的时间字符串
      * 
-     * @param date
-     * @return
+     * @param date 任意时间当天
+     * @return String
      */
     public static String getNightStr(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat(FORMAT_YYYY_MM_DD + StrPoolConstant.BLANK + END_TIME);
@@ -480,9 +477,8 @@ public class DateUtils {
     /**
      * 获得 某天的23:59:59
      *
-     * @param date
-     * @return
-     * @author huayi
+     * @param date 任意时间
+     * @return Date
      */
     public static Date getNight(Date date) {
         Calendar dateCalendar = Calendar.getInstance();
@@ -496,12 +492,13 @@ public class DateUtils {
 
     /**
      * 取得日期是某年的第几周
+     * @param date 任意时间
+     * @return int
      */
     public static int getWeekOfYear(Date date) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
-        int weekOfYear = cal.get(Calendar.WEEK_OF_YEAR);
-        return weekOfYear;
+        return cal.get(Calendar.WEEK_OF_YEAR);
     }
 
     /**
@@ -593,7 +590,7 @@ public class DateUtils {
      * @return long
      */
     public static long getMonthEndStamp() {
-        return getLastDayTimeOfMonth(new Date());
+        return getLastStampOfMonth(new Date());
     }
 
     /**
@@ -613,17 +610,36 @@ public class DateUtils {
     }
 
     /**
+     * 获取指定时间当月0点毫秒时间
+     *
+     * @return long
+     */
+    public static Date getMonthBeginDateTime(Date date) {
+        return new Date(getMonthBeginStamp(date));
+    }
+
+    /**
      * 获得某月的最后一天的最后时刻
      *
      * @param date 要获取的月份
-     * @return
+     * @return long
      */
-    public static long getLastDayTimeOfMonth(Date date) {
+    public static long getLastStampOfMonth(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(getMonthBeginStamp(date));
         calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH) + 1);
         calendar.add(Calendar.SECOND, -1);
         return calendar.getTime().getTime();
+    }
+
+    /**
+     * 获得某月的最后一天的最后时间
+     *
+     * @param date 要获取的月份
+     * @return Date
+     */
+    public static Date getLastDateTimeOfMonth(Date date) {
+        return new Date(getLastStampOfMonth(date));
     }
 
     /**
@@ -643,5 +659,297 @@ public class DateUtils {
      */
     public static boolean isLeapYear(int year) {
         return new GregorianCalendar().isLeapYear(year);
+    }
+
+    /**
+     * 当前季度的开始时间
+     *
+     * @return Date
+     */
+    public static Date getQuarterStartTime(Date date) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        int currentMonth = c.get(Calendar.MONTH) + 1;
+        if (currentMonth <= 3) {
+            c.set(Calendar.MONTH, 0);
+        } else if (currentMonth <= 6) {
+            c.set(Calendar.MONTH, 3);
+        } else if (currentMonth <= 9) {
+            c.set(Calendar.MONTH, 6);
+        } else if (currentMonth <= 12) {
+            c.set(Calendar.MONTH, 9);
+        }
+        c.set(Calendar.DATE, 1);
+        return getMorning(c.getTime());
+    }
+
+    /**
+     * 当前季度的开始时间
+     *
+     * @return long
+     */
+    public static long getQuarterStartStamp(Date date) {
+        return getQuarterStartTime(date).getTime();
+    }
+
+    /**
+     * 当前季度的结束时间
+     *
+     * @return Date
+     */
+    public static Date getQuarterEndTime(Date date) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        int currentMonth = c.get(Calendar.MONTH) + 1;
+        if (currentMonth <= 3) {
+            c.set(Calendar.MONTH, 2);
+            c.set(Calendar.DATE, 31);
+        } else if (currentMonth <= 6) {
+            c.set(Calendar.MONTH, 5);
+            c.set(Calendar.DATE, 30);
+        } else if (currentMonth <= 9) {
+            c.set(Calendar.MONTH, 8);
+            c.set(Calendar.DATE, 30);
+        } else if (currentMonth <= 12) {
+            c.set(Calendar.MONTH, 11);
+            c.set(Calendar.DATE, 31);
+        }
+        return getNight(c.getTime());
+    }
+
+    /**
+     * 当前季度的结束时间
+     *
+     * @return long
+     */
+    public static long getQuarterEndStamp(Date date) {
+        return getQuarterEndTime(date).getTime();
+    }
+
+    /**
+     * 获取当前日期所属季度开始结束时间
+     *
+     * @param date 任意时间
+     * @return
+     */
+    public static Pair<Long, Long> quarterTime(Date date) {
+        return Pair.of(DateUtils.getQuarterStartStamp(date), DateUtils.getQuarterEndStamp(date));
+    }
+
+    /**
+     * 获取日期所属季度开始结束时间
+     *
+     * @return
+     */
+    public static Pair<Long, Long> quarterTime() {
+        return Pair.of(DateUtils.getQuarterStartStamp(new Date()), DateUtils.getQuarterEndStamp(new Date()));
+    }
+
+    /**
+     * 当前年的开始时间
+     *
+     * @return Date
+     */
+    public static Date getYearStartTime(Date date) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        c.set(Calendar.MONTH, 0);
+        c.set(Calendar.DATE, 1);
+        return getMorning(c.getTime());
+    }
+
+    /**
+     * 当前年的开始时间
+     *
+     * @return long
+     */
+    public static long getYearStartStamp(Date date) {
+        return getYearStartTime(date).getTime();
+    }
+
+    /**
+     * 当前年的结束时间
+     *
+     * @return Date
+     */
+    public static Date getYearEndTime(Date date) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        c.set(Calendar.MONTH, 11);
+        c.set(Calendar.DATE, 31);
+        return getNight(c.getTime());
+    }
+
+    /**
+     * 当前年的结束时间
+     *
+     * @return long
+     */
+    public static long getYearEndStamp(Date date) {
+        return getYearEndTime(date).getTime();
+    }
+
+    /**
+     * 获得本周的第一天，周一
+     *
+     * @return Date
+     */
+    public static Date getWeekDayStartTime(Date date) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        int weekday = c.get(Calendar.DAY_OF_WEEK) - 2;
+        c.add(Calendar.DATE, -weekday);
+        return getMorning(c.getTime());
+    }
+
+    /**
+     * 获得本周的第一天，周一
+     *
+     * @return long
+     */
+    public static long getWeekDayStartStamp(Date date) {
+        return getWeekDayStartTime(date).getTime();
+    }
+
+    /**
+     * 获得本周的最后一天，周日
+     *
+     * @return Date
+     */
+    public static Date getWeekDayEndTime(Date date) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        int weekday = c.get(Calendar.DAY_OF_WEEK);
+        c.add(Calendar.DATE, 8 - weekday);
+        return getNight(c.getTime());
+    }
+
+    /**
+     * 获得本周的最后一天，周日
+     *
+     * @return long
+     */
+    public static long getWeekDayEndStamp(Date date) {
+        return getWeekDayEndTime(date).getTime();
+    }
+
+    /**
+     * 获取前/后半年的开始时间
+     *
+     * @return date
+     */
+    public static Date getHalfYearStartTime(Date date) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        int currentMonth = c.get(Calendar.MONTH) + 1;
+        if (currentMonth <= 6) {
+            c.set(Calendar.MONTH, 0);
+        } else if (currentMonth <= 12) {
+            c.set(Calendar.MONTH, 6);
+        }
+        c.set(Calendar.DATE, 1);
+        return getMorning(c.getTime());
+    }
+
+    /**
+     * 获取前/后半年的开始时间
+     *
+     * @return date
+     */
+    public static long getHalfYearStartStamp(Date date) {
+        return getHalfYearStartTime(date).getTime();
+    }
+
+    /**
+     * 获取前/后半年的结束时间
+     *
+     * @return date
+     */
+    public static Date getHalfYearEndTime(Date date) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        int currentMonth = c.get(Calendar.MONTH) + 1;
+        if (currentMonth <= 6) {
+            c.set(Calendar.MONTH, 5);
+            c.set(Calendar.DATE, 30);
+        } else if (currentMonth <= 12) {
+            c.set(Calendar.MONTH, 11);
+            c.set(Calendar.DATE, 31);
+        }
+        return getNight(c.getTime());
+    }
+
+    /**
+     * 获取前/后半年的结束时间
+     *
+     * @return date
+     */
+    public static long getHalfYearEndStamp(Date date) {
+        return getHalfYearEndTime(date).getTime();
+    }
+
+    /**
+     * 获取间隔 1 天 的时间列表
+     * 
+     * @param startDate 开始时间
+     * @param endDate 结束时间
+     * @return List<Long>
+     */
+    public static List<Long> getBetweenWithDay(Date startDate, Date endDate) {
+        return dateBetween(startDate.getTime(), endDate.getTime(), 86400000L);
+    }
+
+    /**
+     * 获取间隔 1 周 的时间列表
+     * 
+     * @param startDate 开始时间
+     * @param endDate 结束时间
+     * @return List<Long>
+     */
+    public static List<Long> getBetweenWithWeek(Date startDate, Date endDate) {
+        return dateBetween(startDate.getTime(), endDate.getTime(), 604800000L);
+    }
+
+    /**
+     * 获取间隔 1月 (30.44 天) 的时间列表
+     * 
+     * @param startDate 开始时间
+     * @param endDate 结束时间
+     * @return List<Long>
+     */
+    public static List<Long> getBetweenWithMonth(Date startDate, Date endDate) {
+        return dateBetween(startDate.getTime(), endDate.getTime(), 2629743000L);
+    }
+
+    /**
+     * 获取间隔 1年 (365.24 天) 的时间列表
+     * 
+     * @param startDate 开始时间
+     * @param endDate 结束时间
+     * @return List<Long>
+     */
+    public static List<Long> getBetweenWithYear(Date startDate, Date endDate) {
+        return dateBetween(startDate.getTime(), endDate.getTime(), 31556736000L);
+    }
+
+    /**
+     * 获取两个时间直接指定间隔天数列表
+     * 
+     * @param startDate 开始时间
+     * @param endDate 结束时间
+     * @param interval 时间间隔
+     * @return List<Long>
+     */
+    public static List<Long> dateBetween(Long startDate, Long endDate, Long interval) {
+        List<Long> list = new ArrayList<>();
+        // 定义一个一天的时间戳时长
+        long oneDay = interval;
+        long time = startDate;
+        // 循环得出
+        while (time <= endDate) {
+            list.add(time);
+            time += oneDay;
+        }
+        return list;
     }
 }
