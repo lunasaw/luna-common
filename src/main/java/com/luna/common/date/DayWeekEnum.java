@@ -5,7 +5,7 @@ package com.luna.common.date;
  */
 public enum DayWeekEnum {
     /** 星期 */
-    SUNDAY(7, "星期日"),
+    SUNDAY(0, "星期日"),
     SATURDAY(6, "星期六"),
     FRIDAY(5, "星期五"),
     THURSDAY(4, "星期四"),
@@ -21,13 +21,13 @@ public enum DayWeekEnum {
         this.name = name;
     }
 
-    public static String getNameByCode(int code) {
+    public static DayWeekEnum getNameByCode(int code) {
         for (DayWeekEnum dayWeekEnum : DayWeekEnum.values()) {
             if (dayWeekEnum.code == code) {
-                return dayWeekEnum.getName();
+                return dayWeekEnum;
             }
         }
-        return SUNDAY.getName();
+        return null;
     }
 
     public int getCode() {

@@ -19,7 +19,7 @@ public class HttpBaseUtils {
     /** 读取时间超时 */
     private static final Integer     READ_TIME_OUT       = 5000;
 
-    private static HttpURLConnection conn                = null;
+    private static volatile HttpURLConnection conn                = null;
 
     private static final int         DEFAULT_BUFFER_SIZE = 4096;
 
@@ -47,7 +47,7 @@ public class HttpBaseUtils {
      * @param headers 请求头
      * @param queries 请求参数
      * @param body 请求体
-     * @return
+     * @return 输入流
      * @throws IOException
      */
     public static InputStream doURL(String host, String path, String method, Map<String, String> headers,
@@ -89,7 +89,7 @@ public class HttpBaseUtils {
                 in = new DataInputStream(new FileInputStream(file));
                 conn.setDoOutput(true);
                 int bytes = 0;
-                byte[] bufferOut = new byte[1024];
+                byte[] bufferOut = new byte[DEFAULT_BUFFER_SIZE];
                 while ((bytes = in.read(bufferOut)) != -1) {
                     out.write(bufferOut, 0, bytes);
                 }

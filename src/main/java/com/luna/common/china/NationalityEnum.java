@@ -1,7 +1,7 @@
 package com.luna.common.china;
 
 /**
- * @author chenzhangyue@weidian.com
+ * @author luna
  * 2021/8/18
  */
 public enum NationalityEnum {
