@@ -14,7 +14,7 @@ import java.nio.charset.Charset;
 import java.util.*;
 
 /**
- * @author chenzhangyue@weidian.com
+ * @author luna
  * 2021/8/18
  */
 public class StringUtils extends org.apache.commons.lang3.StringUtils {

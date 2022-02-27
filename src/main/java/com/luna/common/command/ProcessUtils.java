@@ -10,9 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import com.google.common.collect.ImmutableMap;
-import com.luna.common.constant.Constant;
 import com.luna.common.constant.StrPoolConstant;
 import com.luna.common.dto.constant.ResultCode;
 import com.luna.common.exception.BaseException;
@@ -115,10 +113,34 @@ public class ProcessUtils {
     }
 
     /**
+     * win 强制删除文件夹
+     *
+     * @param filePath 文件夹路径
+     * @return
+     */
+    public static String winDelDir(String filePath) {
+        return runCommand(
+            processBuild(CommandConstant.WIN_DELETE_DIRECTORY,
+                ImmutableMap.of(CommandConstant.FILE_PATH, filePath)));
+    }
+
+    /**
+     * win 强制删除文件
+     *
+     * @param fileName 文件路径
+     * @return
+     */
+    public static String winDelFile(String fileName) {
+        return runCommand(
+            processBuild(CommandConstant.WIN_DELETE_FILE,
+                ImmutableMap.of(CommandConstant.FILE_PATH, fileName)));
+    }
+
+    /**
      * 执行命令行
      * 
      * @param command 命令行
-     * @return
+     * @return 包含 \n 的命令输出字符串
      */
     public static String runCommand(String command) {
         try {

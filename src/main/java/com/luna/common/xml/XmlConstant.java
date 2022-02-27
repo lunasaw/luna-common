@@ -1,7 +1,7 @@
 package com.luna.common.xml;
 
 /**
- * @author chenzhangyue@weidian.com
+ * @author luna
  * 2021/8/18
  */
 public interface XmlConstant {

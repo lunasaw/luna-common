@@ -1,7 +1,7 @@
 package com.luna.common.net;
 
 /**
- * @author chenzhangyue@weidian.com
+ * @author luna
  * 2021/8/13
  */
 public enum HttpContentTypeEnum {

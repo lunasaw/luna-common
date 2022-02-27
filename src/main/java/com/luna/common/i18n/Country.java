@@ -8,7 +8,7 @@ package com.luna.common.i18n;
  * 国家以及简称的枚举
  * </pre>
  * 
- * @author chenzhangyue@weidian.com
+ * @author luna
  * 2021/8/18
  * @since 5.0.0
  *

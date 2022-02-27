@@ -13,6 +13,8 @@ public class DateUtils {
 
     public static final String                         FORMAT_YYYY_MM_DD          = "yyyy-MM-dd";
 
+    public static final String                         FORMAT_YYYY_MM             = "yyyy-MM";
+
     public static final String                         FORMAT_YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
 
     public static final String                         FORMAT_YYYY_MM_DD_HH_MM    = "yyyy-MM-dd HH:mm";
@@ -61,6 +63,13 @@ public class DateUtils {
     }
 
     /**
+     * 返回自字符串格式为：yyyy-MM
+     */
+    public static String formatDateMonth(Date aDate) {
+        return format(FORMAT_YYYY_MM, aDate);
+    }
+
+    /**
      * 返回自字符串格式为：yyyy-MM-dd
      */
     public static String formatDate(Date aDate) {
@@ -93,6 +102,13 @@ public class DateUtils {
      */
     public static String formatDate(long time) {
         return formatDate(new Date(time));
+    }
+
+    /**
+     * 返回自字符串格式为：yyyy-MM
+     */
+    public static String formatDateMonth(Long time) {
+        return formatDateMonth(new Date(time));
     }
 
     /**
@@ -140,6 +156,17 @@ public class DateUtils {
     public static Date parseDate(String strDate) {
         try {
             return parse(FORMAT_YYYY_MM_DD, strDate);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 只支持格式yyyy-MM
+     */
+    public static Date parseDateMonth(String strDate) {
+        try {
+            return parse(FORMAT_YYYY_MM, strDate);
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
@@ -386,6 +413,12 @@ public class DateUtils {
         return formatDate(next);
     }
 
+    public static int getYear(Long date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(date);
+        return cal.get(Calendar.YEAR);
+    }
+
     public static int getYear(Date date) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
@@ -420,7 +453,7 @@ public class DateUtils {
     }
 
     /**
-     * 获取0点时间的字符串
+     * 获取给定日期0点时间的字符串
      * 
      * @param date 任意时间
      * @return String
@@ -431,7 +464,7 @@ public class DateUtils {
     }
 
     /**
-     * 获取23.59.59秒的时间字符串
+     * 获取给定日期23.59.59秒的时间字符串
      * 
      * @param date 任意时间当天
      * @return String
@@ -501,6 +534,10 @@ public class DateUtils {
             weekIndex = 0;
         }
         return weekIndex;
+    }
+
+    public static DayWeekEnum getWeekDayEnum(Date date) {
+        return DayWeekEnum.getNameByCode(getWeekDay(date));
     }
 
     /**
@@ -611,7 +648,7 @@ public class DateUtils {
      * @return
      */
     public static int thisYear() {
-        return getYear(getCurrentDate());
+        return getYear(getCurrentTimestampMs());
     }
 
     /**
