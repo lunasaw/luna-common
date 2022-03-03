@@ -4,14 +4,19 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
+import com.google.common.collect.Lists;
 import com.luna.common.constant.Constant;
 import com.luna.common.exception.BaseException;
 import com.luna.common.file.visitor.MoveVisitor;
 import com.luna.common.text.Assert;
 import com.luna.common.text.CharsetUtil;
 import com.luna.common.text.StringUtils;
+import com.luna.common.utils.Preconditions;
 import org.apache.commons.io.FileUtils;
 import oshi.util.FileUtil;
 
@@ -26,10 +31,11 @@ public class FileTools {
     /**
      * 读取文件所有内容
      *
-     * @param fileName
-     * @return
+     * @param fileName 文件路径带文件名
+     * @return List<String>
      */
     public static List<String> readAllLines(String fileName) {
+        Objects.requireNonNull(fileName, "文件路径不能为空");
         try {
             return Files.readAllLines(Paths.get(fileName), Charset.defaultCharset());
         } catch (IOException e) {
@@ -40,9 +46,10 @@ public class FileTools {
     /**
      * 删除文件或空目录
      *
-     * @param file
+     * @param file 文件目录 或者 文件名
      */
     public static void deleteIfExists(String file) {
+        Objects.requireNonNull(file, "文件路径不能为空");
         try {
             Files.deleteIfExists(Paths.get(file));
         } catch (IOException e) {
@@ -54,7 +61,7 @@ public class FileTools {
      * 判断一个文件是否存在
      *
      * @param fileName 文件路径
-     * @return
+     * @return boolean
      */
     public static boolean isExists(String fileName) {
         return Files.exists(Paths.get(fileName));
@@ -67,6 +74,7 @@ public class FileTools {
      * @param fileName 文件路径
      */
     public static void write(byte[] bytes, String fileName) {
+        Objects.requireNonNull(fileName, "文件路径不能为空");
         try {
             Files.write(Paths.get(fileName), bytes);
         } catch (IOException e) {
@@ -79,9 +87,10 @@ public class FileTools {
      * 
      * @param fileName 文件路径
      * @param content 文本内容
-     * @throws IOException
+     * @throws IOException 写入异常
      */
     public static void write(String content, String fileName) {
+        Objects.requireNonNull(fileName, "文件路径不能为空");
         try {
             Files.write(Paths.get(fileName), content.getBytes(Charset.defaultCharset()));
         } catch (IOException e) {
@@ -96,6 +105,7 @@ public class FileTools {
      * @return 字节数组
      */
     public static byte[] read(String fileName) {
+        Objects.requireNonNull(fileName, "文件路径不能为空");
         try {
             return Files.readAllBytes(Paths.get(fileName));
         } catch (IOException e) {
@@ -107,10 +117,11 @@ public class FileTools {
      * 计算文件中行数
      *
      * @param filePath 文件地址
-     * @return
-     * @throws Exception
+     * @return long 行数
+     * @throws RuntimeException
      */
     public static long count(String filePath) {
+        Objects.requireNonNull(filePath, "文件路径不能为空");
         LineNumberReader reader = null;
         try {
             reader = new LineNumberReader(new FileReader(filePath));
@@ -120,6 +131,44 @@ public class FileTools {
             throw new RuntimeException(e);
         } finally {
             try {
+                assert reader != null;
+                reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static List<String> read(String filePath, int skip, int row) {
+        Objects.requireNonNull(filePath, "文件路径不能为空");
+        LineNumberReader reader = null;
+        if (skip < 0) {
+            skip = 0;
+        }
+        if (row < 0) {
+            row = 1;
+        }
+        try {
+            ArrayList<String> list = Lists.newArrayList();
+            reader = new LineNumberReader(new FileReader(filePath));
+            reader.setLineNumber(0);
+            String s;
+            while ((s = reader.readLine()) != null) {
+                if (reader.getLineNumber() <= skip) {
+                    continue;
+                }
+                list.add(s);
+                for (int i = 0; i < row - 1; i++) {
+                    list.add(reader.readLine());
+                }
+                break;
+            }
+            return list;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                assert reader != null;
                 reader.close();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -140,6 +189,9 @@ public class FileTools {
      * @param file 文件地址
      */
     public static void download(String url, String file) {
+        Objects.requireNonNull(file, "文件路径不能为空");
+        Objects.requireNonNull(url, "网络路径不能为空");
+
         try {
             FileUtils.copyURLToFile(new URL(url), new File(file), Constant.FIVE_THOUSAND, Constant.FIVE_THOUSAND);
         } catch (IOException e) {
@@ -232,7 +284,7 @@ public class FileTools {
      *
      * @param file 文件路径
      * @param content 文件内容
-     * @param
+     * @param destCharset 编码格式
      */
     public static void writeStringToFile(File file, String content, Charset destCharset) {
         writeStringToFile(file, content, destCharset, false);
