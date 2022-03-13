@@ -22,11 +22,7 @@ public class HashTools {
     }
 
     public static String md5WithFile(String path, String charset) {
-        try {
-            return md5(IOUtils.toInputStream(path, charset));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return md5(IOUtils.toInputStream(path, charset));
     }
 
     public static String md5WithFile(String path) {
@@ -46,11 +42,7 @@ public class HashTools {
     }
 
     public static String sha512WithFile(String path, String charset) {
-        try {
-            return sha512(IOUtils.toInputStream(path, charset));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return sha512(IOUtils.toInputStream(path, charset));
     }
 
     public static String sha512WithFile(String path) {
@@ -62,11 +54,7 @@ public class HashTools {
     }
 
     public static String sha256WithFile(String path, String charset) {
-        try {
-            return sha256(IOUtils.toInputStream(path, charset));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return sha256(IOUtils.toInputStream(path, charset));
     }
 
     public static String sha256WithFile(String path) {

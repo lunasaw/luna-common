@@ -32,6 +32,12 @@ public class OshiUtils {
 
     private static final int    OSHI_WAIT_SECOND = 1000;
 
+    public static void main(String[] args) {
+        OshiHardware oshiHardware = new OshiHardware();
+        refresh(oshiHardware,new SystemInfo());
+        System.out.println(oshiHardware);
+    }
+
     /**
      * 刷新系统状态
      * 
@@ -92,6 +98,7 @@ public class OshiUtils {
         oshiHardware.setProcessor(processor);
 
         logger.info("init oshiHardwareDTO success, oshiHardwareDTO={}", oshiHardware);
+        oshiHardware.setSystemInfoDTO(sysInfo());
         return oshiHardware;
     }
 

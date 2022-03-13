@@ -20,6 +20,7 @@ import com.luna.common.text.HexUtil;
 import com.luna.common.text.StringUtils;
 import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.io.output.NullOutputStream;
+import org.apache.commons.io.output.NullPrintStream;
 
 /**
  * IO工具类<br>

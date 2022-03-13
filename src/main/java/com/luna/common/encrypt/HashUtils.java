@@ -24,11 +24,7 @@ public class HashUtils {
     }
 
     public static String md5WithFile(String path) {
-        try {
-            return md5(IOUtils.toInputStream(path, CharsetUtil.UTF_8));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return md5(IOUtils.toInputStream(path, CharsetUtil.UTF_8));
     }
 
     public static String md5(InputStream inputStream) {
@@ -40,11 +36,7 @@ public class HashUtils {
     }
 
     public static String sha256WithFile(String path) {
-        try {
-            return sha256(IOUtils.toInputStream(path, CharsetUtil.UTF_8));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return sha256(IOUtils.toInputStream(path, CharsetUtil.UTF_8));
     }
 
     public static String sha256(InputStream inputStream) {
