@@ -158,6 +158,7 @@
                         <configuration>
                             <autoVersionSubmodules>true</autoVersionSubmodules>
                             <useReleaseProfile>false</useReleaseProfile>
+                            <!--正式包release 快照包snapshots-->
                             <releaseProfiles>snapshots</releaseProfiles>
                             <goals>deploy</goals>
                         </configuration>

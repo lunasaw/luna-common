@@ -597,7 +597,6 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      * @param str 字符串
      * @param desensitizedType 脱敏类型;可以脱敏：用户id、中文名、身份证号、座机号、手机号、地址、电子邮件、密码
      * @return 脱敏之后的字符串
-     * @author dazer and neusoft and qiaomu
      * @see DesensitizedUtil 如果需要自定义，脱敏规则，请使用该工具类；
      * @since 5.6.2
      */

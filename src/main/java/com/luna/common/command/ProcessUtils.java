@@ -59,7 +59,7 @@ public class ProcessUtils {
      * mkdir 命令创建文件
      * 
      * @param filePath
-     * @return
+     * @return 命令输出
      */
     public static String mkdir(String filePath) {
         return runCommand(processBuild(CommandConstant.MKDIR, ImmutableMap.of(CommandConstant.FILE_PATH, filePath)));
@@ -69,7 +69,7 @@ public class ProcessUtils {
      * touch 创建文件
      * 
      * @param fileName
-     * @return
+     * @return 命令输出
      */
     public static String touch(String fileName) {
         return runCommand(processBuild(CommandConstant.TOUCH, ImmutableMap.of(CommandConstant.FILE_NAME, fileName)));
@@ -91,7 +91,7 @@ public class ProcessUtils {
      * 
      * @param fileName xxx.zip
      * @param filePath 添加文件夹
-     * @return
+     * @return 命令输出
      */
     public static String zip(String fileName, String filePath) {
         return runCommand(
@@ -104,7 +104,7 @@ public class ProcessUtils {
      * 
      * @param fileName xxx.zip 待解压文件
      * @param filePath 解压存放路径
-     * @return
+     * @return 命令输出
      */
     public static String unzip(String fileName, String filePath) {
         return runCommand(
@@ -116,7 +116,7 @@ public class ProcessUtils {
      * win 强制删除文件夹
      *
      * @param filePath 文件夹路径
-     * @return
+     * @return 命令输出
      */
     public static String winDelDir(String filePath) {
         return runCommand(
@@ -128,7 +128,7 @@ public class ProcessUtils {
      * win 强制删除文件
      *
      * @param fileName 文件路径
-     * @return
+     * @return 命令输出
      */
     public static String winDelFile(String fileName) {
         return runCommand(
@@ -165,7 +165,7 @@ public class ProcessUtils {
      * 获取所有进程，用filename过滤
      * 
      * @param fileName 文件名
-     * @return
+     * @return  获取所有进程List
      */
     public static List<OSProcess> getProcessesByFileName(String fileName) {
         String fileNameWithoutExtension = removeExtension(fileName);
@@ -189,7 +189,7 @@ public class ProcessUtils {
      * 格式化路径，\替换为/
      * 
      * @param path
-     * @return
+     * @return 替换后的路径
      */
     public static String formatPath(String path) {
         return path.replace(StrPoolConstant.BACKSLASH, StrPoolConstant.SLASH);
@@ -244,15 +244,13 @@ public class ProcessUtils {
     public static void osKill(String fileName) {
         // os kill
         List<OSProcess> osProcessList = getProcessesByFileName(fileName);
-        osProcessList.forEach(osProcess -> {
-            osKill(osProcess.getProcessID());
-        });
+        osProcessList.forEach(osProcess -> osKill(osProcess.getProcessID()));
     }
 
     /**
      * 操作系统级别杀进程
      * 
-     * @param processId
+     * @param processId 进程ID
      */
     public static void osKill(int processId) {
         if (SystemUtils.IS_OS_WINDOWS) {
@@ -277,12 +275,10 @@ public class ProcessUtils {
     /**
      * 根据path查找进程并kill
      * 
-     * @param path
+     * @param path 进程路径
      */
     public static void getProcessesAndKill(String path) {
         List<OSProcess> osProcessList = getProcessesByPath(path);
-        osProcessList.forEach(osProcess -> {
-            osKill(osProcess.getProcessID());
-        });
+        osProcessList.forEach(osProcess -> osKill(osProcess.getProcessID()));
     }
 }
