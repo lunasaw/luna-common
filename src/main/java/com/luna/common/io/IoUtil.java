@@ -17,10 +17,9 @@ import com.luna.common.reflect.ConvertUtil;
 import com.luna.common.text.Assert;
 import com.luna.common.text.CharsetUtil;
 import com.luna.common.text.HexUtil;
-import com.luna.common.text.StringUtils;
+import com.luna.common.text.StringTools;
 import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.io.output.NullOutputStream;
-import org.apache.commons.io.output.NullPrintStream;
 
 /**
  * IO工具类<br>
@@ -339,7 +338,7 @@ public class IoUtil extends NioUtil {
      */
     public static String read(InputStream in, String charsetName) throws IOException {
         final FastByteArrayOutputStream out = read(in);
-        return StringUtils.isBlank(charsetName) ? out.toString() : out.toString(charsetName);
+        return StringTools.isBlank(charsetName) ? out.toString() : out.toString(charsetName);
     }
 
     /**
@@ -462,7 +461,7 @@ public class IoUtil extends NioUtil {
                 final int readLength = in.read(result);
                 if (readLength != available) {
                     throw new IOException(
-                        StringUtils.format("File length is [{}] but read [{}]!", available, readLength));
+                        StringTools.format("File length is [{}] but read [{}]!", available, readLength));
                 }
             } catch (IOException e) {
                 throw new IOException(e);

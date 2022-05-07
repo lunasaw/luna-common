@@ -105,7 +105,7 @@ public class CharsetUtil {
      * @throws UnsupportedCharsetException 编码不支持
      */
     public static Charset charset(String charsetName) throws UnsupportedCharsetException {
-        return StringUtils.isBlank(charsetName) ? Charset.defaultCharset() : Charset.forName(charsetName);
+        return StringTools.isBlank(charsetName) ? Charset.defaultCharset() : Charset.forName(charsetName);
     }
 
     /**
@@ -128,7 +128,7 @@ public class CharsetUtil {
      * @since 5.2.6
      */
     public static Charset parse(String charsetName, Charset defaultCharset) {
-        if (StringUtils.isBlank(charsetName)) {
+        if (StringTools.isBlank(charsetName)) {
             return defaultCharset;
         }
 
@@ -179,7 +179,7 @@ public class CharsetUtil {
             destCharset = StandardCharsets.UTF_8;
         }
 
-        if (StringUtils.isBlank(source) || srcCharset.equals(destCharset)) {
+        if (StringTools.isBlank(source) || srcCharset.equals(destCharset)) {
             return source;
         }
         return new String(source.getBytes(srcCharset), destCharset);
@@ -328,7 +328,7 @@ public class CharsetUtil {
         } else if (obj instanceof ByteBuffer) {
             return str((ByteBuffer)obj, charset);
         } else if (null != obj && obj.getClass().isArray()) {
-            return StringUtils.toString(obj);
+            return StringTools.toString(obj);
         }
 
         return obj.toString();

@@ -166,7 +166,7 @@ public class NumberUtil {
         BigDecimal result = toBigDecimal(value);
         for (int i = 1; i < values.length; i++) {
             value = values[i];
-            if (StringUtils.isNotBlank(value)) {
+            if (StringTools.isNotBlank(value)) {
                 result = result.add(toBigDecimal(value));
             }
         }
@@ -306,7 +306,7 @@ public class NumberUtil {
         BigDecimal result = toBigDecimal(value);
         for (int i = 1; i < values.length; i++) {
             value = values[i];
-            if (StringUtils.isNotBlank(value)) {
+            if (StringTools.isNotBlank(value)) {
                 result = result.subtract(toBigDecimal(value));
             }
         }
@@ -876,7 +876,7 @@ public class NumberUtil {
      * @return 新值
      */
     public static BigDecimal round(String numberStr, int scale, RoundingMode roundingMode) {
-        StringUtils.isNotBlank(numberStr);
+        StringTools.isNotBlank(numberStr);
         if (scale < 0) {
             scale = 0;
         }
@@ -1136,7 +1136,7 @@ public class NumberUtil {
      * @return 是否为数字
      */
     public static boolean isNumber(CharSequence str) {
-        if (StringUtils.isBlank(str)) {
+        if (StringTools.isBlank(str)) {
             return false;
         }
         char[] chars = str.toString().toCharArray();
@@ -1485,7 +1485,7 @@ public class NumberUtil {
         Assert.notNull(end, "Factorial end must be not null!");
         if (start.compareTo(BigInteger.ZERO) < 0 || end.compareTo(BigInteger.ZERO) < 0) {
             throw new IllegalArgumentException(
-                StringUtils.format("Factorial start and end both must be > 0, but got start={}, end={}", start, end));
+                StringTools.format("Factorial start and end both must be > 0, but got start={}, end={}", start, end));
         }
 
         if (start.equals(BigInteger.ZERO)) {
@@ -1520,7 +1520,7 @@ public class NumberUtil {
         // 负数没有阶乘
         if (start < 0 || end < 0) {
             throw new IllegalArgumentException(
-                StringUtils.format("Factorial start and end both must be >= 0, but got start={}, end={}", start, end));
+                StringTools.format("Factorial start and end both must be >= 0, but got start={}, end={}", start, end));
         }
         if (0L == start || start == end) {
             return 1L;
@@ -1542,7 +1542,7 @@ public class NumberUtil {
         if (a <= Long.MAX_VALUE / b) {
             return a * b;
         }
-        throw new IllegalArgumentException(StringUtils.format("Overflow in multiplication: {} * {}", a, b));
+        throw new IllegalArgumentException(StringTools.format("Overflow in multiplication: {} * {}", a, b));
     }
 
     /**
@@ -1557,7 +1557,7 @@ public class NumberUtil {
     public static long factorial(long n) {
         if (n < 0 || n > 20) {
             throw new IllegalArgumentException(
-                StringUtils.format("Factorial must have n >= 0 and n <= 20 for n!, but got n = {}", n));
+                StringTools.format("Factorial must have n >= 0 and n <= 20 for n!, but got n = {}", n));
         }
         return FACTORIALS[(int)n];
     }
@@ -1974,7 +1974,7 @@ public class NumberUtil {
         } catch (Exception ignore) {
             // 忽略解析错误
         }
-        return StringUtils.isBlank(number) ? BigDecimal.ZERO : new BigDecimal(number);
+        return StringTools.isBlank(number) ? BigDecimal.ZERO : new BigDecimal(number);
     }
 
     /**
@@ -2008,7 +2008,7 @@ public class NumberUtil {
      * @since 5.4.5
      */
     public static BigInteger toBigInteger(String number) {
-        return StringUtils.isBlank(number) ? BigInteger.ZERO : new BigInteger(number);
+        return StringTools.isBlank(number) ? BigInteger.ZERO : new BigInteger(number);
     }
 
     /**
@@ -2055,7 +2055,7 @@ public class NumberUtil {
      * @since 3.2.1
      */
     public static BigInteger newBigInteger(String str) {
-        str = StringUtils.trimToNull(str);
+        str = StringTools.trimToNull(str);
         if (null == str) {
             return null;
         }
@@ -2197,11 +2197,11 @@ public class NumberUtil {
      * @since 4.1.4
      */
     public static int parseInt(String number) throws NumberFormatException {
-        if (StringUtils.isBlank(number)) {
+        if (StringTools.isBlank(number)) {
             return 0;
         }
 
-        if (StringUtils.startWithIgnoreCase(number, "0x")) {
+        if (StringTools.startWithIgnoreCase(number, "0x")) {
             // 0x04表示16进制数
             return Integer.parseInt(number.substring(2), 16);
         }
@@ -2230,7 +2230,7 @@ public class NumberUtil {
      * @since 4.1.4
      */
     public static long parseLong(String number) {
-        if (StringUtils.isBlank(number)) {
+        if (StringTools.isBlank(number)) {
             return 0L;
         }
 
@@ -2261,7 +2261,7 @@ public class NumberUtil {
      * @since 5.5.5
      */
     public static float parseFloat(String number) {
-        if (StringUtils.isBlank(number)) {
+        if (StringTools.isBlank(number)) {
             return 0f;
         }
 
@@ -2287,7 +2287,7 @@ public class NumberUtil {
      * @since 5.5.5
      */
     public static double parseDouble(String number) {
-        if (StringUtils.isBlank(number)) {
+        if (StringTools.isBlank(number)) {
             return 0D;
         }
 

@@ -18,7 +18,7 @@ import java.util.*;
  * @author luna
  * 2021/8/18
  */
-public class StringUtils extends org.apache.commons.lang3.StringUtils {
+public class StringTools extends org.apache.commons.lang3.StringUtils {
 
     /**
      * 清理空白字符
@@ -70,7 +70,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      * @return 是否为数字
      */
     public static boolean isNumber(CharSequence str) {
-        if (StringUtils.isBlank(str)) {
+        if (StringTools.isBlank(str)) {
             return false;
         }
         char[] chars = str.toString().toCharArray();
@@ -919,10 +919,10 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      * <p>
      * 
      * <pre class="code">
-     * StringUtils.hasLength(null) = false
-     * StringUtils.hasLength("") = false
-     * StringUtils.hasLength(" ") = true
-     * StringUtils.hasLength("Hello") = true
+     * StringTools.hasLength(null) = false
+     * StringTools.hasLength("") = false
+     * StringTools.hasLength(" ") = true
+     * StringTools.hasLength("Hello") = true
      * </pre>
      * 
      * @param str the {@code CharSequence} to check (may be {@code null})
@@ -958,11 +958,11 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      * <p>
      * 
      * <pre class="code">
-     * StringUtils.hasText(null) = false
-     * StringUtils.hasText("") = false
-     * StringUtils.hasText(" ") = false
-     * StringUtils.hasText("12345") = true
-     * StringUtils.hasText(" 12345 ") = true
+     * StringTools.hasText(null) = false
+     * StringTools.hasText("") = false
+     * StringTools.hasText(" ") = false
+     * StringTools.hasText("12345") = true
+     * StringTools.hasText(" 12345 ") = true
      * </pre>
      * 
      * @param str the {@code CharSequence} to check (may be {@code null})

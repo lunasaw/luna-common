@@ -153,7 +153,7 @@ public class IdcardUtil {
      * @return 是否有效
      */
     public static boolean isValidCard(String idCard) {
-        if (StringUtils.isBlank(idCard)) {
+        if (StringTools.isBlank(idCard)) {
             return false;
         }
 
@@ -305,7 +305,7 @@ public class IdcardUtil {
      * </p>
      */
     public static String[] isValidCard10(String idcard) {
-        if (StringUtils.isBlank(idcard)) {
+        if (StringTools.isBlank(idcard)) {
             return null;
         }
         String[] info = new String[3];
@@ -424,7 +424,7 @@ public class IdcardUtil {
      * @return 生日(yyyyMMdd)
      */
     public static String getBirth(String idCard) {
-        if (StringUtils.isBlank(idCard)) {
+        if (StringTools.isBlank(idCard)) {
             return null;
         }
         final int len = idCard.length();
@@ -525,7 +525,7 @@ public class IdcardUtil {
      * @return 性别(1 : 男 ， 0 : 女)
      */
     public static int getGenderByIdCard(String idcard) {
-        if (StringUtils.isBlank(idcard)) {
+        if (StringTools.isBlank(idcard)) {
             return 0;
         }
         final int len = idcard.length();
@@ -563,7 +563,7 @@ public class IdcardUtil {
      */
     public static String getProvinceByIdCard(String idcard) {
         final String code = getProvinceCodeByIdCard(idcard);
-        if (StringUtils.isNotBlank(code)) {
+        if (StringTools.isNotBlank(code)) {
             return CITY_CODES.get(code);
         }
         return null;
@@ -590,11 +590,11 @@ public class IdcardUtil {
      * @param startInclude 开始位置（包含）
      * @param endExclude 结束位置（不包含）
      * @return 隐藏后的身份证号码
-     * @see StringUtils#hide(CharSequence, int, int)
+     * @see StringTools#hide(CharSequence, int, int)
      * @since 3.2.2
      */
     public static String hide(String idcard, int startInclude, int endExclude) {
-        return StringUtils.hide(idcard, startInclude, endExclude);
+        return StringTools.hide(idcard, startInclude, endExclude);
     }
 
     /**

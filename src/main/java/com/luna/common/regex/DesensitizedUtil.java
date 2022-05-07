@@ -1,7 +1,7 @@
 package com.luna.common.regex;
 
 import com.luna.common.constant.CharPoolConstant;
-import com.luna.common.text.StringUtils;
+import com.luna.common.text.StringTools;
 
 /**
  * 脱敏工具类，支持以下类型信息的脱敏自动处理：
@@ -75,8 +75,8 @@ public class DesensitizedUtil {
      * @since 5.6.2
      */
     public static String desensitized(CharSequence str, DesensitizedType desensitizedType) {
-        if (StringUtils.isBlank(str)) {
-            return StringUtils.EMPTY;
+        if (StringTools.isBlank(str)) {
+            return StringTools.EMPTY;
         }
         String newStr = String.valueOf(str);
         switch (desensitizedType) {
@@ -131,10 +131,10 @@ public class DesensitizedUtil {
      * @return 脱敏后的姓名
      */
     public static String chineseName(String fullName) {
-        if (StringUtils.isBlank(fullName)) {
-            return StringUtils.EMPTY;
+        if (StringTools.isBlank(fullName)) {
+            return StringTools.EMPTY;
         }
-        return StringUtils.hide(fullName, 1, fullName.length());
+        return StringTools.hide(fullName, 1, fullName.length());
     }
 
     /**
@@ -147,18 +147,18 @@ public class DesensitizedUtil {
      */
     public static String idCardNum(String idCardNum, int front, int end) {
         // 身份证不能为空
-        if (StringUtils.isBlank(idCardNum)) {
-            return StringUtils.EMPTY;
+        if (StringTools.isBlank(idCardNum)) {
+            return StringTools.EMPTY;
         }
         // 需要截取的长度不能大于身份证号长度
         if ((front + end) > idCardNum.length()) {
-            return StringUtils.EMPTY;
+            return StringTools.EMPTY;
         }
         // 需要截取的不能小于0
         if (front < 0 || end < 0) {
-            return StringUtils.EMPTY;
+            return StringTools.EMPTY;
         }
-        return StringUtils.hide(idCardNum, front, idCardNum.length() - end);
+        return StringTools.hide(idCardNum, front, idCardNum.length() - end);
     }
 
     /**
@@ -168,10 +168,10 @@ public class DesensitizedUtil {
      * @return 脱敏后的固定电话；
      */
     public static String fixedPhone(String num) {
-        if (StringUtils.isBlank(num)) {
-            return StringUtils.EMPTY;
+        if (StringTools.isBlank(num)) {
+            return StringTools.EMPTY;
         }
-        return StringUtils.hide(num, 4, num.length() - 2);
+        return StringTools.hide(num, 4, num.length() - 2);
     }
 
     /**
@@ -181,10 +181,10 @@ public class DesensitizedUtil {
      * @return 脱敏后的移动电话；
      */
     public static String mobilePhone(String num) {
-        if (StringUtils.isBlank(num)) {
-            return StringUtils.EMPTY;
+        if (StringTools.isBlank(num)) {
+            return StringTools.EMPTY;
         }
-        return StringUtils.hide(num, 3, num.length() - 4);
+        return StringTools.hide(num, 3, num.length() - 4);
     }
 
     /**
@@ -195,11 +195,11 @@ public class DesensitizedUtil {
      * @return 脱敏后的家庭地址
      */
     public static String address(String address, int sensitiveSize) {
-        if (StringUtils.isBlank(address)) {
-            return StringUtils.EMPTY;
+        if (StringTools.isBlank(address)) {
+            return StringTools.EMPTY;
         }
         int length = address.length();
-        return StringUtils.hide(address, length - sensitiveSize, length);
+        return StringTools.hide(address, length - sensitiveSize, length);
     }
 
     /**
@@ -209,14 +209,14 @@ public class DesensitizedUtil {
      * @return 脱敏后的邮箱
      */
     public static String email(String email) {
-        if (StringUtils.isBlank(email)) {
-            return StringUtils.EMPTY;
+        if (StringTools.isBlank(email)) {
+            return StringTools.EMPTY;
         }
-        int index = StringUtils.indexOf(email, '@');
+        int index = StringTools.indexOf(email, '@');
         if (index <= 1) {
             return email;
         }
-        return StringUtils.hide(email, 1, index);
+        return StringTools.hide(email, 1, index);
     }
 
     /**
@@ -226,10 +226,10 @@ public class DesensitizedUtil {
      * @return 脱敏后的邮箱
      */
     public static String password(String password) {
-        if (StringUtils.isBlank(password)) {
-            return StringUtils.EMPTY;
+        if (StringTools.isBlank(password)) {
+            return StringTools.EMPTY;
         }
-        return StringUtils.repeat('*', password.length());
+        return StringTools.repeat('*', password.length());
     }
 
     /**
@@ -244,15 +244,15 @@ public class DesensitizedUtil {
      * @return 脱敏后的车牌
      */
     public static String carLicense(String carLicense) {
-        if (StringUtils.isBlank(carLicense)) {
-            return StringUtils.EMPTY;
+        if (StringTools.isBlank(carLicense)) {
+            return StringTools.EMPTY;
         }
         // 普通车牌
         if (carLicense.length() == 7) {
-            carLicense = StringUtils.hide(carLicense, 3, 6);
+            carLicense = StringTools.hide(carLicense, 3, 6);
         } else if (carLicense.length() == 8) {
             // 新能源车牌
-            carLicense = StringUtils.hide(carLicense, 3, 7);
+            carLicense = StringTools.hide(carLicense, 3, 7);
         }
         return carLicense;
     }
@@ -266,10 +266,10 @@ public class DesensitizedUtil {
      * @since 5.6.3
      */
     public static String bankCard(String bankCardNo) {
-        if (StringUtils.isBlank(bankCardNo)) {
+        if (StringTools.isBlank(bankCardNo)) {
             return bankCardNo;
         }
-        bankCardNo = StringUtils.trim(bankCardNo);
+        bankCardNo = StringTools.trim(bankCardNo);
         if (bankCardNo.length() < 9) {
             return bankCardNo;
         }

@@ -8,7 +8,7 @@ import com.google.common.base.Objects;
 import com.luna.common.date.DateUtils;
 import com.luna.common.text.Assert;
 import com.luna.common.text.RandomIDCardUtil;
-import com.luna.common.text.StringUtils;
+import com.luna.common.text.StringTools;
 
 /**
  * 字段验证器（验证器），分两种类型的验证：
@@ -224,7 +224,7 @@ public class Validator {
      * @return 是否为空
      */
     public static boolean isEmpty(Object value) {
-        return (null == value || (value instanceof String && StringUtils.isEmpty((String)value)));
+        return (null == value || (value instanceof String && StringTools.isEmpty((String)value)));
     }
 
     /**
@@ -483,7 +483,7 @@ public class Validator {
      * @since 3.3.0
      */
     public static boolean isLetter(CharSequence value) {
-        return StringUtils.isAllCharMatch(value, Character::isLetter);
+        return StringTools.isAllCharMatch(value, Character::isLetter);
     }
 
     /**
@@ -511,7 +511,7 @@ public class Validator {
      * @since 3.3.0
      */
     public static boolean isUpperCase(CharSequence value) {
-        return StringUtils.isAllCharMatch(value, Character::isUpperCase);
+        return StringTools.isAllCharMatch(value, Character::isUpperCase);
     }
 
     /**
@@ -539,7 +539,7 @@ public class Validator {
      * @since 3.3.0
      */
     public static boolean isLowerCase(CharSequence value) {
-        return StringUtils.isAllCharMatch(value, Character::isLowerCase);
+        return StringTools.isAllCharMatch(value, Character::isLowerCase);
     }
 
     /**
@@ -566,7 +566,7 @@ public class Validator {
      * @return 是否是数字
      */
     public static boolean isNumber(CharSequence value) {
-        return StringUtils.isNumber(value);
+        return StringTools.isNumber(value);
     }
 
     /**
@@ -946,11 +946,11 @@ public class Validator {
      * @return 是否为URL
      */
     public static boolean isUrl(CharSequence value) {
-        if (StringUtils.isBlank(value)) {
+        if (StringTools.isBlank(value)) {
             return false;
         }
         try {
-            new java.net.URL(StringUtils.str(value));
+            new java.net.URL(StringTools.str(value));
         } catch (MalformedURLException e) {
             return false;
         }

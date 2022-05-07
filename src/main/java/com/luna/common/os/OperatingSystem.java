@@ -37,7 +37,7 @@
 
 package com.luna.common.os;
 
-import com.luna.common.text.StringUtils;
+import com.luna.common.text.StringTools;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -260,8 +260,8 @@ public enum OperatingSystem {
         // combine manufacturer and version id to one unique id.
         this.id = (short) ((manufacturer.getId() << 8) + (byte) versionId);
         this.name = name;
-        this.aliases = StringUtils.toLowerCase(aliases);
-        this.excludeList = StringUtils.toLowerCase(exclude);
+        this.aliases = StringTools.toLowerCase(aliases);
+        this.excludeList = StringTools.toLowerCase(exclude);
         this.deviceType = deviceType;
         if (versionRegexString != null) { // not implemented yet
             this.versionRegEx = Pattern.compile(versionRegexString);
@@ -337,7 +337,7 @@ public enum OperatingSystem {
     }
 
     private boolean isInUserAgentStringLowercase(final String agentLowerCaseString) {
-        return StringUtils.contains(agentLowerCaseString, aliases);
+        return StringTools.contains(agentLowerCaseString, aliases);
     }
 	
     /**
@@ -347,7 +347,7 @@ public enum OperatingSystem {
      * @return true or false
      */
     private boolean containsExcludeTokenLowercase(final String agentLowerCaseString) {
-        return StringUtils.contains(agentLowerCaseString, excludeList);
+        return StringTools.contains(agentLowerCaseString, excludeList);
     }
 		
     private OperatingSystem checkUserAgentLowercase(String agentStringLowercase) {

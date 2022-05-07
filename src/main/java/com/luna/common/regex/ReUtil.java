@@ -6,7 +6,7 @@ import com.luna.common.constant.StrPoolConstant;
 import com.luna.common.exception.UtilException;
 import com.luna.common.reflect.ConvertUtil;
 import com.luna.common.text.CharsetUtil;
-import com.luna.common.text.StringUtils;
+import com.luna.common.text.StringTools;
 import com.luna.common.mutable.Holder;
 import java.util.*;
 import java.util.regex.MatchResult;
@@ -238,7 +238,7 @@ public class ReUtil {
                 int group = Integer.parseInt(var);
                 template = template.replace("$" + var, matcher.group(group));
             }
-            contentHolder.set(StringUtils.sub(content, matcher.end(), content.length()));
+            contentHolder.set(StringTools.sub(content, matcher.end(), content.length()));
             return template;
         }
         return null;
@@ -272,8 +272,8 @@ public class ReUtil {
      * @return 删除后剩余的内容
      */
     public static String delFirst(String regex, CharSequence content) {
-        if (StringUtils.isAnyEmpty(regex, content)) {
-            return StringUtils.str(content);
+        if (StringTools.isAnyEmpty(regex, content)) {
+            return StringTools.str(content);
         }
 
         // Pattern pattern = Pattern.compile(regex, Pattern.DOTALL);
@@ -302,8 +302,8 @@ public class ReUtil {
      * @since 5.6.5
      */
     public static String replaceFirst(Pattern pattern, CharSequence content, String replacement) {
-        if (null == pattern || StringUtils.isEmpty(content)) {
-            return StringUtils.str(content);
+        if (null == pattern || StringTools.isEmpty(content)) {
+            return StringTools.str(content);
         }
 
         return pattern.matcher(content).replaceFirst(replacement);
@@ -318,8 +318,8 @@ public class ReUtil {
      * @since 5.6.5
      */
     public static String delLast(String regex, CharSequence str) {
-        if (StringUtils.isAnyEmpty(regex, str)) {
-            return StringUtils.str(str);
+        if (StringTools.isAnyEmpty(regex, str)) {
+            return StringTools.str(str);
         }
 
         final Pattern pattern = PatternPool.get(regex, Pattern.DOTALL);
@@ -335,14 +335,14 @@ public class ReUtil {
      * @since 5.6.5
      */
     public static String delLast(Pattern pattern, CharSequence str) {
-        if (null != pattern && StringUtils.isNotEmpty(str)) {
+        if (null != pattern && StringTools.isNotEmpty(str)) {
             final MatchResult matchResult = lastIndexOf(pattern, str);
             if (null != matchResult) {
-                return StringUtils.subPre(str, matchResult.start()) + StringUtils.subSuf(str, matchResult.end());
+                return StringTools.subPre(str, matchResult.start()) + StringTools.subSuf(str, matchResult.end());
             }
         }
 
-        return StringUtils.str(str);
+        return StringTools.str(str);
     }
 
     /**
@@ -353,8 +353,8 @@ public class ReUtil {
      * @return 删除后剩余的内容
      */
     public static String delAll(String regex, CharSequence content) {
-        if (StringUtils.isAnyBlank(regex, content)) {
-            return StringUtils.str(content);
+        if (StringTools.isAnyBlank(regex, content)) {
+            return StringTools.str(content);
         }
 
         // Pattern pattern = Pattern.compile(regex, Pattern.DOTALL);
@@ -370,8 +370,8 @@ public class ReUtil {
      * @return 删除后剩余的内容
      */
     public static String delAll(Pattern pattern, CharSequence content) {
-        if (null == pattern || StringUtils.isBlank(content)) {
-            return StringUtils.str(content);
+        if (null == pattern || StringTools.isBlank(content)) {
+            return StringTools.str(content);
         }
 
         return pattern.matcher(content).replaceAll(StrPoolConstant.EMPTY);
@@ -386,16 +386,16 @@ public class ReUtil {
      */
     public static String delPre(String regex, CharSequence content) {
         if (null == content || null == regex) {
-            return StringUtils.str(content);
+            return StringTools.str(content);
         }
 
         // Pattern pattern = Pattern.compile(regex, Pattern.DOTALL);
         final Pattern pattern = PatternPool.get(regex, Pattern.DOTALL);
         Matcher matcher = pattern.matcher(content);
         if (matcher.find()) {
-            return StringUtils.sub(content, matcher.end(), content.length());
+            return StringTools.sub(content, matcher.end(), content.length());
         }
-        return StringUtils.str(content);
+        return StringTools.str(content);
     }
 
     /**
@@ -684,7 +684,7 @@ public class ReUtil {
             return false;
         }
 
-        if (StringUtils.isEmpty(regex)) {
+        if (StringTools.isEmpty(regex)) {
             // 正则不存在则为全匹配
             return true;
         }
@@ -743,7 +743,7 @@ public class ReUtil {
      * @since 3.0.4
      */
     public static String replaceAll(CharSequence content, Pattern pattern, String replacementTemplate) {
-        if (StringUtils.isEmpty(content)) {
+        if (StringTools.isEmpty(content)) {
             return CharsetUtil.str(content);
         }
 
@@ -802,8 +802,8 @@ public class ReUtil {
      * @since 4.2.2
      */
     public static String replaceAll(CharSequence str, Pattern pattern, Func1<Matcher, String> replaceFun) {
-        if (StringUtils.isEmpty(str)) {
-            return StringUtils.str(str);
+        if (StringTools.isEmpty(str)) {
+            return StringTools.str(str);
         }
 
         final Matcher matcher = pattern.matcher(str);
@@ -841,8 +841,8 @@ public class ReUtil {
      * @return 转义后的文本
      */
     public static String escape(CharSequence content) {
-        if (StringUtils.isBlank(content)) {
-            return StringUtils.str(content);
+        if (StringTools.isBlank(content)) {
+            return StringTools.str(content);
         }
 
         final StringBuilder builder = new StringBuilder();

@@ -37,7 +37,7 @@ import java.util.*;
  * @author Sam Brannen
  * @since 19.03.2004
  * @see CollectionUtils
- * @see StringUtils
+ * @see StringTools
  */
 public abstract class ObjectUtils {
 
@@ -123,8 +123,8 @@ public abstract class ObjectUtils {
 	 * @since 4.2
 	 * @see Optional#isPresent()
 	 * @see ObjectUtils#isEmpty(Object[])
-	 * @see StringUtils#hasLength(CharSequence)
-	 * @see StringUtils#isEmpty(Object)
+	 * @see StringTools#hasLength(CharSequence)
+	 * @see StringTools#isEmpty(Object)
 	 * @see CollectionUtils#isEmpty(Collection)
 	 */
 	@SuppressWarnings("rawtypes")

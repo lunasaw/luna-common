@@ -19,7 +19,7 @@ public class ExtendUtils {
      */
     public static synchronized String setFeaturesValue(String extend, String key, Object value) {
         JSONObject extendObj;
-        if (StringUtils.isBlank(extend)) {
+        if (StringTools.isBlank(extend)) {
             extendObj = new JSONObject();
         } else {
             extendObj = JSONObject.parseObject(extend);
@@ -31,7 +31,7 @@ public class ExtendUtils {
 
     public static synchronized String removeFeaturesValue(String extend, String key) {
         JSONObject extendObj;
-        if (StringUtils.isBlank(extend)) {
+        if (StringTools.isBlank(extend)) {
             return null;
         } else {
             extendObj = JSONObject.parseObject(extend);
@@ -42,7 +42,7 @@ public class ExtendUtils {
     }
 
     public static String getFeaturesValue(String extend, String key) {
-        if (StringUtils.isBlank(extend)) {
+        if (StringTools.isBlank(extend)) {
             return null;
         }
         JSONObject featuresObj = JSONObject.parseObject(extend);
@@ -52,14 +52,14 @@ public class ExtendUtils {
     }
 
     public static Boolean getBoolean(String flag, Boolean defaultValue) {
-        return Optional.ofNullable(flag).filter(StringUtils::isNotBlank).map(Boolean::valueOf).orElse(defaultValue);
+        return Optional.ofNullable(flag).filter(StringTools::isNotBlank).map(Boolean::valueOf).orElse(defaultValue);
     }
 
     public static String getString(String flag, String defaultValue) {
-        return Optional.ofNullable(flag).filter(StringUtils::isNotBlank).orElse(defaultValue);
+        return Optional.ofNullable(flag).filter(StringTools::isNotBlank).orElse(defaultValue);
     }
 
     public static Integer getInteger(String flag, Integer defaultValue) {
-        return Optional.ofNullable(flag).filter(StringUtils::isNotBlank).map(Integer::parseInt).orElse(defaultValue);
+        return Optional.ofNullable(flag).filter(StringTools::isNotBlank).map(Integer::parseInt).orElse(defaultValue);
     }
 }

@@ -1,6 +1,6 @@
 package com.luna.common.regex;
 
-import com.luna.common.text.StringUtils;
+import com.luna.common.text.StringTools;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,7 +52,7 @@ public class CreditCodeUtil {
      * @return 校验结果
      */
     public static boolean isCreditCodeSimple(CharSequence creditCode) {
-        if (StringUtils.isBlank(creditCode)) {
+        if (StringTools.isBlank(creditCode)) {
             return false;
         }
         return ReUtil.isMatch(CREDIT_CODE_PATTERN, creditCode);

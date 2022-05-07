@@ -1,7 +1,7 @@
 package com.luna.common.regex;
 
 import com.luna.common.exception.BaseException;
-import com.luna.common.text.StringUtils;
+import com.luna.common.text.StringTools;
 
 /**
  * 验证异常
@@ -18,7 +18,7 @@ public class ValidateException extends BaseException {
     }
 
     public ValidateException(String messageTemplate, Object... params) {
-        super(StringUtils.format(messageTemplate, params));
+        super(StringTools.format(messageTemplate, params));
     }
 
     public ValidateException(Throwable throwable) {

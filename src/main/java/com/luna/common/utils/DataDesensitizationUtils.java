@@ -1,6 +1,6 @@
 package com.luna.common.utils;
 
-import com.luna.common.text.StringUtils;
+import com.luna.common.text.StringTools;
 
 /**
  * @author luna
@@ -18,7 +18,7 @@ public class DataDesensitizationUtils {
      * @return String
      */
     public static String mobileEncrypt(String mobile) {
-        if (StringUtils.isEmpty(mobile) || (mobile.length() != MAX_LENGTH)) {
+        if (StringTools.isEmpty(mobile) || (mobile.length() != MAX_LENGTH)) {
             return mobile;
         }
         return mobile.replaceAll("(\\d{3})\\d{4}(\\d{4})", "$1****$2");
@@ -31,7 +31,7 @@ public class DataDesensitizationUtils {
      * @return String
      */
     public static String idEncrypt(String id) {
-        if (StringUtils.isEmpty(id) || (id.length() < ID_LENGTH)) {
+        if (StringTools.isEmpty(id) || (id.length() < ID_LENGTH)) {
             return id;
         }
         return id.replaceAll("(?<=\\w{3})\\w(?=\\w{4})", "*");
@@ -44,7 +44,7 @@ public class DataDesensitizationUtils {
      * @return String
      */
     public static String idPassport(String id) {
-        if (StringUtils.isEmpty(id) || (id.length() < ID_LENGTH)) {
+        if (StringTools.isEmpty(id) || (id.length() < ID_LENGTH)) {
             return id;
         }
         return id.substring(0, 2) + new String(new char[id.length() - 5]).replace("\0", "*")

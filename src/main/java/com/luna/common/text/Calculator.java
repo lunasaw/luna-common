@@ -38,8 +38,8 @@ public class Calculator {
      * @return 转换后的字符串
      */
     private static String transform(String expression) {
-        expression = StringUtils.cleanBlank(expression);
-        expression = StringUtils.removeSuffix(expression, "=");
+        expression = StringTools.cleanBlank(expression);
+        expression = StringTools.removeSuffix(expression, "=");
         final char[] arr = expression.toCharArray();
         for (int i = 0; i < arr.length; i++) {
             if (arr[i] == '-') {

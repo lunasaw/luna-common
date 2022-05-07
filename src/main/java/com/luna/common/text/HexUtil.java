@@ -157,7 +157,7 @@ public class HexUtil {
      * @return 字符串
      */
     public static String decodeHexStr(String hexStr, Charset charset) {
-        if (StringUtils.isEmpty(hexStr)) {
+        if (StringTools.isEmpty(hexStr)) {
             return hexStr;
         }
 
@@ -205,7 +205,7 @@ public class HexUtil {
      * @since 5.6.6
      */
     public static byte[] decodeHex(CharSequence hexData) {
-        if (StringUtils.isEmpty(hexData)) {
+        if (StringTools.isEmpty(hexData)) {
             return null;
         }
 

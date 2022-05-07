@@ -236,10 +236,10 @@ public abstract class Assert {
 	 * @param text the String to check
 	 * @param message the exception message to use if the assertion fails
 	 * @throws IllegalArgumentException if the text is empty
-	 * @see StringUtils#hasLength
+	 * @see StringTools#hasLength
 	 */
 	public static void hasLength(@Nullable String text, String message) {
-		if (!StringUtils.hasLength(text)) {
+		if (!StringTools.hasLength(text)) {
 			throw new IllegalArgumentException(message);
 		}
 	}
@@ -255,10 +255,10 @@ public abstract class Assert {
 	 * assertion fails
 	 * @throws IllegalArgumentException if the text is empty
 	 * @since 5.0
-	 * @see StringUtils#hasLength
+	 * @see StringTools#hasLength
 	 */
 	public static void hasLength(@Nullable String text, Supplier<String> messageSupplier) {
-		if (!StringUtils.hasLength(text)) {
+		if (!StringTools.hasLength(text)) {
 			throw new IllegalArgumentException(nullSafeGet(messageSupplier));
 		}
 	}
@@ -281,10 +281,10 @@ public abstract class Assert {
 	 * @param text the String to check
 	 * @param message the exception message to use if the assertion fails
 	 * @throws IllegalArgumentException if the text does not contain valid text content
-	 * @see StringUtils#hasText
+	 * @see StringTools#hasText
 	 */
 	public static void hasText(@Nullable String text, String message) {
-		if (!StringUtils.hasText(text)) {
+		if (!StringTools.hasText(text)) {
 			throw new IllegalArgumentException(message);
 		}
 	}
@@ -300,10 +300,10 @@ public abstract class Assert {
 	 * assertion fails
 	 * @throws IllegalArgumentException if the text does not contain valid text content
 	 * @since 5.0
-	 * @see StringUtils#hasText
+	 * @see StringTools#hasText
 	 */
 	public static void hasText(@Nullable String text, Supplier<String> messageSupplier) {
-		if (!StringUtils.hasText(text)) {
+		if (!StringTools.hasText(text)) {
 			throw new IllegalArgumentException(nullSafeGet(messageSupplier));
 		}
 	}
@@ -328,7 +328,7 @@ public abstract class Assert {
 	 * @throws IllegalArgumentException if the text contains the substring
 	 */
 	public static void doesNotContain(@Nullable String textToSearch, String substring, String message) {
-		if (StringUtils.hasLength(textToSearch) && StringUtils.hasLength(substring) &&
+		if (StringTools.hasLength(textToSearch) && StringTools.hasLength(substring) &&
 				textToSearch.contains(substring)) {
 			throw new IllegalArgumentException(message);
 		}
@@ -347,7 +347,7 @@ public abstract class Assert {
 	 * @since 5.0
 	 */
 	public static void doesNotContain(@Nullable String textToSearch, String substring, Supplier<String> messageSupplier) {
-		if (StringUtils.hasLength(textToSearch) && StringUtils.hasLength(substring) &&
+		if (StringTools.hasLength(textToSearch) && StringTools.hasLength(substring) &&
 				textToSearch.contains(substring)) {
 			throw new IllegalArgumentException(nullSafeGet(messageSupplier));
 		}
@@ -644,7 +644,7 @@ public abstract class Assert {
 		String className = (obj != null ? obj.getClass().getName() : "null");
 		String result = "";
 		boolean defaultMessage = true;
-		if (StringUtils.hasLength(msg)) {
+		if (StringTools.hasLength(msg)) {
 			if (endsWithSeparator(msg)) {
 				result = msg + " ";
 			}
@@ -662,7 +662,7 @@ public abstract class Assert {
 	private static void assignableCheckFailed(Class<?> superType, @Nullable Class<?> subType, @Nullable String msg) {
 		String result = "";
 		boolean defaultMessage = true;
-		if (StringUtils.hasLength(msg)) {
+		if (StringTools.hasLength(msg)) {
 			if (endsWithSeparator(msg)) {
 				result = msg + " ";
 			}

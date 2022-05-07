@@ -1,6 +1,6 @@
 package com.luna.common.exception;
 
-import com.luna.common.text.StringUtils;
+import com.luna.common.text.StringTools;
 
 /**
  * 工具类异常
@@ -19,7 +19,7 @@ public class UtilException extends RuntimeException {
     }
 
     public UtilException(String messageTemplate, Object... params) {
-        super(StringUtils.format(messageTemplate, params));
+        super(StringTools.format(messageTemplate, params));
     }
 
     public UtilException(String message, Throwable throwable) {
@@ -27,6 +27,6 @@ public class UtilException extends RuntimeException {
     }
 
     public UtilException(Throwable throwable, String messageTemplate, Object... params) {
-        super(StringUtils.format(messageTemplate, params), throwable);
+        super(StringTools.format(messageTemplate, params), throwable);
     }
 }

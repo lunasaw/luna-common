@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import com.luna.common.constant.StrPoolConstant;
 import com.luna.common.io.FastByteArrayOutputStream;
-import com.luna.common.text.StringUtils;
+import com.luna.common.text.StringTools;
 import org.apache.commons.lang3.ObjectUtils;
 
 /**
@@ -29,7 +29,7 @@ public class ExceptionUtil {
         if (null == e) {
             return StrPoolConstant.EMPTY;
         }
-        return StringUtils.format("{}: {}", e.getClass().getSimpleName(), e.getMessage());
+        return StringTools.format("{}: {}", e.getClass().getSimpleName(), e.getMessage());
     }
 
     /**
@@ -225,7 +225,7 @@ public class ExceptionUtil {
             }
             return sb.toString();
         } else {
-            return StringUtils.subPre(exceptionStr, limit);
+            return StringTools.subPre(exceptionStr, limit);
         }
     }
 

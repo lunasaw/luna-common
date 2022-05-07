@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 import com.luna.common.constant.StrPoolConstant;
 import com.luna.common.regex.ReUtil;
 import com.luna.common.text.CharsetUtil;
-import com.luna.common.text.StringUtils;
+import com.luna.common.text.StringTools;
 
 /**
  * 文件名相关工具类
@@ -224,7 +224,7 @@ public class FileNameUtil {
         } else {
             String ext = fileName.substring(index + 1);
             // 扩展名中不能包含路径相关的符号
-            return StringUtils.containsAny(ext, UNIX_SEPARATOR, WINDOWS_SEPARATOR) ? StrPoolConstant.EMPTY : ext;
+            return StringTools.containsAny(ext, UNIX_SEPARATOR, WINDOWS_SEPARATOR) ? StrPoolConstant.EMPTY : ext;
         }
     }
 
@@ -236,7 +236,7 @@ public class FileNameUtil {
      * @since 3.3.1
      */
     public static String cleanInvalid(String fileName) {
-        return StringUtils.isBlank(fileName) ? fileName : ReUtil.delAll(FILE_NAME_INVALID_PATTERN_WIN, fileName);
+        return StringTools.isBlank(fileName) ? fileName : ReUtil.delAll(FILE_NAME_INVALID_PATTERN_WIN, fileName);
     }
 
     /**
@@ -247,7 +247,7 @@ public class FileNameUtil {
      * @since 3.3.1
      */
     public static boolean containsInvalid(String fileName) {
-        return (false == StringUtils.isBlank(fileName)) && ReUtil.contains(FILE_NAME_INVALID_PATTERN_WIN, fileName);
+        return (false == StringTools.isBlank(fileName)) && ReUtil.contains(FILE_NAME_INVALID_PATTERN_WIN, fileName);
     }
 
     /**
@@ -259,7 +259,7 @@ public class FileNameUtil {
      * @since 5.5.2
      */
     public static boolean isType(String fileName, String... extNames) {
-        return StringUtils.equalsAnyIgnoreCase(extName(fileName), extNames);
+        return StringTools.equalsAnyIgnoreCase(extName(fileName), extNames);
     }
     // -------------------------------------------------------------------------------------------- name end
 }

@@ -7,7 +7,6 @@ import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 import com.luna.common.constant.Constant;
@@ -15,7 +14,7 @@ import com.luna.common.exception.BaseException;
 import com.luna.common.file.visitor.MoveVisitor;
 import com.luna.common.text.Assert;
 import com.luna.common.text.CharsetUtil;
-import com.luna.common.text.StringUtils;
+import com.luna.common.text.StringTools;
 import org.apache.commons.io.FileUtils;
 import static com.luna.common.file.PathUtil.del;
 import static java.nio.file.Files.isDirectory;
@@ -363,7 +362,7 @@ public class FileTools {
     public static File rename(File file, String newName, boolean isRetainExt, boolean isOverride) {
         if (isRetainExt) {
             final String extName = FileNameUtil.extName(file);
-            if (StringUtils.isNotBlank(extName)) {
+            if (StringTools.isNotBlank(extName)) {
                 newName = newName.concat(".").concat(extName);
             }
         }

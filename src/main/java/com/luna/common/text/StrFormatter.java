@@ -2,8 +2,6 @@ package com.luna.common.text;
 
 import com.luna.common.constant.StrPoolConstant;
 
-import java.util.Arrays;
-
 /**
  * 字符串格式化工具
  *
@@ -26,7 +24,7 @@ public class StrFormatter {
      * @return 结果
      */
     public static String format(final String strPattern, final Object... argArray) {
-        if (StringUtils.isEmpty(strPattern) || ObjectUtils.isEmpty(argArray)) {
+        if (StringTools.isEmpty(strPattern) || ObjectUtils.isEmpty(argArray)) {
             return strPattern;
         }
         final int strPatternLength = strPattern.length();
