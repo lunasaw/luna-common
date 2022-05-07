@@ -31,12 +31,21 @@ public class RandomStrUtil {
      *
      * @return String 随机字符串
      */
-    public static String generateNonceStr() {
-        char[] nonceChars = new char[32];
+    public static String generateNonceStr(int size) {
+        char[] nonceChars = new char[size];
         for (int index = 0; index < nonceChars.length; ++index) {
             nonceChars[index] = SYMBOLS.charAt(RANDOM.nextInt(SYMBOLS.length()));
         }
         return new String(nonceChars);
+    }
+
+    /**
+     * 获取随机字符串 Nonce Str
+     *
+     * @return String 随机字符串
+     */
+    public static String generateNonceStr() {
+        return generateNonceStr(32);
     }
 
     /**

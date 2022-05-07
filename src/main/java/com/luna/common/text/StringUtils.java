@@ -1,5 +1,6 @@
 package com.luna.common.text;
 
+import com.luna.common.anno.Filter;
 import com.luna.common.anno.Func1;
 import com.luna.common.anno.Matcher;
 import com.luna.common.constant.CharPoolConstant;
@@ -167,6 +168,29 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     }
 
     // ------------------------------------------------------------------------ startWith
+
+    public static String[] toLowerCase(String[] strArr) {
+        if (strArr == null) {
+            return null;
+        }
+        String[] res = new String[strArr.length];
+        for (int i=0; i<strArr.length; i++) {
+            res[i] = strArr[i].toLowerCase();
+        }
+        return res;
+    }
+
+    public static boolean contains(String str, String[] strArr) {
+        if (strArr == null) {
+            return false;
+        }
+        for (String arrStr : strArr) {
+            if (str.contains(arrStr)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * 字符串是否以给定字符开始

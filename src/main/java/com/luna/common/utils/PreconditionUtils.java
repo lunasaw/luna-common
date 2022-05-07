@@ -6,12 +6,11 @@ import com.luna.common.exception.BaseException;
 /**
  * @author Luna
  */
-public class Preconditions {
+public class PreconditionUtils {
 
     /**
      * 校验表达式是否正确
      *
-     * @param expression 条件
      * @param baseException 异常
      */
     public static void check(boolean expression, RuntimeException baseException) {

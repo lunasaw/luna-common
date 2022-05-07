@@ -1,4 +1,4 @@
-package com.luna.common.text;
+package com.luna.common.anno;
 
 @FunctionalInterface
 public interface Filter<T> {

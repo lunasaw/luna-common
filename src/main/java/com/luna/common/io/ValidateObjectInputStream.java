@@ -1,6 +1,5 @@
 package com.luna.common.io;
-
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
 
 import java.io.*;
 import java.util.HashSet;
@@ -76,13 +75,13 @@ public class ValidateObjectInputStream extends ObjectInputStream {
      */
     private void validateClassName(String className) throws InvalidClassException {
         // 黑名单
-        if (CollectionUtils.isNotEmpty(this.blackClassSet)) {
+        if (ObjectUtils.isNotEmpty(this.blackClassSet)) {
             if (this.blackClassSet.contains(className)) {
                 throw new InvalidClassException("Unauthorized deserialization attempt by black list", className);
             }
         }
 
-        if (CollectionUtils.isEmpty(this.whiteClassSet)) {
+        if (ObjectUtils.isEmpty(this.whiteClassSet)) {
             return;
         }
         if (className.startsWith("java.")) {

@@ -1,5 +1,6 @@
 package com.luna.common.text;
 
+import com.luna.common.anno.Filter;
 import com.luna.common.constant.CharPoolConstant;
 import com.luna.common.file.FileTools;
 import com.luna.common.os.OSinfo;

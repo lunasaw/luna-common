@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import com.luna.common.constant.StrPoolConstant;
 import com.luna.common.io.FastByteArrayOutputStream;
-import com.luna.common.text.MapUtils;
 import com.luna.common.text.StringUtils;
 import org.apache.commons.lang3.ObjectUtils;
 
@@ -211,7 +210,7 @@ public class ExceptionUtil {
             length = limit;
         }
 
-        if (MapUtils.isNotEmpty(replaceCharToStrMap)) {
+        if (ObjectUtils.isNotEmpty(replaceCharToStrMap)) {
             final StringBuilder sb = new StringBuilder();
             char c;
             String value;
