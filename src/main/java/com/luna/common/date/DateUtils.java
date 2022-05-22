@@ -2,6 +2,7 @@ package com.luna.common.date;
 
 import com.luna.common.constant.StrPoolConstant;
 import com.luna.common.text.ObjectUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.lang.management.ManagementFactory;
@@ -130,6 +131,15 @@ public class DateUtils {
      */
     public static String formatTime(long time) {
         return formatTime(new Date(time));
+    }
+
+    /**
+     * 日期路径 即年/月/日 如2018/08/08
+     */
+    public static String datePath()
+    {
+        Date now = new Date();
+        return DateFormatUtils.format(now, "yyyy/MM/dd");
     }
 
     /**
