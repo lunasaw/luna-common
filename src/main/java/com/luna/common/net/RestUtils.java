@@ -2,7 +2,8 @@ package com.luna.common.net;
 
 import java.util.Map;
 
-import com.luna.common.text.MapUtils;
+import com.luna.common.text.MapTools;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.http.HttpResponse;
 
 import com.google.common.collect.Maps;

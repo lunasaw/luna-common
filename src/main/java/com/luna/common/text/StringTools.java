@@ -7,7 +7,7 @@ import com.luna.common.constant.CharPoolConstant;
 import com.luna.common.constant.StrPoolConstant;
 import com.luna.common.regex.DesensitizedUtil;
 import com.luna.common.regex.ReUtil;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import javax.annotation.Nullable;
 import java.io.ByteArrayOutputStream;

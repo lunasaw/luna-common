@@ -16,7 +16,7 @@
 
 package com.luna.common.text;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Array;

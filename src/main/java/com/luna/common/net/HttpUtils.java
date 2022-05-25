@@ -1,11 +1,10 @@
 package com.luna.common.net;
 
 import com.google.common.collect.ImmutableList;
-import com.luna.common.constant.Constant;
 import com.luna.common.constant.StrPoolConstant;
 import com.luna.common.net.method.HttpDelete;
 import com.luna.common.text.CharsetUtil;
-import com.luna.common.text.MapUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.*;

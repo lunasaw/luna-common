@@ -1,5 +1,6 @@
 package com.luna.common.text;
 
+import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,13 +11,9 @@ import java.util.Map;
  * @author luna
  * 2021/8/16
  */
-public class MapUtils extends org.apache.commons.collections.MapUtils {
+public class MapTools {
 
-    private static final Logger log = LoggerFactory.getLogger(MapUtils.class);
-
-    public MapUtils() {
-        super();
-    }
+    private static final Logger log = LoggerFactory.getLogger(MapTools.class);
 
     public static Object getParam(String paramName, Map<String, Object> mapParam, Class<?> clazz) {
         Map<String, Object> map = checkMap(paramName, mapParam);
