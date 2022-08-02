@@ -1,6 +1,6 @@
 # luna-common
 
-www.isczy.tk luna-common
+[www.isluna.ml](http://www.isluna.ml)
 
 # Contributor
 
@@ -13,9 +13,9 @@ www.isczy.tk luna-common
 ```xml
 
 <dependency>
-    <groupId>com.github.czy1024</groupId>
+    <groupId>io.github.lunasaw</groupId>
     <artifactId>luna-common</artifactId>
-    <version>1.3.0</version>
+    <version>2.0.2</version>
 </dependency>
 
 ```
