@@ -1,4 +1,4 @@
-package com.luna.common.utils;
+package com.luna.common.text;
 import java.util.regex.Pattern;
 
 public final class CT{

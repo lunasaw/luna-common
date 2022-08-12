@@ -8,7 +8,7 @@ import com.luna.common.date.DateUtils;
 import com.luna.common.os.SystemInfoUtil;
 import com.luna.common.os.hardware.dto.*;
 import com.luna.common.text.Calculator;
-import com.luna.common.text.NumberUtil;
+import com.luna.common.math.NumberUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.common.collect.Sets;

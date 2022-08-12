@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.luna.common.text;
+package com.luna.common.utils;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import com.luna.common.text.StringTools;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ObjectUtils;

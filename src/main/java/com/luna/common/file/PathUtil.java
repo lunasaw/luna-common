@@ -12,7 +12,7 @@ import com.luna.common.file.visitor.CopyVisitor;
 import com.luna.common.file.visitor.DelVisitor;
 import com.luna.common.file.visitor.MoveVisitor;
 import com.luna.common.io.IoUtil;
-import com.luna.common.text.Assert;
+import com.luna.common.utils.Assert;
 import com.luna.common.text.CharsetUtil;
 
 /**

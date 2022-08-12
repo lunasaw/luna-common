@@ -1,6 +1,6 @@
 package com.luna.common.io;
 
-import com.luna.common.text.Assert;
+import com.luna.common.utils.Assert;
 
 import java.io.*;
 import java.nio.charset.Charset;

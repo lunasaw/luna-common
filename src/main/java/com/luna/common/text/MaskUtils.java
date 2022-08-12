@@ -1,4 +1,4 @@
-package com.luna.common.utils;
+package com.luna.common.text;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;

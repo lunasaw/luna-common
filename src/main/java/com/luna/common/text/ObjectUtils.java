@@ -16,6 +16,7 @@
 
 package com.luna.common.text;
 
+import com.luna.common.utils.Assert;
 import org.apache.commons.collections4.CollectionUtils;
 
 import javax.annotation.Nullable;

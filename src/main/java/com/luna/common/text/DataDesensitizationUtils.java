@@ -1,6 +1,5 @@
-package com.luna.common.utils;
+package com.luna.common.text;
 
-import com.luna.common.text.StringTools;
 
 /**
  * @author luna

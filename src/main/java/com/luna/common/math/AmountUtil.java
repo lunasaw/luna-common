@@ -1,4 +1,4 @@
-package com.luna.common.text;
+package com.luna.common.math;
 
 import com.luna.common.constant.CharPoolConstant;
 import com.luna.common.constant.Constant;

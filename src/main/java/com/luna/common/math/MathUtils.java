@@ -1,4 +1,4 @@
-package com.luna.common.utils;
+package com.luna.common.math;
 
 import com.luna.common.constant.Constant;
 import java.math.BigDecimal;

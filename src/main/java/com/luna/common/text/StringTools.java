@@ -7,7 +7,9 @@ import com.luna.common.constant.CharPoolConstant;
 import com.luna.common.constant.StrPoolConstant;
 import com.luna.common.regex.DesensitizedUtil;
 import com.luna.common.regex.ReUtil;
+import com.luna.common.utils.Assert;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import java.io.ByteArrayOutputStream;
@@ -18,7 +20,7 @@ import java.util.*;
  * @author luna
  * 2021/8/18
  */
-public class StringTools extends org.apache.commons.lang3.StringUtils {
+public class StringTools extends StringUtils {
 
     /**
      * 清理空白字符

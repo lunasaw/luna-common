@@ -1,4 +1,4 @@
-package com.luna.common.utils;
+package com.luna.common.math;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

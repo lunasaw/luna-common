@@ -1,6 +1,8 @@
 package com.luna.common.text;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Optional;
 
@@ -49,6 +51,44 @@ public class ExtendUtils {
         Object value = featuresObj.get(key);
 
         return value == null ? null : value.toString();
+    }
+
+    public Object getFeaturesSubValue(String extend, String key, String subKey) {
+        if (StringUtils.isBlank(extend)) {
+            return null;
+        }
+        JSONObject featuresObj = JSONObject.parseObject(extend);
+        Object object = featuresObj.get(key);
+        if (object != null) {
+            return ((JSONObject) object).get(subKey);
+        }
+        return object;
+    }
+
+    public synchronized String setFeaturesSubValue(String extend, String key, String subKey, Object value) {
+        JSONObject extendObj;
+        if (StringUtils.isBlank(extend)) {
+            extendObj = new JSONObject();
+        } else {
+            extendObj = JSONObject.parseObject(extend);
+        }
+        JSONObject object = new JSONObject();
+        object.put(subKey, value);
+        extendObj.put(key, object);
+        return extendObj.toString();
+    }
+
+    public synchronized String removeFeaturesSubValue(String extend, String key, String subKey) {
+        JSONObject extendObj;
+        if (StringTools.isBlank(extend)) {
+            return null;
+        } else {
+            extendObj = Optional.ofNullable(JSONObject.parseObject(extend)).orElse(new JSONObject());
+        }
+        JSONObject object = Optional.ofNullable(JSONObject.parseObject(extendObj.getString(key))).orElse(new JSONObject());
+        object.remove(subKey);
+        extendObj.put(key, object);
+        return extendObj.toString();
     }
 
     public static Boolean getBoolean(String flag, Boolean defaultValue) {
