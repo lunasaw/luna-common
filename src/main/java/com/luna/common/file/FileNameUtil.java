@@ -1,11 +1,21 @@
 package com.luna.common.file;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Pattern;
+
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.luna.common.constant.CharPoolConstant;
 import com.luna.common.constant.StrPoolConstant;
 import com.luna.common.regex.ReUtil;
 import com.luna.common.text.CharsetUtil;
 import com.luna.common.text.StringTools;
+import com.luna.common.utils.Assert;
+import oshi.util.FileUtil;
+import sun.net.util.URLUtil;
 
 /**
  * 文件名相关工具类
@@ -14,6 +24,60 @@ import com.luna.common.text.StringTools;
  * @since 5.4.1
  */
 public class FileNameUtil {
+
+
+    /**
+     * 针对ClassPath路径的伪协议前缀（兼容Spring）: "classpath:"
+     */
+    public static final String CLASSPATH_URL_PREFIX = "classpath:";
+    /**
+     * URL 前缀表示文件: "file:"
+     */
+    public static final String FILE_URL_PREFIX = "file:";
+    /**
+     * URL 前缀表示jar: "jar:"
+     */
+    public static final String JAR_URL_PREFIX = "jar:";
+    /**
+     * URL 前缀表示war: "war:"
+     */
+    public static final String WAR_URL_PREFIX = "war:";
+    /**
+     * URL 协议表示文件: "file"
+     */
+    public static final String URL_PROTOCOL_FILE = "file";
+    /**
+     * URL 协议表示Jar文件: "jar"
+     */
+    public static final String URL_PROTOCOL_JAR = "jar";
+    /**
+     * URL 协议表示zip文件: "zip"
+     */
+    public static final String URL_PROTOCOL_ZIP = "zip";
+    /**
+     * URL 协议表示WebSphere文件: "wsjar"
+     */
+    public static final String URL_PROTOCOL_WSJAR = "wsjar";
+    /**
+     * URL 协议表示JBoss zip文件: "vfszip"
+     */
+    public static final String URL_PROTOCOL_VFSZIP = "vfszip";
+    /**
+     * URL 协议表示JBoss文件: "vfsfile"
+     */
+    public static final String URL_PROTOCOL_VFSFILE = "vfsfile";
+    /**
+     * URL 协议表示JBoss VFS资源: "vfs"
+     */
+    public static final String URL_PROTOCOL_VFS = "vfs";
+    /**
+     * Jar路径以及内部文件路径的分界符: "!/"
+     */
+    public static final String JAR_URL_SEPARATOR = "!/";
+    /**
+     * WAR路径及内部文件路径分界符
+     */
+    public static final String WAR_URL_SEPARATOR = "*/";
 
     /**
      * .java文件扩展名
@@ -260,6 +324,169 @@ public class FileNameUtil {
      */
     public static boolean isType(String fileName, String... extNames) {
         return StringTools.equalsAnyIgnoreCase(extName(fileName), extNames);
+    }
+
+    /**
+     * 获得相对子路径，忽略大小写
+     * <p>
+     * 栗子：
+     *
+     * <pre>
+     * dirPath: d:/aaa/bbb    filePath: d:/aaa/bbb/ccc     =》    ccc
+     * dirPath: d:/Aaa/bbb    filePath: d:/aaa/bbb/ccc.txt     =》    ccc.txt
+     * dirPath: d:/Aaa/bbb    filePath: d:/aaa/bbb/     =》    ""
+     * </pre>
+     *
+     * @param dirPath  父路径
+     * @param filePath 文件路径
+     * @return 相对子路径
+     */
+    public static String subPath(String dirPath, String filePath) {
+        if (StringTools.isNotEmpty(dirPath) && StringTools.isNotEmpty(filePath)) {
+
+            dirPath = StringTools.removeSuffix(normalize(dirPath), "/");
+            filePath = normalize(filePath);
+
+            final String result = StringTools.substringAfter(filePath, dirPath);
+            return StringTools.removeStart(result, "/");
+        }
+        return filePath;
+    }
+
+    /**
+     * 获得相对子路径
+     * <p>
+     * 栗子：
+     *
+     * <pre>
+     * dirPath: d:/aaa/bbb    filePath: d:/aaa/bbb/ccc     =》    ccc
+     * dirPath: d:/Aaa/bbb    filePath: d:/aaa/bbb/ccc.txt     =》    ccc.txt
+     * </pre>
+     *
+     * @param rootDir 绝对父路径
+     * @param file    文件
+     * @return 相对子路径
+     */
+    public static String subPath(String rootDir, File file) {
+        try {
+            return subPath(rootDir, file.getCanonicalPath());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 修复路径<br>
+     * 如果原路径尾部有分隔符，则保留为标准分隔符（/），否则不保留
+     * <ol>
+     * <li>1. 统一用 /</li>
+     * <li>2. 多个 / 转换为一个 /</li>
+     * <li>3. 去除左边空格</li>
+     * <li>4. .. 和 . 转换为绝对路径，当..多于已有路径时，直接返回根路径</li>
+     * </ol>
+     * <p>
+     * 栗子：
+     *
+     * <pre>
+     * "/foo//" =》 "/foo/"
+     * "/foo/./" =》 "/foo/"
+     * "/foo/../bar" =》 "/bar"
+     * "/foo/../bar/" =》 "/bar/"
+     * "/foo/../bar/../baz" =》 "/baz"
+     * "/../" =》 "/"
+     * "foo/bar/.." =》 "foo"
+     * "foo/../bar" =》 "bar"
+     * "foo/../../bar" =》 "bar"
+     * "//server/foo/../bar" =》 "/server/bar"
+     * "//server/../bar" =》 "/bar"
+     * "C:\\foo\\..\\bar" =》 "C:/bar"
+     * "C:\\..\\bar" =》 "C:/bar"
+     * "~/foo/../bar/" =》 "~/bar/"
+     * "~/../bar" =》 普通用户运行是'bar的home目录'，ROOT用户运行是'/bar'
+     * </pre>
+     *
+     * @param path 原路径
+     * @return 修复后的路径
+     */
+    public static String normalize(String path) {
+        if (path == null) {
+            return null;
+        }
+
+        // 兼容Spring风格的ClassPath路径，去除前缀，不区分大小写
+        String pathToUse = StringTools.substringBefore(path, CLASSPATH_URL_PREFIX);
+        // 去除file:前缀
+        pathToUse = StringTools.substringBefore(pathToUse, FILE_URL_PREFIX);
+
+        // 识别home目录形式，并转换为绝对路径
+        if (StringTools.startWith(pathToUse, '~')) {
+            pathToUse = FileTools.getUserHomePath() + pathToUse.substring(1);
+        }
+
+        // 统一使用斜杠
+        pathToUse = pathToUse.replaceAll("[/\\\\]+", StrPoolConstant.SLASH);
+        // 去除开头空白符，末尾空白符合法，不去除
+        pathToUse = StringTools.trimLeadingWhitespace(pathToUse);
+        //兼容Windows下的共享目录路径（原始路径如果以\\开头，则保留这种路径）
+        if (path.startsWith("\\\\")) {
+            pathToUse = "\\" + pathToUse;
+        }
+
+        String prefix = StrPoolConstant.EMPTY;
+        int prefixIndex = pathToUse.indexOf(CharPoolConstant.COLON);
+        if (prefixIndex > -1) {
+            // 可能Windows风格路径
+            prefix = pathToUse.substring(0, prefixIndex + 1);
+            if (StringTools.startWith(prefix, CharPoolConstant.SLASH)) {
+                // 去除类似于/C:这类路径开头的斜杠
+                prefix = prefix.substring(1);
+            }
+            if (false == prefix.contains(StrPoolConstant.SLASH)) {
+                pathToUse = pathToUse.substring(prefixIndex + 1);
+            } else {
+                // 如果前缀中包含/,说明非Windows风格path
+                prefix = StringTools.EMPTY;
+            }
+        }
+        if (pathToUse.startsWith(StrPoolConstant.SLASH)) {
+            prefix += StrPoolConstant.SLASH;
+            pathToUse = pathToUse.substring(1);
+        }
+
+        List<String> pathList = Splitter.on(CharPoolConstant.SLASH).splitToList(pathToUse);
+
+        List<String> pathElements = new LinkedList<>();
+        int tops = 0;
+        String element;
+        for (int i = pathList.size() - 1; i >= 0; i--) {
+            element = pathList.get(i);
+            // 只处理非.的目录，即只处理非当前目录
+            if (false == StrPoolConstant.DOT.equals(element)) {
+                if (StrPoolConstant.DOUBLE_DOT.equals(element)) {
+                    tops++;
+                } else {
+                    if (tops > 0) {
+                        // 有上级目录标记时按照个数依次跳过
+                        tops--;
+                    } else {
+                        // Normal path element found.
+                        pathElements.add(0, element);
+                    }
+                }
+            }
+        }
+
+        // issue#1703@Github
+        if (tops > 0 && StringTools.isEmpty(prefix)) {
+            // 只有相对路径补充开头的..，绝对路径直接忽略之
+            while (tops-- > 0) {
+                //遍历完节点发现还有上级标注（即开头有一个或多个..），补充之
+                // Normal path element found.
+                pathElements.add(0, StrPoolConstant.DOUBLE_DOT);
+            }
+        }
+
+        return prefix + Joiner.on(StrPoolConstant.SLASH).join(pathElements);
     }
     // -------------------------------------------------------------------------------------------- name end
 }

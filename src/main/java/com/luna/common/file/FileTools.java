@@ -12,10 +12,12 @@ import com.google.common.collect.Lists;
 import com.luna.common.constant.Constant;
 import com.luna.common.exception.BaseException;
 import com.luna.common.file.visitor.MoveVisitor;
+import com.luna.common.io.IoUtil;
 import com.luna.common.utils.Assert;
 import com.luna.common.text.CharsetUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import oshi.util.FileUtil;
 
 import static com.luna.common.file.PathUtil.del;
 import static java.nio.file.Files.isDirectory;
@@ -24,6 +26,48 @@ import static java.nio.file.Files.isDirectory;
  * @author Luna
  */
 public class FileTools {
+
+
+    /**
+     * 获取临时文件路径（绝对路径）
+     *
+     * @return 临时文件路径
+     * @since 4.0.6
+     */
+    public static String getTmpDirPath() {
+        return System.getProperty("java.io.tmpdir");
+    }
+
+    /**
+     * 获取临时文件目录
+     *
+     * @return 临时文件目录
+     * @since 4.0.6
+     */
+    public static File getTmpDir() {
+        return  new File(getTmpDirPath());
+    }
+
+    /**
+     * 获取用户路径（绝对路径）
+     *
+     * @return 用户路径
+     * @since 4.0.6
+     */
+    public static String getUserHomePath() {
+        return System.getProperty("user.home");
+    }
+
+    /**
+     * 获取用户目录
+     *
+     * @return 用户目录
+     * @since 4.0.6
+     */
+    public static File getUserHomeDir() {
+        return new File(getUserHomePath());
+    }
+
     /**
      * 读取文件所有内容
      *
@@ -64,6 +108,16 @@ public class FileTools {
     }
 
     /**
+     * 判断一个文件是否存在
+     *
+     * @param fileName 文件路径
+     * @return boolean
+     */
+    public static boolean notExists(String fileName) {
+        return !isExists(fileName);
+    }
+
+    /**
      * 字节写入文件
      * 
      * @param bytes 字节数组
@@ -76,6 +130,44 @@ public class FileTools {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * 将流的内容写入文件
+     *
+     * @param in        输入流，不关闭
+     * @param isCloseIn 是否关闭输入流
+     * @return dest
+     * @throws IOException IO异常
+     * @since 5.5.2
+     */
+    public static File write(InputStream in, File file, boolean isCloseIn) throws IOException {
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream(file);
+            IoUtil.copy(in, out);
+        } catch (IOException e) {
+            throw new IOException(e);
+        } finally {
+            IoUtil.close(out);
+            if (isCloseIn) {
+                IoUtil.close(in);
+            }
+        }
+        return file;
+    }
+
+    /**
+     * 将流的内容写入文件
+     *
+     * @param in        输入流，不关闭
+     * @param isCloseIn 是否关闭输入流
+     * @return dest
+     * @throws IOException IO异常
+     * @since 5.5.2
+     */
+    public static File write(InputStream in, String file, boolean isCloseIn) throws IOException {
+        return write(in, new File(file), isCloseIn);
     }
 
     /**
@@ -460,5 +552,71 @@ public class FileTools {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * 获取{@link Path}文件名
+     *
+     * @param path {@link Path}
+     * @return 文件名
+     * @since 5.7.15
+     */
+    public static String getName(Path path) {
+        if (null == path) {
+            return null;
+        }
+        return path.getFileName().toString();
+    }
+
+    /**
+     * 获得一个输出流对象
+     *
+     * @param file 文件
+     * @return 输出流对象
+     * @throws IOException IO异常
+     */
+    public static BufferedOutputStream getOutputStream(File file) {
+        final OutputStream out;
+        try {
+            out = Files.newOutputStream(touch(file).toPath());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return IoUtil.toBuffered(out);
+    }
+
+    /**
+     * 创建文件及其父目录，如果这个文件存在，直接返回这个文件<br>
+     * 此方法不对File对象类型做判断，如果File不存在，无法判断其类型
+     *
+     * @param file 文件对象
+     * @return 文件，若路径为null，返回null
+     * @throws IOException IO异常
+     */
+    public static File touch(File file) throws IOException {
+        if (null == file) {
+            return null;
+        }
+        if (false == file.exists()) {
+            Files.createFile(file.toPath());
+            try {
+                //noinspection ResultOfMethodCallIgnored
+                file.createNewFile();
+            } catch (Exception e) {
+                throw new IOException(e);
+            }
+        }
+        return file;
+    }
+
+    /**
+     * 获得输入流
+     *
+     * @param file 文件
+     * @return 输入流
+     * @throws IOException 文件未找到
+     */
+    public static BufferedInputStream getInputStream(File file) throws IOException {
+        return IoUtil.toBuffered(IoUtil.toStream(file));
     }
 }

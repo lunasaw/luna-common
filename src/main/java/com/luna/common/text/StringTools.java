@@ -8,6 +8,7 @@ import com.luna.common.constant.StrPoolConstant;
 import com.luna.common.regex.DesensitizedUtil;
 import com.luna.common.regex.ReUtil;
 import com.luna.common.utils.Assert;
+import com.luna.common.utils.ObjectUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -2208,7 +2209,7 @@ public class StringTools extends StringUtils {
             return "";
         }
         if (arr.length == 1) {
-            return com.luna.common.text.ObjectUtils.nullSafeToString(arr[0]);
+            return ObjectUtils.nullSafeToString(arr[0]);
         }
 
         StringJoiner sj = new StringJoiner(delim);

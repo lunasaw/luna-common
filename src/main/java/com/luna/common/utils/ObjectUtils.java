@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.luna.common.text;
+package com.luna.common.utils;
 
-import com.luna.common.utils.Assert;
+import com.luna.common.text.StringTools;
 import org.apache.commons.collections4.CollectionUtils;
 
 import javax.annotation.Nullable;
