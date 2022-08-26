@@ -776,14 +776,16 @@ public class StringTools extends StringUtils {
      * @since 4.1.11
      */
     public static boolean containsAny(CharSequence str, char... testChars) {
-        int index = -1;
         if (!isEmpty(str)) {
-            String s = CharsetUtil.str(str);
+            String s = str.toString();
             for (char testChar : testChars) {
-                index = s.indexOf(testChar);
+                int index = s.indexOf(testChar);
+                if (index != -1) {
+                    return true;
+                }
             }
         }
-        return index == -1;
+        return false;
     }
 
     /**
