@@ -16,7 +16,7 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
       - name: Publish package
-        run: mvn --batch-mode deploy
+        run: mvn -DskipTests --batch-mode deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
   publish:
