@@ -14,27 +14,27 @@ jobs:
       - name: Set up Java for publishing to GitHub Packages
         uses: actions/setup-java@v3
         with:
-          java-version: '11'
+          java-version: 8
           distribution: adopt
       - name: Publish to GitHub Packages
         run: mvn --batch-mode deploy -DskipTests -Pgithub_auth
         env:
-          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   release:
     runs-on: ubuntu-18.04
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
-      - name: Install Java and Maven
-        uses: actions/setup-java@v1
         with:
-          java-version: '11'
+          java-version: 8
+
       - name: Release Maven package
         uses: samuelmeuli/action-maven-publish@v1
         with:
           maven_profiles: ossrh
-          maven_args: '-DskipTests'
-          gpg_private_key: '${{ secrets.gpg_private_key }}'
-          gpg_passphrase: '${{ secrets.gpg_passphrase }}'
-          nexus_username: '${{ secrets.OSSRH_USERNAME }}'
-          nexus_password: '${{ secrets.OSSRH_TOKEN }}'
+          maven_args: -DskipTests
+          gpg_private_key: ${{ secrets.gpg_private_key }}
+          gpg_passphrase: ${{ secrets.gpg_passphrase }}
+          nexus_username: ${{ secrets.OSSRH_USERNAME }}
+          nexus_password: ${{ secrets.OSSRH_TOKEN }}
+
