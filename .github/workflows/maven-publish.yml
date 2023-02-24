@@ -19,40 +19,40 @@ jobs:
         run: mvn -DskipTests --batch-mode deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
-  publish:
-    runs-on: ubuntu-latestÏ
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Maven Central Repository
-        uses: actions/setup-java@v3
-        with:
-          java-version: '8'
-          distribution: 'adopt'
-          server-id: ossrh
-          server-username: MAVEN_USERNAME
-          server-password: MAVEN_PASSWORD
-      - name: Publish package
-        run: mvn -DskipTests --batch-mode deploy
-        env:
-          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
-  release:
-    runs-on: ubuntu-18.04
-    steps:
-      - name: Install Java and Maven
-        uses: actions/setup-java@v1
-        with:
-          java-version: 8
-
-      - name: Release Maven package
-        uses: samuelmeuli/action-maven-publish@v1.4.0
-
-        with:
-          maven_profiles: ossrh
-          maven_args: -DskipTests
-          server_id: ossrh
-          gpg_private_key: ${{ secrets.gpg_private_key }}
-          gpg_passphrase: ${{ secrets.gpg_passphrase }}
-          nexus_username: ${{ secrets.OSSRH_USERNAME }}
-          nexus_password: ${{ secrets.OSSRH_TOKEN }}
-
+#  publish:
+#    runs-on: ubuntu-latestÏ
+#    steps:
+#      - uses: actions/checkout@v3
+#      - name: Set up Maven Central Repository
+#        uses: actions/setup-java@v3
+#        with:
+#          java-version: '8'
+#          distribution: 'adopt'
+#          server-id: ossrh
+#          server-username: MAVEN_USERNAME
+#          server-password: MAVEN_PASSWORD
+#      - name: Publish package
+#        run: mvn -DskipTests --batch-mode deploy
+#        env:
+#          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+#          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+#  release:
+#    runs-on: ubuntu-18.04
+#    steps:
+#      - name: Install Java and Maven
+#        uses: actions/setup-java@v1
+#        with:
+#          java-version: 8
+#
+#      - name: Release Maven package
+#        uses: samuelmeuli/action-maven-publish@v1.4.0
+#
+#        with:
+#          maven_profiles: ossrh
+#          maven_args: -DskipTests
+#          server_id: ossrh
+#          gpg_private_key: ${{ secrets.gpg_private_key }}
+#          gpg_passphrase: ${{ secrets.gpg_passphrase }}
+#          nexus_username: ${{ secrets.OSSRH_USERNAME }}
+#          nexus_password: ${{ secrets.OSSRH_TOKEN }}
+#

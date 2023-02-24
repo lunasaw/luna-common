@@ -124,10 +124,10 @@
 <!--            <id>ossrh</id>-->
 <!--            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>-->
 <!--        </repository>-->
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
+<!--        <snapshotRepository>-->
+<!--            <id>ossrh</id>-->
+<!--            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>-->
+<!--        </snapshotRepository>-->
 
         <!-- 两个ID必须与setting.xml中的<server><id>nexus-releases</id></server>保持一致-->
         <!--        <repository>-->
