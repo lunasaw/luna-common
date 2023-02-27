@@ -41,10 +41,12 @@ jobs:
         with:
           java-version: '8'
           distribution: 'zulu'
+          server-id: github_auth
       - name: Publish package
         run: mvn -DskipTests --batch-mode deploy -P github_auth
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          server-username: lunasaw
+          server-password: ${{ secrets.SECRET_KEY }}
 #  publish:
 #    runs-on: ubuntu-latestÏ
 #    steps:
