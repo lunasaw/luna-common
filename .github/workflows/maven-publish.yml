@@ -22,12 +22,12 @@ jobs:
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: GPG_PASSPHRASE
       - name: Publish to the Maven Central Repository
+        run: mvn -DskipTests --batch-mode deploy -P ossrh
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE}}
-          GITHUB_TOKEN: ${{ secrets.SECRET_KEY }}
+
 #  publish:
 #    # 任务运行的环境
 #    runs-on: ubuntu-latest
