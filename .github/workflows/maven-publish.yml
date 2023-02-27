@@ -45,8 +45,7 @@ jobs:
       - name: Publish package
         run: mvn -DskipTests --batch-mode deploy -P github_auth
         env:
-          server-username: lunasaw
-          server-password: ${{ secrets.SECRET_KEY }}
+          GITHUB_TOKEN: ${{ secrets.SECRET_KEY }}
 #  publish:
 #    runs-on: ubuntu-latestÏ
 #    steps:
