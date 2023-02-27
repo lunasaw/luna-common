@@ -15,7 +15,7 @@
 <dependency>
     <groupId>io.github.lunasaw</groupId>
     <artifactId>luna-common</artifactId>
-    <version>2.1.1</version>
+    <version>${last.version}</version>
 </dependency>
 
 ```
