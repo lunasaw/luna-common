@@ -4,7 +4,7 @@ name: Publish package to the Maven Central Repository and GitHub Packages
     branches:
       - master
 jobs:
-  publish_github:
+  publish:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -14,8 +14,8 @@ jobs:
       - name: Set up Java for publishing to Maven Central Repository
         uses: actions/setup-java@v1
         with:
-          java-version: '11'
-          distribution: 'adopt'
+          java-version: '8'
+          distribution: 'zulu'
           server-id: ossrh
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
@@ -27,6 +27,17 @@ jobs:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE}}
+
+      - name: Set up Java for publishing to GitHub Packages
+        uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: 'zulu'
+          server-id: github_auth
+      - name: Publish package
+        run: mvn -DskipTests --batch-mode deploy -P github_auth
+        env:
+          GITHUB_TOKEN: ${{ secrets.SECRET_KEY }}
 
 #  publish:
 #    # 任务运行的环境
@@ -57,16 +68,7 @@ jobs:
 #          nexus_username: ${{ secrets.OSSRH_USER }}
 #          nexus_password: ${{ secrets.OSSRH_USERNAME }}
 
-#      - name: Set up Java for publishing to GitHub Packages
-#        uses: actions/setup-java@v3
-#        with:
-#          java-version: '8'
-#          distribution: 'zulu'
-#          server-id: github_auth
-#      - name: Publish package
-#        run: mvn -DskipTests --batch-mode deploy -P github_auth
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.SECRET_KEY }}
+
 
 #        uses: actions/setup-java@v3
 #        with:
