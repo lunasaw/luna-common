@@ -13,9 +13,6 @@ import com.luna.common.constant.StrPoolConstant;
 import com.luna.common.regex.ReUtil;
 import com.luna.common.text.CharsetUtil;
 import com.luna.common.text.StringTools;
-import com.luna.common.utils.Assert;
-import oshi.util.FileUtil;
-import sun.net.util.URLUtil;
 
 /**
  * 文件名相关工具类
