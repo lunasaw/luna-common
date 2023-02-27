@@ -13,10 +13,10 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v3
         with:
-          java-version: '11'
-          distribution: 'adopt'
+          java-version: '8'
+          distribution: 'zulu'
       - name: Publish package
-        run: mvn -DskipTests --batch-mode deploy
+        run: mvn -DskipTests --batch-mode deploy -Pgithub_auth
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
 #  publish:
