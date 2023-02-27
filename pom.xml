@@ -235,6 +235,9 @@
                             <execution>
                                 <id>sign-artifacts</id>
                                 <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
                             </execution>
                         </executions>
                         <configuration>
@@ -281,84 +284,5 @@
                 </plugins>
             </build>
         </profile>
-<!--        <profile>-->
-<!--            <id>nexus-releases</id>-->
-<!--            <activation>-->
-<!--                <activeByDefault>true</activeByDefault>-->
-<!--            </activation>-->
-<!--            <build>-->
-<!--                <plugins>-->
-<!--                    <plugin>-->
-<!--                        <groupId>org.apache.maven.plugins</groupId>-->
-<!--                        <artifactId>maven-release-plugin</artifactId>-->
-<!--                        <version>2.3.2</version>-->
-<!--                        <configuration>-->
-<!--                            <autoVersionSubmodules>true</autoVersionSubmodules>-->
-<!--                            <useReleaseProfile>false</useReleaseProfile>-->
-<!--                            <releaseProfiles>release</releaseProfiles>-->
-<!--                            <goals>deploy</goals>-->
-<!--                        </configuration>-->
-<!--                    </plugin>-->
-<!--                    <plugin>-->
-<!--                        <groupId>org.apache.maven.plugins</groupId>-->
-<!--                        <artifactId>maven-compiler-plugin</artifactId>-->
-<!--                        <version>3.0</version>-->
-<!--                        <configuration>-->
-<!--                            <source>1.8</source>-->
-<!--                            <target>1.8</target>-->
-<!--                        </configuration>-->
-<!--                    </plugin>-->
-<!--                    <plugin>-->
-<!--                        <groupId>org.apache.maven.plugins</groupId>-->
-<!--                        <artifactId>maven-gpg-plugin</artifactId>-->
-<!--                        <version>1.5</version>-->
-<!--                        <executions>-->
-<!--                            <execution>-->
-<!--                                <id>sign-artifacts</id>-->
-<!--                                <phase>verify</phase>-->
-<!--                                <goals>-->
-<!--                                    <goal>sign</goal>-->
-<!--                                </goals>-->
-<!--                            </execution>-->
-<!--                        </executions>-->
-<!--                    </plugin>-->
-<!--                    <plugin>-->
-<!--                        <groupId>org.apache.maven.plugins</groupId>-->
-<!--                        <artifactId>maven-source-plugin</artifactId>-->
-<!--                        <version>3.0.1</version>-->
-<!--                        <executions>-->
-<!--                            <execution>-->
-<!--                                <id>attach-sources</id>-->
-<!--                                <goals>-->
-<!--                                    <goal>jar-no-fork</goal>-->
-<!--                                </goals>-->
-<!--                            </execution>-->
-<!--                        </executions>-->
-<!--                    </plugin>-->
-<!--                    <plugin>-->
-<!--                        <groupId>org.apache.maven.plugins</groupId>-->
-<!--                        <artifactId>maven-javadoc-plugin</artifactId>-->
-<!--                        <version>2.9.1</version>-->
-<!--                        <configuration>-->
-<!--                            <javadocExecutable>${java.home}/../bin/javadoc</javadocExecutable>-->
-<!--                            &lt;!&ndash; 忽略生成文档中的错误，如果想看下控制台中关于生成doc错误的去掉这个参数 &ndash;&gt;-->
-<!--                            <additionalparam>-Xdoclint:none</additionalparam>-->
-<!--                            <aggregate>true</aggregate>-->
-<!--                            <charset>UTF-8</charset>&lt;!&ndash; utf-8读取文件 &ndash;&gt;-->
-<!--                            <encoding>UTF-8</encoding>&lt;!&ndash; utf-8进行编码代码 &ndash;&gt;-->
-<!--                            <docencoding>UTF-8</docencoding>&lt;!&ndash; utf-8进行编码文档 &ndash;&gt;-->
-<!--                        </configuration>-->
-<!--                        <executions>-->
-<!--                            <execution>-->
-<!--                                <phase>package</phase>-->
-<!--                                <goals>-->
-<!--                                    <goal>jar</goal>-->
-<!--                                </goals>-->
-<!--                            </execution>-->
-<!--                        </executions>-->
-<!--                    </plugin>-->
-<!--                </plugins>-->
-<!--            </build>-->
-<!--        </profile>-->
     </profiles>
 </project>
