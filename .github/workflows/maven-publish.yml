@@ -28,6 +28,8 @@ jobs:
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PASSPHRASE}}
           GPG_PASSPHRASE: ${{ secrets.GPG_PRIVATE_KEY }}
+          GITHUB_TOKEN: ${{ secrets.SECRET_KEY }}
+
 
 #      - name: Set up Java for publishing to GitHub Packages
 #        uses: actions/setup-java@v3
