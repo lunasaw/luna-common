@@ -6,7 +6,7 @@ import com.luna.common.dto.constant.ResultCode;
  * @author luna
  */
 public class BaseException extends RuntimeException {
-    /** 错误吗 */
+    /** 错误码 {@link  ResultCode} */
     private int    code;
     /** 错误消息 */
     private String message;

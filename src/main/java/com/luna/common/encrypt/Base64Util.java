@@ -1,4 +1,4 @@
-package com.luna.common.text;
+package com.luna.common.encrypt;
 
 import java.util.regex.Pattern;
 

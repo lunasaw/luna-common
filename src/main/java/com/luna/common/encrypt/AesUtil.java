@@ -1,4 +1,4 @@
-package com.luna.common.text;
+package com.luna.common.encrypt;
 
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
