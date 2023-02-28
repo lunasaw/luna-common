@@ -7,6 +7,7 @@ com.luna.common.calendarist.core
 com.luna.common.calendarist.core.convert
 com.luna.common.calendarist.pojo
 com.luna.common.calendarist.utils
+com.luna.common.check
 com.luna.common.china
 com.luna.common.command
 com.luna.common.constant
@@ -17,9 +18,11 @@ com.luna.common.encrypt
 com.luna.common.encrypt.security
 com.luna.common.exception
 com.luna.common.file
+com.luna.common.file.compress
 com.luna.common.file.visitor
 com.luna.common.i18n
 com.luna.common.io
+com.luna.common.math
 com.luna.common.media
 com.luna.common.mutable
 com.luna.common.net
@@ -32,6 +35,7 @@ com.luna.common.os.hardware.dto
 com.luna.common.page
 com.luna.common.reflect
 com.luna.common.regex
+com.luna.common.sensitive
 com.luna.common.text
 com.luna.common.thread
 com.luna.common.utils
