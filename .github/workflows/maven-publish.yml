@@ -10,6 +10,17 @@ jobs:
       contents: read
       packages: write
     steps:
+      - name: Set up Java for publishing to GitHub Packages
+        uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: 'zulu'
+          server-id: github_auth
+      - name: Publish package Github
+        run: mvn -DskipTests --batch-mode deploy -Pgithub_auth
+        env:
+          GITHUB_TOKEN: ${{ secrets.SECRET_KEY }}
+
       - uses: actions/checkout@v3
       - name: Set up Java for publishing to Maven Central Repository
         uses: actions/setup-java@v1
@@ -28,16 +39,7 @@ jobs:
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE}}
 
-      - name: Set up Java for publishing to GitHub Packages
-        uses: actions/setup-java@v3
-        with:
-          java-version: '8'
-          distribution: 'zulu'
-          server-id: github_auth
-      - name: Publish package
-        run: mvn -DskipTests --batch-mode deploy -Pgithub_auth
-        env:
-          GITHUB_TOKEN: ${{ secrets.SECRET_KEY }}
+
 
 #  publish:
 #    # 任务运行的环境
