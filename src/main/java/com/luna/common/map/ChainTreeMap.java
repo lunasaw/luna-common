@@ -1,4 +1,4 @@
-package com.luna.common.text;
+package com.luna.common.map;
 
 import java.util.Comparator;
 import java.util.Map;

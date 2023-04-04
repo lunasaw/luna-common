@@ -597,16 +597,48 @@ public class FileTools {
         if (null == file) {
             return null;
         }
-        if (false == file.exists()) {
+        if (!file.exists()) {
             Files.createFile(file.toPath());
             try {
                 //noinspection ResultOfMethodCallIgnored
                 file.createNewFile();
             } catch (Exception e) {
-                throw new IOException(e);
+                throw new RuntimeException(e);
             }
         }
         return file;
+    }
+
+    /**
+     * 创建文件及其父目录，如果这个文件存在，直接返回这个文件<br>
+     * 此方法不对File对象类型做判断，如果File不存在，无法判断其类型
+     *
+     * @param path 相对ClassPath的目录或者绝对路径目录，使用POSIX风格
+     * @return 文件，若路径为null，返回null
+     * @throws IORuntimeException IO异常
+     */
+    public static File touch(String path){
+        if (path == null) {
+            return null;
+        }
+        try {
+            return touch(file(path));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 创建File对象，自动识别相对或绝对路径，相对路径将自动从ClassPath下寻找
+     *
+     * @param path 相对ClassPath的目录或者绝对路径目录
+     * @return File
+     */
+    public static File file(String path) {
+        if (null == path) {
+            return null;
+        }
+        return new File(path);
     }
 
     /**
@@ -616,7 +648,36 @@ public class FileTools {
      * @return 输入流
      * @throws IOException 文件未找到
      */
-    public static BufferedInputStream getInputStream(File file) throws IOException {
+    public static BufferedInputStream getInputStream(File file)  {
         return IoUtil.toBuffered(IoUtil.toStream(file));
+    }
+
+
+
+    /**
+     * 获得一个带缓存的写入对象
+     *
+     * @param isAppend 是否追加
+     * @return BufferedReader对象
+     * @throws IOException IO异常
+     */
+    public static BufferedWriter getWriter(File file, Charset charset, boolean isAppend) {
+        try {
+            return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(FileTools.touch(file), isAppend), charset));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 获得一个文件读取器
+     *
+     * @param file    文件
+     * @param charset 字符集
+     * @return BufferedReader对象
+     * @throws IORuntimeException IO异常
+     */
+    public static BufferedReader getReader(File file, Charset charset) {
+        return IoUtil.getReader(getInputStream(file), charset);
     }
 }
