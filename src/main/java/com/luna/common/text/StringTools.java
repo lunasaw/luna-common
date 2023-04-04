@@ -5,6 +5,8 @@ import com.luna.common.anno.Func1;
 import com.luna.common.anno.Matcher;
 import com.luna.common.constant.CharPoolConstant;
 import com.luna.common.constant.StrPoolConstant;
+import com.luna.common.io.FastByteArrayOutputStream;
+import com.luna.common.io.IoUtil;
 import com.luna.common.regex.DesensitizedUtil;
 import com.luna.common.regex.ReUtil;
 import com.luna.common.utils.Assert;
@@ -13,7 +15,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
-import java.io.ByteArrayOutputStream;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.*;
 
@@ -2251,4 +2253,27 @@ public class StringTools extends StringUtils {
     public static String arrayToCommaDelimitedString(@Nullable Object[] arr) {
         return arrayToDelimitedString(arr, ",");
     }
+
+    /**
+     * 获得StringReader
+     *
+     * @param str 字符串
+     * @return StringReader
+     */
+    public static StringReader getReader(CharSequence str) {
+        if (null == str) {
+            return null;
+        }
+        return new StringReader(str.toString());
+    }
+
+    /**
+     * 获得StringWriter
+     *
+     * @return StringWriter
+     */
+    public static StringWriter getWriter() {
+        return new StringWriter();
+    }
+
 }

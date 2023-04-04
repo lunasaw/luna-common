@@ -103,6 +103,12 @@ public class FileNameUtil {
      */
     private static final Pattern FILE_NAME_INVALID_PATTERN_WIN = Pattern.compile("[\\\\/:*?\"<>|]");
 
+    /**
+     * 绝对路径判断正则
+     */
+    private static final Pattern PATTERN_PATH_ABSOLUTE = Pattern.compile("^[a-zA-Z]:([/\\\\].*)?");
+
+
     // -------------------------------------------------------------------------------------------- name start
 
     /**
@@ -484,6 +490,28 @@ public class FileNameUtil {
         }
 
         return prefix + Joiner.on(StrPoolConstant.SLASH).join(pathElements);
+    }
+
+    /**
+     * 给定路径已经是绝对路径<br>
+     * 此方法并没有针对路径做标准化，建议先执行{@link #normalize(String)}方法标准化路径后判断<br>
+     * 绝对路径判断条件是：
+     * <ul>
+     *     <li>以/开头的路径</li>
+     *     <li>满足类似于 c:/xxxxx，其中祖母随意，不区分大小写</li>
+     *     <li>满足类似于 d:\xxxxx，其中祖母随意，不区分大小写</li>
+     * </ul>
+     *
+     * @param path 需要检查的Path
+     * @return 是否已经是绝对路径
+     */
+    public static boolean isAbsolutePath(String path) {
+        if (StringTools.isEmpty(path)) {
+            return false;
+        }
+
+        // 给定的路径已经是绝对路径了
+        return StrPoolConstant.C_SLASH == path.charAt(0) || ReUtil.isMatch(PATTERN_PATH_ABSOLUTE, path);
     }
     // -------------------------------------------------------------------------------------------- name end
 }
