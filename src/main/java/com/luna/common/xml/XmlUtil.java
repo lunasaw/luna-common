@@ -1,11 +1,11 @@
 package com.luna.common.xml;
 
-import com.google.common.collect.BiMap;
 import com.google.common.collect.Lists;
 import com.luna.common.escape.EscapeUtil;
 import com.luna.common.exception.UtilException;
 import com.luna.common.file.FileTools;
 import com.luna.common.io.IoUtil;
+import com.luna.common.map.BiMap;
 import com.luna.common.text.CharsetUtil;
 import com.luna.common.text.StringTools;
 import com.luna.common.utils.Assert;
@@ -1387,8 +1387,9 @@ public class XmlUtil {
 					final int childLength = childNodes.getLength();
 					for (int i = 0; i < childLength; i++) {
 						item = childNodes.item(i);
-						if (item.getNodeType() == Node.ELEMENT_NODE)
+						if (item.getNodeType() == Node.ELEMENT_NODE) {
 							examineNode(item, false);
+						}
 					}
 				}
 			}
