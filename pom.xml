@@ -107,8 +107,8 @@
             <version>${oshi.version}</version> <!-- 这个版本不要随便升级，和JNA的环境有关 -->
         </dependency>
         <dependency>
-            <groupId>com.alibaba.fastjson2</groupId>
-            <artifactId>fastjson2</artifactId>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
             <version>${fast-json.version}</version>
         </dependency>
         <dependency>
