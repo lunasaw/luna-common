@@ -1,6 +1,7 @@
 package com.luna.common.sensitive;
 
-import com.alibaba.fastjson.JSON;
+
+import com.alibaba.fastjson2.JSON;
 
 import java.util.Arrays;
 import java.util.HashMap;
