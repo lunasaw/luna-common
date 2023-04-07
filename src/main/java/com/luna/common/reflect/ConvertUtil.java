@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -83,7 +84,7 @@ public class ConvertUtil {
         try {
             Map<String, String> data = new HashMap<String, String>();
             DocumentBuilder documentBuilder = XmlUtil.newDocumentBuilder();
-            InputStream stream = new ByteArrayInputStream(strXML.getBytes(CharsetUtil.UTF_8));
+            InputStream stream = new ByteArrayInputStream(strXML.getBytes(StandardCharsets.UTF_8));
             org.w3c.dom.Document doc = documentBuilder.parse(stream);
             doc.getDocumentElement().normalize();
             NodeList nodeList = doc.getDocumentElement().getChildNodes();
