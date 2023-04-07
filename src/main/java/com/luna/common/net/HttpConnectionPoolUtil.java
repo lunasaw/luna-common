@@ -45,21 +45,9 @@ public class HttpConnectionPoolUtil {
     private static Logger                             logger           = LoggerFactory.getLogger(HttpConnectionPoolUtil.class);
 
     /**
-     * 设置连接建立的超时时间为10s
-     */
-    private static final int                          CONNECT_TIMEOUT  = 10;
-    private static final int                          SOCKET_TIMEOUT   = 5000;
-    /**
-     * 最大连接数
-     */
-    private static final int                          MAX_CONN         = 200;
-    private static final int                          MAX_POOL_SIZE    = 300;
-
-    /**
      * 监控线程
      */
     private static final int                          MONITOR_MAX_CONN = 20;
-    private static final int                          MAX_ROUTE        = 50;
     /**
      * 发送请求的客户端单例
      */
@@ -81,9 +69,9 @@ public class HttpConnectionPoolUtil {
      * @param httpRequestBase http请求
      */
     private static void setRequestConfig(HttpRequestBase httpRequestBase) {
-        RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(CONNECT_TIMEOUT)
-            .setConnectTimeout(CONNECT_TIMEOUT)
-            .setSocketTimeout(SOCKET_TIMEOUT).build();
+        RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(HttpUtils.CONNECT_TIMEOUT)
+            .setConnectTimeout(HttpUtils.CONNECT_TIMEOUT)
+            .setSocketTimeout(HttpUtils.SOCKET_TIMEOUT).build();
 
         httpRequestBase.setConfig(requestConfig);
     }
@@ -103,7 +91,7 @@ public class HttpConnectionPoolUtil {
                             // 关闭异常连接
                             manager.closeExpiredConnections();
                             // 关闭5s空闲的连接
-                            manager.closeIdleConnections(SOCKET_TIMEOUT, TimeUnit.MILLISECONDS);
+                            manager.closeIdleConnections(HttpUtils.SOCKET_TIMEOUT, TimeUnit.MILLISECONDS);
                         }
                     }, 0, 50, TimeUnit.MILLISECONDS);
                 }
@@ -115,8 +103,7 @@ public class HttpConnectionPoolUtil {
     /**
      * 根据host和port构建httpclient实例
      *
-     * @param host 要访问的域名
-     * @param port 要访问的端口
+     * @param host 要访问的域名+端口
      * @return
      */
     public static CloseableHttpClient createHttpClient(String host) {
@@ -128,12 +115,12 @@ public class HttpConnectionPoolUtil {
         manager = new PoolingHttpClientConnectionManager(registry);
         // 设置连接参数
         // 最大连接数
-        manager.setMaxTotal(MAX_CONN);
+        manager.setMaxTotal(HttpUtils.MAX_CONN);
         // 路由最大连接数
-        manager.setDefaultMaxPerRoute(MAX_POOL_SIZE);
+        manager.setDefaultMaxPerRoute(HttpUtils.MAX_ROUTE);
 
         HttpHost httpHost = HttpHost.create(host);
-        manager.setMaxPerRoute(new HttpRoute(httpHost), MAX_ROUTE);
+        manager.setMaxPerRoute(new HttpRoute(httpHost), HttpUtils.MAX_ROUTE);
 
         // 请求失败时,进行请求重试
         HttpRequestRetryHandler handler = (e, i, httpContext) -> {
