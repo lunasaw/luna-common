@@ -1,7 +1,13 @@
 package com.luna.common.net.base;
 
 import com.luna.common.file.FileTools;
+import com.luna.common.io.IoUtil;
 import com.luna.common.net.HttpUtils;
+import com.luna.common.text.CharsetUtil;
+import com.luna.common.utils.ObjectUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
+
 import java.io.*;
 import java.net.*;
 import java.util.List;
@@ -12,16 +18,21 @@ import java.util.Objects;
  * @author luna@mac
  * 2021年05月12日 09:42
  */
+@Slf4j
 public class HttpBaseUtils {
 
-    /** 连接时间超时 */
-    private static final Integer     CONN_TIME_OUT       = 5000;
-    /** 读取时间超时 */
-    private static final Integer     READ_TIME_OUT       = 5000;
+    /**
+     * 连接时间超时
+     */
+    private static final Integer              CONN_TIME_OUT       = 5000;
+    /**
+     * 读取时间超时
+     */
+    private static final Integer              READ_TIME_OUT       = 5000;
 
     private static volatile HttpURLConnection conn                = null;
 
-    private static final int         DEFAULT_BUFFER_SIZE = 4096;
+    private static final int                  DEFAULT_BUFFER_SIZE = 4096;
 
     public static HttpURLConnection getConn(String url) {
         try {
@@ -56,10 +67,7 @@ public class HttpBaseUtils {
             HttpURLConnection conn = getConnection(host, path, method, headers, queries);
             if (!Objects.isNull(body)) {
                 conn.setDoOutput(true);
-                DataOutputStream out = new DataOutputStream(conn.getOutputStream());
-                out.writeBytes(body);
-                out.flush();
-                out.close();
+                IoUtil.write(conn.getOutputStream(), CharsetUtil.defaultCharsetName(),true,  body);
             }
             return conn.getInputStream();
         } catch (IOException e) {
@@ -79,45 +87,27 @@ public class HttpBaseUtils {
      * @throws IOException
      */
     public static InputStream doURL(String host, String path, String method, Map<String, String> headers,
-        Map<String, String> queries, File file) {
-        DataOutputStream out = null;
-        DataInputStream in = null;
+        Map<String, String> queries, byte[] file) {
         try {
             HttpURLConnection conn = getConnection(host, path, method, headers, queries);
-            if (!Objects.isNull(file)) {
-                out = new DataOutputStream(conn.getOutputStream());
-                in = new DataInputStream(new FileInputStream(file));
+            if (!ObjectUtils.isEmpty(file)) {
                 conn.setDoOutput(true);
-                int bytes = 0;
-                byte[] bufferOut = new byte[DEFAULT_BUFFER_SIZE];
-                while ((bytes = in.read(bufferOut)) != -1) {
-                    out.write(bufferOut, 0, bytes);
-                }
-                out.flush();
+                IOUtils.write(file, conn.getOutputStream());
             }
             return conn.getInputStream();
         } catch (IOException e) {
             throw new RuntimeException(e);
-        } finally {
-            try {
-                assert out != null;
-                out.close();
-                assert in != null;
-                in.close();
-            } catch (IOException ignored) {
-                ignored.printStackTrace();
-            }
         }
     }
 
     public static byte[] doURLWithByte(String host, String path, String method, Map<String, String> headers,
         Map<String, String> queries, File file) {
-        return readWithByte(doURL(host, path, method, headers, queries, file));
+        return readWithByte(doURL(host, path, method, headers, queries, FileTools.read(file.getAbsolutePath())));
     }
 
     public static String doURLWithString(String host, String path, String method, Map<String, String> headers,
         Map<String, String> queries, File file) {
-        return readWithString(doURL(host, path, method, headers, queries, file));
+        return readWithString(doURL(host, path, method, headers, queries, FileTools.read(file.getAbsolutePath())));
     }
 
     public static byte[] doURLWithByte(String host, String path, String method, Map<String, String> headers,
@@ -132,7 +122,7 @@ public class HttpBaseUtils {
 
     /**
      * 流转文件
-     * 
+     *
      * @param url
      * @param path
      */
@@ -210,7 +200,7 @@ public class HttpBaseUtils {
 
     /**
      * 字符编码指定格式读取
-     * 
+     *
      * @param inputStream 输入流
      * @param charsetName 编码格式
      * @return String
