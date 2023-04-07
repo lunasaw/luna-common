@@ -8,11 +8,16 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.*;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.AuthCache;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
@@ -25,10 +30,8 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.client.*;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.util.EntityUtils;
@@ -46,11 +49,25 @@ import java.util.*;
  */
 public class HttpUtils {
 
-    private static CloseableHttpClient httpClient;
+    private static final HttpClientContext CLIENT_CONTEXT  = HttpClientContext.create();
+    private static CloseableHttpClient     httpClient;
 
-    private static BasicCookieStore    cookieStore;
+    private static BasicCookieStore        cookieStore;
 
-    private static HttpHost            proxy;
+    private static HttpHost                proxy;
+
+    /**
+     * 最大连接数
+     */
+    public static final int                MAX_CONN        = 200;
+
+    public static final int                SOCKET_TIMEOUT  = 5000;
+    /**
+     * 设置连接建立的超时时间为10s
+     */
+    public static final int                CONNECT_TIMEOUT = 10000;
+
+    public static final int                MAX_ROUTE       = 200;
 
     static {
         refresh();
@@ -70,13 +87,13 @@ public class HttpUtils {
             .register("http", PlainConnectionSocketFactory.getSocketFactory())
             .register("https", socketFactory != null ? socketFactory : PlainConnectionSocketFactory.getSocketFactory())
             .build();
-        RequestConfig defaultRequestConfig = RequestConfig.custom().setSocketTimeout(10000).setConnectTimeout(10000)
-            .setConnectionRequestTimeout(10000).build();
+        RequestConfig defaultRequestConfig = RequestConfig.custom().setSocketTimeout(SOCKET_TIMEOUT).setConnectTimeout(CONNECT_TIMEOUT)
+            .setConnectionRequestTimeout(CONNECT_TIMEOUT).build();
 
         cookieStore = new BasicCookieStore();
         PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(registry);
-        cm.setMaxTotal(200);
-        cm.setDefaultMaxPerRoute(200);
+        cm.setMaxTotal(MAX_CONN);
+        cm.setDefaultMaxPerRoute(MAX_ROUTE);
 
         HttpClientBuilder httpClientBuilder =
             HttpClients.custom().setConnectionManager(cm)
@@ -90,6 +107,23 @@ public class HttpUtils {
         }
 
         httpClient = httpClientBuilder.build();
+    }
+
+    public static void initClientContext(String userName, String password, String host) {
+        HttpHost targetHost = new HttpHost(host);
+        CredentialsProvider provider = new BasicCredentialsProvider();
+
+        UsernamePasswordCredentials upc = new UsernamePasswordCredentials(userName, password);
+        provider.setCredentials(AuthScope.ANY, upc);
+
+        AuthCache authCache = new BasicAuthCache();
+        // Generate BASIC scheme object and add it to the local auth cache
+        BasicScheme basicAuth = new BasicScheme();
+        authCache.put(targetHost, basicAuth);
+
+        // Add AuthCache to the execution context
+        CLIENT_CONTEXT.setCredentialsProvider(provider);
+        CLIENT_CONTEXT.setAuthCache(authCache);
     }
 
     public static CloseableHttpClient getProxy(String host, Integer port) {
@@ -166,7 +200,7 @@ public class HttpUtils {
         HttpGet request = new HttpGet(buildUrl(host, path, queries));
         builderHeader(headers, request);
         try {
-            return httpClient.execute(request);
+            return httpClient.execute(request, CLIENT_CONTEXT);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -190,7 +224,7 @@ public class HttpUtils {
             if (StringUtils.isNotBlank(body)) {
                 delete.setEntity(new StringEntity(body, Charset.defaultCharset()));
             }
-            return httpClient.execute(delete);
+            return httpClient.execute(delete, CLIENT_CONTEXT);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -214,7 +248,7 @@ public class HttpUtils {
             if (StringUtils.isNotBlank(body)) {
                 httpPut.setEntity(new StringEntity(body, Charset.defaultCharset()));
             }
-            return httpClient.execute(httpPut);
+            return httpClient.execute(httpPut, CLIENT_CONTEXT);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -252,7 +286,7 @@ public class HttpUtils {
             });
         }
         try {
-            return httpClient.execute(request);
+            return httpClient.execute(request, CLIENT_CONTEXT);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -277,7 +311,7 @@ public class HttpUtils {
             request.setEntity(new StringEntity(body, Charset.defaultCharset()));
         }
         try {
-            return httpClient.execute(request);
+            return httpClient.execute(request, CLIENT_CONTEXT);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -302,7 +336,7 @@ public class HttpUtils {
             request.setEntity(new ByteArrayEntity(body));
         }
         try {
-            return httpClient.execute(request);
+            return httpClient.execute(request, CLIENT_CONTEXT);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
