@@ -2,6 +2,7 @@ package com.luna.common.net;
 
 import com.google.common.collect.ImmutableList;
 import com.luna.common.constant.StrPoolConstant;
+import com.luna.common.net.hander.HttpResponseHandler;
 import com.luna.common.net.method.HttpDelete;
 import com.luna.common.text.CharsetUtil;
 import org.apache.commons.collections4.MapUtils;
@@ -12,11 +13,9 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.*;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
@@ -136,22 +135,6 @@ public class HttpUtils {
             .setDefaultCookieStore(cookieStore).build();
     }
 
-    public static boolean isUrl(String str) {
-        // 转换为小写
-        str = str.toLowerCase();
-        String regex = "^((https|http|ftp|rtsp|mms)?://)" // https、http、ftp、rtsp、mms
-            + "?(([0-9a-z_!~*'().&=+$%-]+: )?[0-9a-z_!~*'().&=+$%-]+@)?" // ftp的user@
-            + "(([0-9]{1,3}\\.){3}[0-9]{1,3}" // IP形式的URL- 例如：199.194.52.184
-            + "|" // 允许IP和DOMAIN（域名）
-            + "([0-9a-z_!~*'()-]+\\.)*" // 域名- www.
-            + "([0-9a-z][0-9a-z-]{0,61})?[0-9a-z]\\." // 二级域名
-            + "[a-z]{2,6})" // first level domain- .com or .museum
-            + "(:[0-9]{1,5})?" // 端口号最大为65535,5位数
-            + "((/?)|" // a slash isn't required if there is no file name
-            + "(/[0-9a-z_!~*'().;?:@&=+$,%#-]+)+/?)$";
-        return str.matches(regex);
-    }
-
     /**
      * 请求头构建
      *
@@ -192,18 +175,41 @@ public class HttpUtils {
      * @param path 路径
      * @param headers 请求头
      * @param queries 请求参数
+     * @param responseHandler 响应处理器
      * @return
      * @throws Exception
      */
-    public static HttpResponse doGet(String host, String path, Map<String, String> headers,
-        Map<String, String> queries) {
+    public static <T> T doGet(String host, String path, Map<String, String> headers,
+        Map<String, String> queries, ResponseHandler<T> responseHandler, Boolean pool) {
+
         HttpGet request = new HttpGet(buildUrl(host, path, queries));
         builderHeader(headers, request);
         try {
-            return httpClient.execute(request, CLIENT_CONTEXT);
+            if (pool){
+                HttpConnectionPoolUtil.getHttpClient(host).execute(request, responseHandler, CLIENT_CONTEXT);
+            }
+            return httpClient.execute(request, responseHandler, CLIENT_CONTEXT);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * 发送 get 请求
+     *
+     * @param host 主机地址
+     * @param path 路径
+     * @param headers 请求头
+     * @param queries 请求参数
+     * @return
+     */
+    public static HttpResponse doGet(String host, String path, Map<String, String> headers,
+        Map<String, String> queries) {
+        return doGet(host, path, headers, queries, new HttpResponseHandler(), false);
+    }
+
+    public static HttpResponse doGet(String host, String path, Map<String, String> headers) {
+        return doGet(host, path, headers, null, new HttpResponseHandler(), false);
     }
 
     /**
@@ -213,18 +219,54 @@ public class HttpUtils {
      * @param path 路径
      * @param headers 请求头
      * @param queries 请求参数
+     * @param responseHandler 响应处理器
      * @param body
      * @return
      */
-    public static HttpResponse doDelete(String host, String path, Map<String, String> headers,
-        Map<String, String> queries, String body) {
+    public static <T> T doDelete(String host, String path, Map<String, String> headers,
+        Map<String, String> queries, String body, ResponseHandler<T> responseHandler, Boolean pool) {
         try {
             HttpDelete delete = new HttpDelete(buildUrl(host, path, queries));
             builderHeader(headers, delete);
             if (StringUtils.isNotBlank(body)) {
                 delete.setEntity(new StringEntity(body, Charset.defaultCharset()));
             }
-            return httpClient.execute(delete, CLIENT_CONTEXT);
+            if (pool){
+                HttpConnectionPoolUtil.getHttpClient(host).execute(delete, responseHandler, CLIENT_CONTEXT);
+            }
+            return httpClient.execute(delete, responseHandler, CLIENT_CONTEXT);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static HttpResponse doDelete(String host, String path, Map<String, String> headers,
+        Map<String, String> queries, String body) {
+        return doDelete(host, path, headers, queries, body, new HttpResponseHandler(), false);
+    }
+
+    /**
+     * PUT 方法请求
+     *
+     * @param host 主机地址
+     * @param path 路径
+     * @param headers 请求头
+     * @param queries 请求参数
+     * @param body 请求体
+     * @return HttpResponse
+     */
+    public static <T> T doPut(String host, String path, Map<String, String> headers,
+        Map<String, String> queries, String body, ResponseHandler<T> responseHandler, Boolean pool) {
+        try {
+            HttpPut httpPut = new HttpPut(buildUrl(host, path, queries));
+            builderHeader(headers, httpPut);
+            if (StringUtils.isNotBlank(body)) {
+                httpPut.setEntity(new StringEntity(body, Charset.defaultCharset()));
+            }
+            if (pool){
+                HttpConnectionPoolUtil.getHttpClient(host).execute(httpPut, responseHandler, CLIENT_CONTEXT);
+            }
+            return httpClient.execute(httpPut, responseHandler, CLIENT_CONTEXT);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -242,16 +284,7 @@ public class HttpUtils {
      */
     public static HttpResponse doPut(String host, String path, Map<String, String> headers,
         Map<String, String> queries, String body) {
-        try {
-            HttpPut httpPut = new HttpPut(buildUrl(host, path, queries));
-            builderHeader(headers, httpPut);
-            if (StringUtils.isNotBlank(body)) {
-                httpPut.setEntity(new StringEntity(body, Charset.defaultCharset()));
-            }
-            return httpClient.execute(httpPut, CLIENT_CONTEXT);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return doPut(host, path, headers, queries, body, new HttpResponseHandler(), false);
     }
 
     /**
@@ -265,8 +298,8 @@ public class HttpUtils {
      * @return HttpResponse
      * @throws Exception 运行时异常
      */
-    public static HttpResponse doPost(String host, String path, Map<String, String> headers,
-        Map<String, String> queries, Map<String, String> bodies) {
+    public static <T> T doPost(String host, String path, Map<String, String> headers,
+        Map<String, String> queries, Map<String, String> bodies, ResponseHandler<T> responseHandler) {
         HttpPost request = new HttpPost(buildUrl(host, path, queries));
         builderHeader(headers, request);
         if (MapUtils.isNotEmpty(bodies)) {
@@ -286,10 +319,15 @@ public class HttpUtils {
             });
         }
         try {
-            return httpClient.execute(request, CLIENT_CONTEXT);
+            return httpClient.execute(request, responseHandler, CLIENT_CONTEXT);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static HttpResponse doPost(String host, String path, Map<String, String> headers,
+        Map<String, String> queries, Map<String, String> bodies) {
+        return doPost(host, path, headers, queries, bodies, new HttpResponseHandler());
     }
 
     /**
@@ -303,18 +341,26 @@ public class HttpUtils {
      * @return HttpResponse
      * @throws RuntimeException
      */
-    public static HttpResponse doPost(String host, String path, Map<String, String> headers,
-        Map<String, String> queries, String body) {
+    public static <T> T doPost(String host, String path, Map<String, String> headers,
+        Map<String, String> queries, String body, ResponseHandler<T> responseHandler, Boolean pool) {
         HttpPost request = new HttpPost(buildUrl(host, path, queries));
         builderHeader(headers, request);
         if (StringUtils.isNotBlank(body)) {
             request.setEntity(new StringEntity(body, Charset.defaultCharset()));
         }
         try {
-            return httpClient.execute(request, CLIENT_CONTEXT);
+            if (pool){
+                return HttpConnectionPoolUtil.getHttpClient(host).execute(request, responseHandler, CLIENT_CONTEXT);
+            }
+            return httpClient.execute(request, responseHandler, CLIENT_CONTEXT);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static HttpResponse doPost(String host, String path, Map<String, String> headers,
+        Map<String, String> queries, String body) {
+        return doPost(host, path, headers, queries, body, new HttpResponseHandler(), false);
     }
 
     /**
@@ -328,18 +374,45 @@ public class HttpUtils {
      * @return HttpResponse
      * @throws RuntimeException
      */
-    public static HttpResponse doPost(String host, String path, Map<String, String> headers,
-        Map<String, String> queries, byte[] body) {
+    public static <T> T doPost(String host, String path, Map<String, String> headers,
+        Map<String, String> queries, byte[] body, ResponseHandler<T> responseHandler, Boolean pool) {
         HttpPost request = new HttpPost(buildUrl(host, path, queries));
         builderHeader(headers, request);
         if (ObjectUtils.isNotEmpty(body)) {
             request.setEntity(new ByteArrayEntity(body));
         }
         try {
-            return httpClient.execute(request, CLIENT_CONTEXT);
+            if (pool){
+                return HttpConnectionPoolUtil.getHttpClient(host).execute(request, responseHandler, CLIENT_CONTEXT);
+            }
+            return httpClient.execute(request, responseHandler, CLIENT_CONTEXT);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static HttpResponse doPost(String host, String path, Map<String, String> headers,
+        Map<String, String> queries, byte[] body) {
+        return doPost(host, path, headers, queries, body, new HttpResponseHandler(), false);
+    }
+
+    public static boolean isUrl(String url) {
+        // 转换为小写
+        url = url.toLowerCase();
+        // https、http、ftp、rtsp、mms
+        String regex = "^((https|http|ftp|rtsp|mms)?://)"
+                // ftp的user@
+                + "?(([0-9a-z_!~*'().&=+$%-]+: )?[0-9a-z_!~*'().&=+$%-]+@)?"
+                // IP形式的URL- 例如：199.194.52.184
+                + "(([0-9]{1,3}\\.){3}[0-9]{1,3}"
+                + "|" // 允许IP和DOMAIN（域名）
+                + "([0-9a-z_!~*'()-]+\\.)*" // 域名- www.
+                + "([0-9a-z][0-9a-z-]{0,61})?[0-9a-z]\\." // 二级域名
+                + "[a-z]{2,6})" // first level domain- .com or .museum
+                + "(:[0-9]{1,5})?" // 端口号最大为65535,5位数
+                + "((/?)|" // a slash isn't required if there is no file name
+                + "(/[0-9a-z_!~*'().;?:@&=+$,%#-]+)+/?)$";
+        return url.matches(regex);
     }
 
     /**
