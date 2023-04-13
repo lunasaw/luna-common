@@ -166,7 +166,7 @@ public class HttpConnectionPoolUtil {
                 // 关闭5s空闲的连接
                 finalManager.closeIdleConnections(HttpUtils.SOCKET_TIMEOUT, TimeUnit.MILLISECONDS);
             }
-        }, 0, 50, TimeUnit.MILLISECONDS);
+        }, 20, 50, TimeUnit.MILLISECONDS);
         CONCURRENT_MANAGER_MAP.put(host, manager);
         return client;
     }
@@ -210,6 +210,11 @@ public class HttpConnectionPoolUtil {
     public static <T> T doPut(String host, String path, Map<String, String> headers,
         Map<String, String> queries, String body, ResponseHandler<T> responseHandler) {
         return HttpUtils.doPut(host, path, headers, queries, body, responseHandler, true);
+    }
+
+    public static <T> T doPost(String host, String path, Map<String, String> headers,
+        Map<String, String> queries, Map<String, String> bodies, ResponseHandler<T> responseHandler) {
+        return HttpUtils.doPost(host, path, headers, queries, bodies, responseHandler, true);
     }
 
     /**

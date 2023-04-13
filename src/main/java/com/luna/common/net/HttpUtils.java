@@ -30,10 +30,12 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.auth.DigestScheme;
 import org.apache.http.impl.client.*;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.util.EntityUtils;
+import org.omg.CORBA.TIMEOUT;
 
 import javax.net.ssl.SSLContext;
 import java.io.File;
@@ -108,7 +110,22 @@ public class HttpUtils {
         httpClient = httpClientBuilder.build();
     }
 
-    public static void initClientContext(String userName, String password, String host) {
+    public static void initClientContextBasic(String userName, String password, String host) {
+        initClientContext(userName, password, host, "basic");
+    }
+
+    public static void initClientContextDigest(String userName, String password, String host) {
+        initClientContext(userName, password, host, "digest");
+    }
+
+    /**
+     * 需要用户名basic 验证
+     * 
+     * @param userName
+     * @param password
+     * @param host
+     */
+    public static void initClientContext(String userName, String password, String host, String authType) {
         HttpHost targetHost = new HttpHost(host);
         CredentialsProvider provider = new BasicCredentialsProvider();
 
@@ -117,20 +134,32 @@ public class HttpUtils {
 
         AuthCache authCache = new BasicAuthCache();
         // Generate BASIC scheme object and add it to the local auth cache
-        BasicScheme basicAuth = new BasicScheme();
-        authCache.put(targetHost, basicAuth);
+        BasicScheme basicScheme = new BasicScheme();
+        DigestScheme digestScheme = new DigestScheme();
+        if (basicScheme.getSchemeName().equals(authType)) {
+            authCache.put(targetHost, basicScheme);
+        } else if (digestScheme.getSchemeName().equals(authType)) {
+            authCache.put(targetHost, digestScheme);
+        }
 
         // Add AuthCache to the execution context
         CLIENT_CONTEXT.setCredentialsProvider(provider);
         CLIENT_CONTEXT.setAuthCache(authCache);
     }
 
+    /**
+     * 使用代理访问
+     * 
+     * @param host 代理地址
+     * @param port 代理端口
+     * @return
+     */
     public static CloseableHttpClient getProxy(String host, Integer port) {
         // for proxy debug
         HttpHost proxy = new HttpHost(host, port);
         RequestConfig defaultRequestConfig =
-            RequestConfig.custom().setProxy(proxy).setSocketTimeout(10000).setConnectTimeout(10000)
-                .setConnectionRequestTimeout(10000).build();
+            RequestConfig.custom().setProxy(proxy).setSocketTimeout(CONNECT_TIMEOUT).setConnectTimeout(CONNECT_TIMEOUT)
+                .setConnectionRequestTimeout(CONNECT_TIMEOUT).build();
         return HttpClients.custom().setDefaultRequestConfig(defaultRequestConfig)
             .setDefaultCookieStore(cookieStore).build();
     }
@@ -185,7 +214,7 @@ public class HttpUtils {
         HttpGet request = new HttpGet(buildUrl(host, path, queries));
         builderHeader(headers, request);
         try {
-            if (pool){
+            if (pool) {
                 HttpConnectionPoolUtil.getHttpClient(host).execute(request, responseHandler, CLIENT_CONTEXT);
             }
             return httpClient.execute(request, responseHandler, CLIENT_CONTEXT);
@@ -231,7 +260,7 @@ public class HttpUtils {
             if (StringUtils.isNotBlank(body)) {
                 delete.setEntity(new StringEntity(body, Charset.defaultCharset()));
             }
-            if (pool){
+            if (pool) {
                 HttpConnectionPoolUtil.getHttpClient(host).execute(delete, responseHandler, CLIENT_CONTEXT);
             }
             return httpClient.execute(delete, responseHandler, CLIENT_CONTEXT);
@@ -257,14 +286,15 @@ public class HttpUtils {
      */
     public static <T> T doPut(String host, String path, Map<String, String> headers,
         Map<String, String> queries, String body, ResponseHandler<T> responseHandler, Boolean pool) {
+
+        HttpPut httpPut = new HttpPut(buildUrl(host, path, queries));
+        builderHeader(headers, httpPut);
+        if (StringUtils.isNotBlank(body)) {
+            httpPut.setEntity(new StringEntity(body, Charset.defaultCharset()));
+        }
         try {
-            HttpPut httpPut = new HttpPut(buildUrl(host, path, queries));
-            builderHeader(headers, httpPut);
-            if (StringUtils.isNotBlank(body)) {
-                httpPut.setEntity(new StringEntity(body, Charset.defaultCharset()));
-            }
-            if (pool){
-                HttpConnectionPoolUtil.getHttpClient(host).execute(httpPut, responseHandler, CLIENT_CONTEXT);
+            if (pool) {
+                return HttpConnectionPoolUtil.getHttpClient(host).execute(httpPut, responseHandler, CLIENT_CONTEXT);
             }
             return httpClient.execute(httpPut, responseHandler, CLIENT_CONTEXT);
         } catch (IOException e) {
@@ -299,7 +329,7 @@ public class HttpUtils {
      * @throws Exception 运行时异常
      */
     public static <T> T doPost(String host, String path, Map<String, String> headers,
-        Map<String, String> queries, Map<String, String> bodies, ResponseHandler<T> responseHandler) {
+        Map<String, String> queries, Map<String, String> bodies, ResponseHandler<T> responseHandler, Boolean pool) {
         HttpPost request = new HttpPost(buildUrl(host, path, queries));
         builderHeader(headers, request);
         if (MapUtils.isNotEmpty(bodies)) {
@@ -310,7 +340,7 @@ public class HttpUtils {
                 // 设置浏览器兼容模式
                 builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
                 // 设置请求的编码格式
-                builder.setCharset(Consts.UTF_8);
+                builder.setCharset(CharsetUtil.defaultCharset());
                 builder.setContentType(ContentType.MULTIPART_FORM_DATA);
                 // 添加文件
                 builder.addBinaryBody(k, file);
@@ -319,6 +349,9 @@ public class HttpUtils {
             });
         }
         try {
+            if (pool) {
+                return HttpConnectionPoolUtil.getHttpClient(host).execute(request, responseHandler, CLIENT_CONTEXT);
+            }
             return httpClient.execute(request, responseHandler, CLIENT_CONTEXT);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -327,7 +360,7 @@ public class HttpUtils {
 
     public static HttpResponse doPost(String host, String path, Map<String, String> headers,
         Map<String, String> queries, Map<String, String> bodies) {
-        return doPost(host, path, headers, queries, bodies, new HttpResponseHandler());
+        return doPost(host, path, headers, queries, bodies, new HttpResponseHandler(), false);
     }
 
     /**
@@ -349,7 +382,7 @@ public class HttpUtils {
             request.setEntity(new StringEntity(body, Charset.defaultCharset()));
         }
         try {
-            if (pool){
+            if (pool) {
                 return HttpConnectionPoolUtil.getHttpClient(host).execute(request, responseHandler, CLIENT_CONTEXT);
             }
             return httpClient.execute(request, responseHandler, CLIENT_CONTEXT);
@@ -382,7 +415,7 @@ public class HttpUtils {
             request.setEntity(new ByteArrayEntity(body));
         }
         try {
-            if (pool){
+            if (pool) {
                 return HttpConnectionPoolUtil.getHttpClient(host).execute(request, responseHandler, CLIENT_CONTEXT);
             }
             return httpClient.execute(request, responseHandler, CLIENT_CONTEXT);
@@ -401,17 +434,17 @@ public class HttpUtils {
         url = url.toLowerCase();
         // https、http、ftp、rtsp、mms
         String regex = "^((https|http|ftp|rtsp|mms)?://)"
-                // ftp的user@
-                + "?(([0-9a-z_!~*'().&=+$%-]+: )?[0-9a-z_!~*'().&=+$%-]+@)?"
-                // IP形式的URL- 例如：199.194.52.184
-                + "(([0-9]{1,3}\\.){3}[0-9]{1,3}"
-                + "|" // 允许IP和DOMAIN（域名）
-                + "([0-9a-z_!~*'()-]+\\.)*" // 域名- www.
-                + "([0-9a-z][0-9a-z-]{0,61})?[0-9a-z]\\." // 二级域名
-                + "[a-z]{2,6})" // first level domain- .com or .museum
-                + "(:[0-9]{1,5})?" // 端口号最大为65535,5位数
-                + "((/?)|" // a slash isn't required if there is no file name
-                + "(/[0-9a-z_!~*'().;?:@&=+$,%#-]+)+/?)$";
+            // ftp的user@
+            + "?(([0-9a-z_!~*'().&=+$%-]+: )?[0-9a-z_!~*'().&=+$%-]+@)?"
+            // IP形式的URL- 例如：199.194.52.184
+            + "(([0-9]{1,3}\\.){3}[0-9]{1,3}"
+            + "|" // 允许IP和DOMAIN（域名）
+            + "([0-9a-z_!~*'()-]+\\.)*" // 域名- www.
+            + "([0-9a-z][0-9a-z-]{0,61})?[0-9a-z]\\." // 二级域名
+            + "[a-z]{2,6})" // first level domain- .com or .museum
+            + "(:[0-9]{1,5})?" // 端口号最大为65535,5位数
+            + "((/?)|" // a slash isn't required if there is no file name
+            + "(/[0-9a-z_!~*'().;?:@&=+$,%#-]+)+/?)$";
         return url.matches(regex);
     }
 
@@ -540,8 +573,8 @@ public class HttpUtils {
             try {
                 if (ObjectUtils.isNotEmpty(k) && ObjectUtils.isNotEmpty(v)) {
                     sb.append(String.format("%s=%s",
-                        URLEncoder.encode(k.toString(), CharsetUtil.UTF_8),
-                        URLEncoder.encode(v.toString(), CharsetUtil.UTF_8)));
+                        URLEncoder.encode(k.toString(), CharsetUtil.defaultCharsetName()),
+                        URLEncoder.encode(v.toString(), CharsetUtil.defaultCharsetName())));
                 }
                 sb.append("&");
             } catch (UnsupportedEncodingException e) {
