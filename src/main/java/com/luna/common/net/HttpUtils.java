@@ -217,6 +217,9 @@ public class HttpUtils {
             if (pool) {
                 HttpConnectionPoolUtil.getHttpClient(host).execute(request, responseHandler, CLIENT_CONTEXT);
             }
+            if (responseHandler == null){
+                return (T) httpClient.execute(request, CLIENT_CONTEXT);
+            }
             return httpClient.execute(request, responseHandler, CLIENT_CONTEXT);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -234,11 +237,11 @@ public class HttpUtils {
      */
     public static HttpResponse doGet(String host, String path, Map<String, String> headers,
         Map<String, String> queries) {
-        return doGet(host, path, headers, queries, new HttpResponseHandler(), false);
+        return doGet(host, path, headers, queries, null, false);
     }
 
     public static HttpResponse doGet(String host, String path, Map<String, String> headers) {
-        return doGet(host, path, headers, null, new HttpResponseHandler(), false);
+        return doGet(host, path, headers, null, null, false);
     }
 
     /**
@@ -263,6 +266,9 @@ public class HttpUtils {
             if (pool) {
                 HttpConnectionPoolUtil.getHttpClient(host).execute(delete, responseHandler, CLIENT_CONTEXT);
             }
+            if (responseHandler == null){
+                return (T) httpClient.execute(delete, CLIENT_CONTEXT);
+            }
             return httpClient.execute(delete, responseHandler, CLIENT_CONTEXT);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -271,7 +277,7 @@ public class HttpUtils {
 
     public static HttpResponse doDelete(String host, String path, Map<String, String> headers,
         Map<String, String> queries, String body) {
-        return doDelete(host, path, headers, queries, body, new HttpResponseHandler(), false);
+        return doDelete(host, path, headers, queries, body, null, false);
     }
 
     /**
@@ -296,6 +302,9 @@ public class HttpUtils {
             if (pool) {
                 return HttpConnectionPoolUtil.getHttpClient(host).execute(httpPut, responseHandler, CLIENT_CONTEXT);
             }
+            if (responseHandler == null){
+                return (T) httpClient.execute(httpPut, CLIENT_CONTEXT);
+            }
             return httpClient.execute(httpPut, responseHandler, CLIENT_CONTEXT);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -314,7 +323,7 @@ public class HttpUtils {
      */
     public static HttpResponse doPut(String host, String path, Map<String, String> headers,
         Map<String, String> queries, String body) {
-        return doPut(host, path, headers, queries, body, new HttpResponseHandler(), false);
+        return doPut(host, path, headers, queries, body, null, false);
     }
 
     /**
@@ -352,6 +361,9 @@ public class HttpUtils {
             if (pool) {
                 return HttpConnectionPoolUtil.getHttpClient(host).execute(request, responseHandler, CLIENT_CONTEXT);
             }
+            if (responseHandler == null){
+                return (T) httpClient.execute(request, CLIENT_CONTEXT);
+            }
             return httpClient.execute(request, responseHandler, CLIENT_CONTEXT);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -360,7 +372,7 @@ public class HttpUtils {
 
     public static HttpResponse doPost(String host, String path, Map<String, String> headers,
         Map<String, String> queries, Map<String, String> bodies) {
-        return doPost(host, path, headers, queries, bodies, new HttpResponseHandler(), false);
+        return doPost(host, path, headers, queries, bodies, null, false);
     }
 
     /**
@@ -385,6 +397,9 @@ public class HttpUtils {
             if (pool) {
                 return HttpConnectionPoolUtil.getHttpClient(host).execute(request, responseHandler, CLIENT_CONTEXT);
             }
+            if (responseHandler == null){
+                return (T) httpClient.execute(request, CLIENT_CONTEXT);
+            }
             return httpClient.execute(request, responseHandler, CLIENT_CONTEXT);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -393,7 +408,7 @@ public class HttpUtils {
 
     public static HttpResponse doPost(String host, String path, Map<String, String> headers,
         Map<String, String> queries, String body) {
-        return doPost(host, path, headers, queries, body, new HttpResponseHandler(), false);
+        return doPost(host, path, headers, queries, body, null, false);
     }
 
     /**
@@ -418,6 +433,9 @@ public class HttpUtils {
             if (pool) {
                 return HttpConnectionPoolUtil.getHttpClient(host).execute(request, responseHandler, CLIENT_CONTEXT);
             }
+            if (responseHandler == null){
+                return (T) httpClient.execute(request, CLIENT_CONTEXT);
+            }
             return httpClient.execute(request, responseHandler, CLIENT_CONTEXT);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -426,7 +444,7 @@ public class HttpUtils {
 
     public static HttpResponse doPost(String host, String path, Map<String, String> headers,
         Map<String, String> queries, byte[] body) {
-        return doPost(host, path, headers, queries, body, new HttpResponseHandler(), false);
+        return doPost(host, path, headers, queries, body, null, false);
     }
 
     public static boolean isUrl(String url) {
