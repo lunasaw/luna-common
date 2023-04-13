@@ -8,7 +8,7 @@
 
 # Use
 
-[文档链接](https://lunasaw.github.io/luna-common/docs/)
+[文档链接](https://lunasaw.github.io/luna-common/docs/){:target="_blank"}
 
 ```xml
 
