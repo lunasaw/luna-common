@@ -11,6 +11,7 @@ import org.apache.hc.client5.http.auth.*;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.cookie.BasicCookieStore;
 import org.apache.hc.client5.http.cookie.StandardCookieSpec;
@@ -69,11 +70,13 @@ public class HttpUtils {
     /**
      * 设置连接建立的超时时间为10s
      */
-    public static final int                   CONNECT_TIMEOUT  = 10000;
+    public static final int                   CONNECT_TIMEOUT  = 10;
 
-    public static final int                   RESPONSE_TIMEOUT = 10000;
+    public static final int                   RESPONSE_TIMEOUT = 30;
 
     public static final int                   MAX_ROUTE        = 200;
+
+    public static final int                   SOCKET_TIME_OUT  = 10;
 
     static {
         init();
@@ -96,14 +99,16 @@ public class HttpUtils {
         RequestConfig defaultRequestConfig = RequestConfig.custom()
             .setCookieSpec(StandardCookieSpec.STRICT)
             .setMaxRedirects(MAX_REDIRECTS)
-            .setResponseTimeout(RESPONSE_TIMEOUT, TimeUnit.MILLISECONDS)
-            .setConnectionRequestTimeout(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS)
+            .setResponseTimeout(RESPONSE_TIMEOUT, TimeUnit.SECONDS)
+            .setConnectionRequestTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
             .build();
 
         PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(registry);
         cm.setMaxTotal(MAX_CONN);
         cm.setDefaultMaxPerRoute(MAX_ROUTE);
-        cm.setDefaultSocketConfig(SocketConfig.DEFAULT);
+        cm.setDefaultSocketConfig(SocketConfig.custom()
+            .setSoTimeout(SOCKET_TIME_OUT, TimeUnit.SECONDS)
+            .build());
 
         if (httpClientBuilder == null) {
             httpClientBuilder = HttpClients.custom();
@@ -128,7 +133,7 @@ public class HttpUtils {
 
     /**
      * 需要用户名basic 验证
-     * 
+     *
      * @param userName
      * @param password
      * @param host
@@ -166,7 +171,7 @@ public class HttpUtils {
 
     /**
      * 使用代理访问
-     * 
+     *
      * @param host 代理地址
      * @param port 代理端口
      * @return
@@ -187,7 +192,7 @@ public class HttpUtils {
      * @param headers
      * @param requestBase
      */
-    private static void builderHeader(Map<String, String> headers, BasicClassicHttpRequest requestBase) {
+    public static void builderHeader(Map<String, String> headers, BasicClassicHttpRequest requestBase) {
         if (MapUtils.isEmpty(headers)) {
             return;
         }
@@ -203,11 +208,22 @@ public class HttpUtils {
     }
 
     public static void addCookie(List<Cookie> cookies) {
-        cookies.forEach(cookie -> cookieStore.addCookie(cookie));
+        cookies.forEach(cookieStore::addCookie);
     }
 
     public static void addCookie(Cookie... cookies) {
-        Arrays.stream(cookies).forEach(cookie -> cookieStore.addCookie(cookie));
+        Arrays.stream(cookies).forEach(cookieStore::addCookie);
+    }
+
+    private static <T> T doRequest(HttpClientResponseHandler<T> responseHandler, HttpUriRequestBase request) {
+        try {
+            if (responseHandler == null) {
+                return (T) httpClient.execute(request, CLIENT_CONTEXT);
+            }
+            return httpClient.execute(request, CLIENT_CONTEXT, responseHandler);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -226,14 +242,7 @@ public class HttpUtils {
 
         HttpGet request = new HttpGet(buildUrl(host, path, queries));
         builderHeader(headers, request);
-        try {
-            if (responseHandler == null) {
-                return (T)httpClient.execute(request, CLIENT_CONTEXT);
-            }
-            return httpClient.execute(request, CLIENT_CONTEXT, responseHandler);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return doRequest(responseHandler, request);
     }
 
     /**
@@ -267,19 +276,12 @@ public class HttpUtils {
      */
     public static <T> T doDelete(String host, String path, Map<String, String> headers,
         Map<String, String> queries, String body, HttpClientResponseHandler<T> responseHandler) {
-        try {
-            HttpDelete delete = new HttpDelete(buildUrl(host, path, queries));
-            builderHeader(headers, delete);
-            if (StringUtils.isNotBlank(body)) {
-                delete.setEntity(new StringEntity(body, Charset.defaultCharset()));
-            }
-            if (responseHandler == null) {
-                return (T)httpClient.execute(delete, CLIENT_CONTEXT);
-            }
-            return httpClient.execute(delete, CLIENT_CONTEXT, responseHandler);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        HttpDelete delete = new HttpDelete(buildUrl(host, path, queries));
+        builderHeader(headers, delete);
+        if (StringUtils.isNotBlank(body)) {
+            delete.setEntity(new StringEntity(body, Charset.defaultCharset()));
         }
+        return doRequest(responseHandler, delete);
     }
 
     public static String doDeleteHandler(String host, String path, Map<String, String> headers,
@@ -310,14 +312,7 @@ public class HttpUtils {
         if (StringUtils.isNotBlank(body)) {
             httpPut.setEntity(new StringEntity(body, Charset.defaultCharset()));
         }
-        try {
-            if (responseHandler == null) {
-                return (T)httpClient.execute(httpPut, CLIENT_CONTEXT);
-            }
-            return httpClient.execute(httpPut, CLIENT_CONTEXT, responseHandler);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return doRequest(responseHandler, httpPut);
     }
 
     /**
@@ -371,14 +366,7 @@ public class HttpUtils {
                 request.setEntity(reqEntity);
             });
         }
-        try {
-            if (responseHandler == null) {
-                return (T)httpClient.execute(request, CLIENT_CONTEXT);
-            }
-            return httpClient.execute(request, CLIENT_CONTEXT, responseHandler);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return doRequest(responseHandler, request);
     }
 
     public static ClassicHttpResponse doPost(String host, String path, Map<String, String> headers,
@@ -404,14 +392,7 @@ public class HttpUtils {
         if (StringUtils.isNotBlank(body)) {
             request.setEntity(new StringEntity(body, Charset.defaultCharset()));
         }
-        try {
-            if (responseHandler == null) {
-                return (T)httpClient.execute(request, CLIENT_CONTEXT);
-            }
-            return httpClient.execute(request, CLIENT_CONTEXT, responseHandler);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return doRequest(responseHandler, request);
     }
 
     public static ClassicHttpResponse doPost(String host, String path, Map<String, String> headers,
@@ -442,15 +423,7 @@ public class HttpUtils {
         if (ObjectUtils.isNotEmpty(body)) {
             request.setEntity(new ByteArrayEntity(body, ContentType.APPLICATION_OCTET_STREAM));
         }
-        try {
-
-            if (responseHandler == null) {
-                return (T)httpClient.execute(request, CLIENT_CONTEXT);
-            }
-            return httpClient.execute(request, CLIENT_CONTEXT, responseHandler);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return doRequest(responseHandler, request);
     }
 
     public static HttpResponse doPost(String host, String path, Map<String, String> headers,
