@@ -1,13 +1,8 @@
 package com.luna.common.net;
 
 import java.util.Map;
-
-import com.luna.common.text.MapTools;
-
 import com.google.common.collect.Maps;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.hc.core5.http.ClassicHttpResponse;
-import org.apache.hc.core5.http.HttpResponse;
 
 /**
  * @author Luna

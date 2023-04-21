@@ -17,6 +17,7 @@
 package com.luna.common.net.hander;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.hc.client5.http.impl.classic.AbstractHttpClientResponseHandler;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.HttpStatus;
@@ -29,7 +30,7 @@ import org.apache.hc.core5.http.io.HttpClientResponseHandler;
  * @author luna
  */
 @Slf4j
-public abstract class ValidatingResponseHandler<T> implements HttpClientResponseHandler<T> {
+public abstract class ValidatingResponseHandler<T> extends AbstractHttpClientResponseHandler<T> {
 
     /**
      * Checks the response for a statuscode between {@link HttpStatus#SC_OK} and {@link HttpStatus#SC_MULTIPLE_CHOICES}

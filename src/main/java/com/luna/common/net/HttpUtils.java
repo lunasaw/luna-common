@@ -54,13 +54,13 @@ import java.util.concurrent.TimeUnit;
  */
 public class HttpUtils {
 
-    private static final HttpClientContext    CLIENT_CONTEXT   = HttpClientContext.create();
+    private static HttpClientContext          CLIENT_CONTEXT   = HttpClientContext.create();
     private static final int                  MAX_REDIRECTS    = 10;
     private static CloseableHttpClient        httpClient;
 
     private static volatile HttpClientBuilder httpClientBuilder;
 
-    private static BasicCookieStore           cookieStore      = new BasicCookieStore();
+    private static final BasicCookieStore     cookieStore      = new BasicCookieStore();
 
     /**
      * 最大连接数
@@ -118,12 +118,12 @@ public class HttpUtils {
         httpClient = httpClientBuilder.build();
     }
 
-    public static void initClientContextBasic(String userName, String password, String host) {
-        initClientContext(userName, password, host, StandardAuthScheme.BASIC);
+    public static void basicAuth(String userName, String password, String host) {
+        authContext(userName, password, host, StandardAuthScheme.BASIC);
     }
 
-    public static void initClientContextDigest(String userName, String password, String host) {
-        initClientContext(userName, password, host, StandardAuthScheme.DIGEST);
+    public static void digestAuth(String userName, String password, String host) {
+        authContext(userName, password, host, StandardAuthScheme.DIGEST);
     }
 
     /**
@@ -133,23 +133,34 @@ public class HttpUtils {
      * @param password
      * @param host
      */
-    public static void initClientContext(String userName, String password, String host, String authType) {
-        HttpHost targetHost = new HttpHost(host);
-        AuthScope authScope = new AuthScope(targetHost);
-        CredentialsProvider build = CredentialsProviderBuilder.create().add(authScope, userName, password.toCharArray()).build();
+    public static void authContext(String userName, String password, String host, String authType) {
+        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(userName, password.toCharArray());
+        BasicCredentialsProvider credsProvider = new BasicCredentialsProvider();
 
-        AuthCache authCache = new BasicAuthCache();
-        // Generate BASIC scheme object and add it to the local auth cache
-        BasicScheme basicScheme = new BasicScheme();
-        DigestScheme digestScheme = new DigestScheme();
-        if (basicScheme.getName().equals(authType)) {
-            authCache.put(targetHost, basicScheme);
-        } else if (digestScheme.getName().equals(authType)) {
-            authCache.put(targetHost, digestScheme);
+        AuthScope authScope = new AuthScope(null, -1);
+
+        AuthCache authCache = CLIENT_CONTEXT.getAuthCache();
+
+        if (StringUtils.isNotEmpty(host)) {
+            HttpHost targetHost = new HttpHost(host);
+
+            if (authCache == null) {
+                authCache = new BasicAuthCache();
+            }
+
+            if (StandardAuthScheme.BASIC.equals(authType)) {
+                BasicScheme basicScheme = new BasicScheme();
+                authCache.put(targetHost, basicScheme);
+                basicScheme.initPreemptive(credentials);
+            } else if (StandardAuthScheme.DIGEST.equals(authType)) {
+                DigestScheme digestScheme = new DigestScheme();
+                authCache.put(targetHost, digestScheme);
+            }
         }
+        credsProvider.setCredentials(authScope, credentials);
 
         // Add AuthCache to the execution context
-        CLIENT_CONTEXT.setCredentialsProvider(build);
+        CLIENT_CONTEXT.setCredentialsProvider(credsProvider);
         CLIENT_CONTEXT.setAuthCache(authCache);
     }
 
