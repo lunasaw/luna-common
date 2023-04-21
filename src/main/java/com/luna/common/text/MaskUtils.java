@@ -1,12 +1,7 @@
 package com.luna.common.text;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
-import org.apache.commons.validator.routines.EmailValidator;
 
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author Luna
@@ -25,19 +20,6 @@ public class MaskUtils {
     /** 11位整数支持 */
     private static final String ELEVEN_NUMBER                     = "\\d{11}";
 
-    /**
-     * 判断外标是不是个邮箱
-     *
-     * @param email 邮箱
-     * @return
-     */
-    public static boolean isEmailAddress(String email) {
-        if (StringUtils.isBlank(email)) {
-            return false;
-        }
-        EmailValidator validator = EmailValidator.getInstance();
-        return validator.isValid(email);
-    }
 
     /**
      * 判断是不是邮箱.

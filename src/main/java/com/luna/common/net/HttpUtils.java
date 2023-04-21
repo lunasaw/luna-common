@@ -2,40 +2,43 @@ package com.luna.common.net;
 
 import com.google.common.collect.ImmutableList;
 import com.luna.common.constant.StrPoolConstant;
-import com.luna.common.net.hander.HttpResponseHandler;
 import com.luna.common.net.method.HttpDelete;
 import com.luna.common.text.CharsetUtil;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.*;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.AuthCache;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.*;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustStrategy;
-import org.apache.http.cookie.Cookie;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.auth.DigestScheme;
-import org.apache.http.impl.client.*;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.ssl.SSLContextBuilder;
-import org.apache.http.util.EntityUtils;
-import org.omg.CORBA.TIMEOUT;
+import org.apache.hc.client5.http.auth.*;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.cookie.BasicCookieStore;
+import org.apache.hc.client5.http.cookie.StandardCookieSpec;
+import org.apache.hc.client5.http.impl.auth.*;
+import org.apache.hc.client5.http.impl.classic.BasicHttpClientResponseHandler;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.routing.DefaultProxyRoutePlanner;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.config.Registry;
+import org.apache.hc.core5.http.config.RegistryBuilder;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+
+import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
+import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
+import org.apache.hc.client5.http.cookie.Cookie;
+import org.apache.hc.client5.http.entity.mime.HttpMultipartMode;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.core5.http.io.HttpClientResponseHandler;
+import org.apache.hc.core5.http.io.SocketConfig;
+import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.message.BasicClassicHttpRequest;
+import org.apache.hc.core5.ssl.SSLContextBuilder;
 
 import javax.net.ssl.SSLContext;
 import java.io.File;
@@ -44,42 +47,43 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Luna
  */
 public class HttpUtils {
 
-    private static final HttpClientContext CLIENT_CONTEXT  = HttpClientContext.create();
-    private static CloseableHttpClient     httpClient;
+    private static final HttpClientContext    CLIENT_CONTEXT   = HttpClientContext.create();
+    private static final int                  MAX_REDIRECTS    = 10;
+    private static CloseableHttpClient        httpClient;
 
-    private static BasicCookieStore        cookieStore;
+    private static volatile HttpClientBuilder httpClientBuilder;
 
-    private static HttpHost                proxy;
+    private static BasicCookieStore           cookieStore      = new BasicCookieStore();
 
     /**
      * 最大连接数
      */
-    public static final int                MAX_CONN        = 200;
-
-    public static final int                SOCKET_TIMEOUT  = 5000;
+    public static final int                   MAX_CONN         = 200;
     /**
      * 设置连接建立的超时时间为10s
      */
-    public static final int                CONNECT_TIMEOUT = 10000;
+    public static final int                   CONNECT_TIMEOUT  = 10000;
 
-    public static final int                MAX_ROUTE       = 200;
+    public static final int                   RESPONSE_TIMEOUT = 10000;
+
+    public static final int                   MAX_ROUTE        = 200;
 
     static {
-        refresh();
+        init();
     }
 
-    public static void refresh() {
+    public static void init() {
         SSLConnectionSocketFactory socketFactory = null;
         try {
             // 信任所有
-            SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null,
-                (TrustStrategy)(chain, authType) -> true).build();
+            SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, (chain, authType) -> true).build();
             socketFactory = new SSLConnectionSocketFactory(sslContext);
         } catch (Exception e) {
             e.printStackTrace();
@@ -88,34 +92,38 @@ public class HttpUtils {
             .register("http", PlainConnectionSocketFactory.getSocketFactory())
             .register("https", socketFactory != null ? socketFactory : PlainConnectionSocketFactory.getSocketFactory())
             .build();
-        RequestConfig defaultRequestConfig = RequestConfig.custom().setSocketTimeout(SOCKET_TIMEOUT).setConnectTimeout(CONNECT_TIMEOUT)
-            .setConnectionRequestTimeout(CONNECT_TIMEOUT).build();
 
-        cookieStore = new BasicCookieStore();
+        RequestConfig defaultRequestConfig = RequestConfig.custom()
+            .setCookieSpec(StandardCookieSpec.STRICT)
+            .setMaxRedirects(MAX_REDIRECTS)
+            .setResponseTimeout(RESPONSE_TIMEOUT, TimeUnit.MILLISECONDS)
+            .setConnectionRequestTimeout(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS)
+            .build();
+
         PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(registry);
         cm.setMaxTotal(MAX_CONN);
         cm.setDefaultMaxPerRoute(MAX_ROUTE);
+        cm.setDefaultSocketConfig(SocketConfig.DEFAULT);
 
-        HttpClientBuilder httpClientBuilder =
-            HttpClients.custom().setConnectionManager(cm)
-                .setDefaultRequestConfig(defaultRequestConfig);
-
-        if (cookieStore != null) {
-            httpClientBuilder.setDefaultCookieStore(cookieStore);
+        if (httpClientBuilder == null) {
+            httpClientBuilder = HttpClients.custom();
         }
-        if (proxy != null) {
-            httpClientBuilder.setProxy(proxy);
-        }
+        httpClientBuilder.setConnectionManager(cm)
+            .setDefaultRequestConfig(defaultRequestConfig).setDefaultCookieStore(cookieStore);
 
         httpClient = httpClientBuilder.build();
     }
 
+    public static void refresh() {
+        httpClient = httpClientBuilder.build();
+    }
+
     public static void initClientContextBasic(String userName, String password, String host) {
-        initClientContext(userName, password, host, "basic");
+        initClientContext(userName, password, host, StandardAuthScheme.BASIC);
     }
 
     public static void initClientContextDigest(String userName, String password, String host) {
-        initClientContext(userName, password, host, "digest");
+        initClientContext(userName, password, host, StandardAuthScheme.DIGEST);
     }
 
     /**
@@ -127,23 +135,21 @@ public class HttpUtils {
      */
     public static void initClientContext(String userName, String password, String host, String authType) {
         HttpHost targetHost = new HttpHost(host);
-        CredentialsProvider provider = new BasicCredentialsProvider();
-
-        UsernamePasswordCredentials upc = new UsernamePasswordCredentials(userName, password);
-        provider.setCredentials(AuthScope.ANY, upc);
+        AuthScope authScope = new AuthScope(targetHost);
+        CredentialsProvider build = CredentialsProviderBuilder.create().add(authScope, userName, password.toCharArray()).build();
 
         AuthCache authCache = new BasicAuthCache();
         // Generate BASIC scheme object and add it to the local auth cache
         BasicScheme basicScheme = new BasicScheme();
         DigestScheme digestScheme = new DigestScheme();
-        if (basicScheme.getSchemeName().equals(authType)) {
+        if (basicScheme.getName().equals(authType)) {
             authCache.put(targetHost, basicScheme);
-        } else if (digestScheme.getSchemeName().equals(authType)) {
+        } else if (digestScheme.getName().equals(authType)) {
             authCache.put(targetHost, digestScheme);
         }
 
         // Add AuthCache to the execution context
-        CLIENT_CONTEXT.setCredentialsProvider(provider);
+        CLIENT_CONTEXT.setCredentialsProvider(build);
         CLIENT_CONTEXT.setAuthCache(authCache);
     }
 
@@ -154,14 +160,14 @@ public class HttpUtils {
      * @param port 代理端口
      * @return
      */
-    public static CloseableHttpClient getProxy(String host, Integer port) {
+    public static void setProxy(String host, Integer port) {
         // for proxy debug
         HttpHost proxy = new HttpHost(host, port);
-        RequestConfig defaultRequestConfig =
-            RequestConfig.custom().setProxy(proxy).setSocketTimeout(CONNECT_TIMEOUT).setConnectTimeout(CONNECT_TIMEOUT)
-                .setConnectionRequestTimeout(CONNECT_TIMEOUT).build();
-        return HttpClients.custom().setDefaultRequestConfig(defaultRequestConfig)
-            .setDefaultCookieStore(cookieStore).build();
+        DefaultProxyRoutePlanner defaultProxyRoutePlanner = new DefaultProxyRoutePlanner(proxy);
+        httpClientBuilder.setRoutePlanner(defaultProxyRoutePlanner)
+            .setDefaultCookieStore(cookieStore);
+
+        refresh();
     }
 
     /**
@@ -170,7 +176,7 @@ public class HttpUtils {
      * @param headers
      * @param requestBase
      */
-    private static void builderHeader(Map<String, String> headers, HttpRequestBase requestBase) {
+    private static void builderHeader(Map<String, String> headers, BasicClassicHttpRequest requestBase) {
         if (MapUtils.isEmpty(headers)) {
             return;
         }
@@ -193,10 +199,6 @@ public class HttpUtils {
         Arrays.stream(cookies).forEach(cookie -> cookieStore.addCookie(cookie));
     }
 
-    public static void setProxy(String host, Integer port) {
-        proxy = new HttpHost(host, port);
-    }
-
     /**
      * 发送 get 请求
      *
@@ -209,18 +211,15 @@ public class HttpUtils {
      * @throws Exception
      */
     public static <T> T doGet(String host, String path, Map<String, String> headers,
-        Map<String, String> queries, ResponseHandler<T> responseHandler, Boolean pool) {
+        Map<String, String> queries, HttpClientResponseHandler<T> responseHandler) {
 
         HttpGet request = new HttpGet(buildUrl(host, path, queries));
         builderHeader(headers, request);
         try {
-            if (pool) {
-                HttpConnectionPoolUtil.getHttpClient(host).execute(request, responseHandler, CLIENT_CONTEXT);
+            if (responseHandler == null) {
+                return (T)httpClient.execute(request, CLIENT_CONTEXT);
             }
-            if (responseHandler == null){
-                return (T) httpClient.execute(request, CLIENT_CONTEXT);
-            }
-            return httpClient.execute(request, responseHandler, CLIENT_CONTEXT);
+            return httpClient.execute(request, CLIENT_CONTEXT, responseHandler);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -235,13 +234,13 @@ public class HttpUtils {
      * @param queries 请求参数
      * @return
      */
-    public static HttpResponse doGet(String host, String path, Map<String, String> headers,
+    public static String doGetHandler(String host, String path, Map<String, String> headers,
         Map<String, String> queries) {
-        return doGet(host, path, headers, queries, null, false);
+        return doGet(host, path, headers, queries, new BasicHttpClientResponseHandler());
     }
 
-    public static HttpResponse doGet(String host, String path, Map<String, String> headers) {
-        return doGet(host, path, headers, null, null, false);
+    public static ClassicHttpResponse doGet(String host, String path, Map<String, String> headers, Map<String, String> queries) {
+        return doGet(host, path, headers, queries, null);
     }
 
     /**
@@ -256,28 +255,30 @@ public class HttpUtils {
      * @return
      */
     public static <T> T doDelete(String host, String path, Map<String, String> headers,
-        Map<String, String> queries, String body, ResponseHandler<T> responseHandler, Boolean pool) {
+        Map<String, String> queries, String body, HttpClientResponseHandler<T> responseHandler) {
         try {
             HttpDelete delete = new HttpDelete(buildUrl(host, path, queries));
             builderHeader(headers, delete);
             if (StringUtils.isNotBlank(body)) {
                 delete.setEntity(new StringEntity(body, Charset.defaultCharset()));
             }
-            if (pool) {
-                HttpConnectionPoolUtil.getHttpClient(host).execute(delete, responseHandler, CLIENT_CONTEXT);
+            if (responseHandler == null) {
+                return (T)httpClient.execute(delete, CLIENT_CONTEXT);
             }
-            if (responseHandler == null){
-                return (T) httpClient.execute(delete, CLIENT_CONTEXT);
-            }
-            return httpClient.execute(delete, responseHandler, CLIENT_CONTEXT);
+            return httpClient.execute(delete, CLIENT_CONTEXT, responseHandler);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static HttpResponse doDelete(String host, String path, Map<String, String> headers,
+    public static String doDeleteHandler(String host, String path, Map<String, String> headers,
         Map<String, String> queries, String body) {
-        return doDelete(host, path, headers, queries, body, null, false);
+        return doDelete(host, path, headers, queries, body, new BasicHttpClientResponseHandler());
+    }
+
+    public static ClassicHttpResponse doDelete(String host, String path, Map<String, String> headers,
+        Map<String, String> queries, String body) {
+        return doDelete(host, path, headers, queries, body, null);
     }
 
     /**
@@ -288,10 +289,10 @@ public class HttpUtils {
      * @param headers 请求头
      * @param queries 请求参数
      * @param body 请求体
-     * @return HttpResponse
+     * @return ClassicHttpResponse
      */
     public static <T> T doPut(String host, String path, Map<String, String> headers,
-        Map<String, String> queries, String body, ResponseHandler<T> responseHandler, Boolean pool) {
+        Map<String, String> queries, String body, HttpClientResponseHandler<T> responseHandler) {
 
         HttpPut httpPut = new HttpPut(buildUrl(host, path, queries));
         builderHeader(headers, httpPut);
@@ -299,13 +300,10 @@ public class HttpUtils {
             httpPut.setEntity(new StringEntity(body, Charset.defaultCharset()));
         }
         try {
-            if (pool) {
-                return HttpConnectionPoolUtil.getHttpClient(host).execute(httpPut, responseHandler, CLIENT_CONTEXT);
+            if (responseHandler == null) {
+                return (T)httpClient.execute(httpPut, CLIENT_CONTEXT);
             }
-            if (responseHandler == null){
-                return (T) httpClient.execute(httpPut, CLIENT_CONTEXT);
-            }
-            return httpClient.execute(httpPut, responseHandler, CLIENT_CONTEXT);
+            return httpClient.execute(httpPut, CLIENT_CONTEXT, responseHandler);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -319,11 +317,16 @@ public class HttpUtils {
      * @param headers 请求头
      * @param queries 请求参数
      * @param body 请求体
-     * @return HttpResponse
+     * @return ClassicHttpResponse
      */
-    public static HttpResponse doPut(String host, String path, Map<String, String> headers,
+    public static ClassicHttpResponse doPut(String host, String path, Map<String, String> headers,
         Map<String, String> queries, String body) {
-        return doPut(host, path, headers, queries, body, null, false);
+        return doPut(host, path, headers, queries, body, null);
+    }
+
+    public static String doPutHandler(String host, String path, Map<String, String> headers,
+        Map<String, String> queries, String body) {
+        return doPut(host, path, headers, queries, body, new BasicHttpClientResponseHandler());
     }
 
     /**
@@ -334,11 +337,11 @@ public class HttpUtils {
      * @param headers 请求头
      * @param queries 请求参数
      * @param bodies 文件列表
-     * @return HttpResponse
+     * @return ClassicHttpResponse
      * @throws Exception 运行时异常
      */
     public static <T> T doPost(String host, String path, Map<String, String> headers,
-        Map<String, String> queries, Map<String, String> bodies, ResponseHandler<T> responseHandler, Boolean pool) {
+        Map<String, String> queries, Map<String, String> bodies, HttpClientResponseHandler<T> responseHandler) {
         HttpPost request = new HttpPost(buildUrl(host, path, queries));
         builderHeader(headers, request);
         if (MapUtils.isNotEmpty(bodies)) {
@@ -347,7 +350,7 @@ public class HttpUtils {
                 File file = new File(v);
                 MultipartEntityBuilder builder = MultipartEntityBuilder.create();
                 // 设置浏览器兼容模式
-                builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+                builder.setMode(HttpMultipartMode.LEGACY);
                 // 设置请求的编码格式
                 builder.setCharset(CharsetUtil.defaultCharset());
                 builder.setContentType(ContentType.MULTIPART_FORM_DATA);
@@ -358,21 +361,18 @@ public class HttpUtils {
             });
         }
         try {
-            if (pool) {
-                return HttpConnectionPoolUtil.getHttpClient(host).execute(request, responseHandler, CLIENT_CONTEXT);
+            if (responseHandler == null) {
+                return (T)httpClient.execute(request, CLIENT_CONTEXT);
             }
-            if (responseHandler == null){
-                return (T) httpClient.execute(request, CLIENT_CONTEXT);
-            }
-            return httpClient.execute(request, responseHandler, CLIENT_CONTEXT);
+            return httpClient.execute(request, CLIENT_CONTEXT, responseHandler);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static HttpResponse doPost(String host, String path, Map<String, String> headers,
+    public static ClassicHttpResponse doPost(String host, String path, Map<String, String> headers,
         Map<String, String> queries, Map<String, String> bodies) {
-        return doPost(host, path, headers, queries, bodies, null, false);
+        return doPost(host, path, headers, queries, bodies, null);
     }
 
     /**
@@ -383,32 +383,34 @@ public class HttpUtils {
      * @param headers 请求头
      * @param queries 请求参数
      * @param body 请求体
-     * @return HttpResponse
+     * @return ClassicHttpResponse
      * @throws RuntimeException
      */
     public static <T> T doPost(String host, String path, Map<String, String> headers,
-        Map<String, String> queries, String body, ResponseHandler<T> responseHandler, Boolean pool) {
+        Map<String, String> queries, String body, HttpClientResponseHandler<T> responseHandler) {
         HttpPost request = new HttpPost(buildUrl(host, path, queries));
         builderHeader(headers, request);
         if (StringUtils.isNotBlank(body)) {
             request.setEntity(new StringEntity(body, Charset.defaultCharset()));
         }
         try {
-            if (pool) {
-                return HttpConnectionPoolUtil.getHttpClient(host).execute(request, responseHandler, CLIENT_CONTEXT);
+            if (responseHandler == null) {
+                return (T)httpClient.execute(request, CLIENT_CONTEXT);
             }
-            if (responseHandler == null){
-                return (T) httpClient.execute(request, CLIENT_CONTEXT);
-            }
-            return httpClient.execute(request, responseHandler, CLIENT_CONTEXT);
+            return httpClient.execute(request, CLIENT_CONTEXT, responseHandler);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static HttpResponse doPost(String host, String path, Map<String, String> headers,
+    public static ClassicHttpResponse doPost(String host, String path, Map<String, String> headers,
         Map<String, String> queries, String body) {
-        return doPost(host, path, headers, queries, body, null, false);
+        return doPost(host, path, headers, queries, body, null);
+    }
+
+    public static String doPostHander(String host, String path, Map<String, String> headers,
+        Map<String, String> queries, String body) {
+        return doPost(host, path, headers, queries, body, new BasicHttpClientResponseHandler());
     }
 
     /**
@@ -423,20 +425,18 @@ public class HttpUtils {
      * @throws RuntimeException
      */
     public static <T> T doPost(String host, String path, Map<String, String> headers,
-        Map<String, String> queries, byte[] body, ResponseHandler<T> responseHandler, Boolean pool) {
+        Map<String, String> queries, byte[] body, HttpClientResponseHandler<T> responseHandler) {
         HttpPost request = new HttpPost(buildUrl(host, path, queries));
         builderHeader(headers, request);
         if (ObjectUtils.isNotEmpty(body)) {
-            request.setEntity(new ByteArrayEntity(body));
+            request.setEntity(new ByteArrayEntity(body, ContentType.APPLICATION_OCTET_STREAM));
         }
         try {
-            if (pool) {
-                return HttpConnectionPoolUtil.getHttpClient(host).execute(request, responseHandler, CLIENT_CONTEXT);
+
+            if (responseHandler == null) {
+                return (T)httpClient.execute(request, CLIENT_CONTEXT);
             }
-            if (responseHandler == null){
-                return (T) httpClient.execute(request, CLIENT_CONTEXT);
-            }
-            return httpClient.execute(request, responseHandler, CLIENT_CONTEXT);
+            return httpClient.execute(request, CLIENT_CONTEXT, responseHandler);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -444,7 +444,7 @@ public class HttpUtils {
 
     public static HttpResponse doPost(String host, String path, Map<String, String> headers,
         Map<String, String> queries, byte[] body) {
-        return doPost(host, path, headers, queries, body, null, false);
+        return doPost(host, path, headers, queries, body, null);
     }
 
     public static boolean isUrl(String url) {
@@ -507,7 +507,6 @@ public class HttpUtils {
      * @return String
      */
     public static String buildUrlString(String host, String path, Map<String, String> queries) {
-
         return buildUrl(host, path, queries);
     }
 
@@ -537,20 +536,18 @@ public class HttpUtils {
      * @param httpResponse 响应体
      * @return String
      */
-    public static String checkResponseAndGetResult(HttpResponse httpResponse, boolean isEnsure) {
+    public static String checkResponseAndGetResult(ClassicHttpResponse httpResponse, boolean isEnsure) {
         if (httpResponse == null) {
             throw new RuntimeException();
         }
-        if (httpResponse.getStatusLine() == null) {
-            throw new RuntimeException();
-        }
-        if (isEnsure && HttpStatus.SC_OK != httpResponse.getStatusLine().getStatusCode()) {
+
+        if (isEnsure && HttpStatus.SC_OK != httpResponse.getCode()) {
             throw new RuntimeException();
         }
         HttpEntity entity = httpResponse.getEntity();
         try {
             return EntityUtils.toString(entity, Charset.defaultCharset());
-        } catch (IOException e) {
+        } catch (IOException | ParseException e) {
             throw new RuntimeException(e);
         }
     }
@@ -561,14 +558,12 @@ public class HttpUtils {
      * @param httpResponse 响应体
      * @return
      */
-    public static byte[] checkResponseStreamAndGetResult(HttpResponse httpResponse) {
+    public static byte[] checkResponseStreamAndGetResult(ClassicHttpResponse httpResponse) {
         if (Objects.isNull(httpResponse)) {
             throw new NullPointerException();
         }
-        if (Objects.isNull(httpResponse.getStatusLine())) {
-            throw new RuntimeException();
-        }
-        if (HttpStatus.SC_OK != httpResponse.getStatusLine().getStatusCode()) {
+
+        if (HttpStatus.SC_OK != httpResponse.getCode()) {
             throw new RuntimeException();
         }
         HttpEntity entity = httpResponse.getEntity();
@@ -622,7 +617,7 @@ public class HttpUtils {
      * @param statusList 状态码列表
      * @return 解析字节
      */
-    public static byte[] checkResponseStreamAndGetResult(HttpResponse httpResponse, List<Integer> statusList) {
+    public static byte[] checkResponseStreamAndGetResult(ClassicHttpResponse httpResponse, List<Integer> statusList) {
         checkCode(httpResponse, statusList);
         HttpEntity entity = httpResponse.getEntity();
         try {
@@ -639,13 +634,13 @@ public class HttpUtils {
      * @param statusList 状态码列表
      * @return 解析字符串
      */
-    public static String checkResponseAndGetResult(HttpResponse httpResponse, List<Integer> statusList) {
+    public static String checkResponseAndGetResult(ClassicHttpResponse httpResponse, List<Integer> statusList) {
         checkCode(httpResponse, statusList);
 
         HttpEntity entity = httpResponse.getEntity();
         try {
             return EntityUtils.toString(entity, Charset.defaultCharset());
-        } catch (IOException e) {
+        } catch (IOException | ParseException e) {
             throw new RuntimeException(e);
         }
     }
@@ -656,14 +651,11 @@ public class HttpUtils {
      * @param httpResponse 响应体
      * @param statusList 检测状态表
      */
-    private static void checkCode(HttpResponse httpResponse, List<Integer> statusList) {
+    private static void checkCode(ClassicHttpResponse httpResponse, List<Integer> statusList) {
         if (httpResponse == null) {
             throw new RuntimeException();
         }
-        if (httpResponse.getStatusLine() == null) {
-            throw new RuntimeException();
-        }
-        if (!statusList.contains(httpResponse.getStatusLine().getStatusCode())) {
+        if (!statusList.contains(httpResponse.getCode())) {
             throw new RuntimeException();
         }
     }
@@ -674,7 +666,11 @@ public class HttpUtils {
      * @param httpResponse 响应体
      * @return String
      */
-    public static String checkResponseAndGetResult(HttpResponse httpResponse) {
+    public static String checkResponseAndGetResult(ClassicHttpResponse httpResponse) {
         return checkResponseAndGetResult(httpResponse, ImmutableList.of(HttpStatus.SC_OK));
+    }
+
+    public static String checkResponseAndGetResult(HttpResponse httpResponse) {
+        return checkResponseAndGetResult((ClassicHttpResponse)httpResponse, ImmutableList.of(HttpStatus.SC_OK));
     }
 }
