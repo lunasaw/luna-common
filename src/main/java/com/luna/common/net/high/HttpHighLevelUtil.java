@@ -2,27 +2,21 @@ package com.luna.common.net.high;
 
 import com.luna.common.net.HttpUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.client5.http.classic.methods.*;
+import org.apache.hc.client5.http.impl.classic.BasicHttpClientResponseHandler;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.core5.http.*;
-import org.apache.hc.core5.http.impl.Http1StreamListener;
 import org.apache.hc.core5.http.impl.bootstrap.HttpRequester;
 import org.apache.hc.core5.http.impl.bootstrap.RequesterBootstrap;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.apache.hc.core5.http.io.SocketConfig;
-import org.apache.hc.core5.http.io.entity.EntityUtils;
-import org.apache.hc.core5.http.io.support.ClassicRequestBuilder;
-import org.apache.hc.core5.http.message.RequestLine;
-import org.apache.hc.core5.http.message.StatusLine;
-import org.apache.hc.core5.http.protocol.HttpCoreContext;
 import org.apache.hc.core5.util.Timeout;
 
-import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.URISyntaxException;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * @author weidian
@@ -32,85 +26,84 @@ import java.util.stream.Collectors;
 @Slf4j
 public class HttpHighLevelUtil {
 
-    final static HttpRequester httpRequester = RequesterBootstrap.bootstrap()
-            .setStreamListener(new HttpStreamListener() )
-            .setSocketConfig(SocketConfig.custom()
-                    .setSoTimeout(10, TimeUnit.SECONDS)
-                    .build())
-            .create();
+    public static final RequesterBootstrap BOOTSTRAP      = RequesterBootstrap.bootstrap();
+    public static HttpRequester            HTTP_REQUESTER;
 
-    final static HttpCoreContext coreContext = HttpCoreContext.create();
+    public static final HttpClientContext  CLIENT_CONTEXT = HttpClientContext.create();
 
-    public static void doPost(String host, String path, Map<String,String> headers,
-                       Map<String, String> queries) throws URISyntaxException, HttpException, IOException {
-
-//        Header[] headers = header.entrySet().stream()
-//                .map(entry -> new BasicHeader(entry.getKey(), entry.getValue()))
-//                .toArray(BasicHeader[]::new);
-        HttpHost httpHost = HttpHost.create(host);
-
-        HttpPost request = new HttpPost(HttpUtils.buildUrl(host, path, queries));
-        HttpUtils.builderHeader(headers, request);
-
-
-        httpRequester.execute(httpHost, request, Timeout.ofSeconds(5), coreContext, (HttpClientResponseHandler) response -> {
-            System.out.println(response.getCode() + " " + response.getReasonPhrase());
-
-            System.out.println(EntityUtils.toString(response.getEntity()));
-            System.out.println("==============");
-            return null;
-        });
+    static {
+        init();
     }
 
-    public static void main(final String[] args) throws Exception {
-        final HttpRequester httpRequester = RequesterBootstrap.bootstrap()
-                .setStreamListener(new Http1StreamListener() {
+    public static void init() {
+        HTTP_REQUESTER = BOOTSTRAP.setStreamListener(new HttpStreamListener())
+            .setMaxTotal(HttpUtils.MAX_CONN)
+            .setDefaultMaxPerRoute(HttpUtils.MAX_ROUTE)
+            .create();
+    }
 
-                    @Override
-                    public void onRequestHead(final HttpConnection connection, final HttpRequest request) {
-                        System.out.println(connection.getRemoteAddress() + " " + new RequestLine(request));
+    public static void setProxy(int port) {
+        setProxy(StringUtils.EMPTY, port);
+    }
 
-                    }
+    public static void setProxy(String hostname, int port) {
+        SocketConfig.Builder custom = SocketConfig.custom();
+        custom.setSoTimeout(HttpUtils.SOCKET_TIME_OUT, TimeUnit.SECONDS);
+        if (StringUtils.isNotBlank(hostname)) {
+            custom.setSocksProxyAddress(new InetSocketAddress(hostname, port));
+            BOOTSTRAP.setSocketConfig(custom.build());
+        }
+        custom.setSocksProxyAddress(new InetSocketAddress(port));
+        BOOTSTRAP.setSocketConfig(custom.build());
+        HTTP_REQUESTER = BOOTSTRAP.create();
+    }
 
-                    @Override
-                    public void onResponseHead(final HttpConnection connection, final HttpResponse response) {
-                        System.out.println(connection.getRemoteAddress() + " " + new StatusLine(response));
-                    }
+    public static HttpHost getHost(String host) {
+        try {
+            return HttpHost.create(host);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-                    @Override
-                    public void onExchangeComplete(final HttpConnection connection, final boolean keepAlive) {
-                        if (keepAlive) {
-                            System.out.println(connection.getRemoteAddress() + " exchange completed (connection kept alive)");
-                        } else {
-                            System.out.println(connection.getRemoteAddress() + " exchange completed (connection closed)");
-                        }
-                    }
+    public static <T> T doGet(String host, String path, Map<String, String> headers,
+        Map<String, String> queries, HttpClientResponseHandler<T> responseHandler) {
+        HttpHost httpHost = getHost(host);
+        HttpGet request = new HttpGet(HttpUtils.buildUrl(host, path, queries));
+        HttpUtils.builderHeader(headers, request);
+        return doRequest(responseHandler, httpHost, request);
+    }
 
-                })
-                .setSocketConfig(SocketConfig.custom()
-                        .setSoTimeout(10, TimeUnit.SECONDS)
-                        .build())
-                .create();
+    public static <T> T doPost(String host, String path, Map<String, String> headers,
+        Map<String, String> queries, HttpClientResponseHandler<T> responseHandler) {
+        HttpHost httpHost = getHost(host);
+        HttpPost request = new HttpPost(HttpUtils.buildUrl(host, path, queries));
+        HttpUtils.builderHeader(headers, request);
+        return doRequest(responseHandler, httpHost, request);
+    }
 
-        final HttpCoreContext coreContext = HttpCoreContext.create();
-        final HttpHost target = new HttpHost("httpbin.org");
-        final String[] requestUris = new String[] {"/ip", "/user-agent", "/headers"};
+    public static <T> T doDelete(String host, String path, Map<String, String> headers,
+        Map<String, String> queries, HttpClientResponseHandler<T> responseHandler) {
+        HttpHost httpHost = getHost(host);
+        HttpDelete request = new HttpDelete(HttpUtils.buildUrl(host, path, queries));
+        HttpUtils.builderHeader(headers, request);
+        return doRequest(responseHandler, httpHost, request);
+    }
 
-        for (int i = 0; i < requestUris.length; i++) {
-            final String requestUri = requestUris[i];
-            final ClassicHttpRequest request = ClassicRequestBuilder.get()
-                    .setHttpHost(target)
-                    .setPath(requestUri)
-                    .build();
+    public static <T> T doPut(String host, String path, Map<String, String> headers,
+        Map<String, String> queries, HttpClientResponseHandler<T> responseHandler) {
+        HttpHost httpHost = getHost(host);
+        HttpPut request = new HttpPut(HttpUtils.buildUrl(host, path, queries));
+        HttpUtils.builderHeader(headers, request);
+        return doRequest(responseHandler, httpHost, request);
+    }
 
-            doPost("http://httpbin.org", requestUri, null, null);
-
-//            try (ClassicHttpResponse response = httpRequester.execute(target, request, Timeout.ofSeconds(5), coreContext)) {
-//                System.out.println(requestUri + "->" + response.getCode());
-//                System.out.println(EntityUtils.toString(response.getEntity()));
-//                System.out.println("==============");
-//            }
-//
+    public static <T> T doRequest(HttpClientResponseHandler<T> responseHandler, HttpHost httpHost, HttpUriRequestBase httpUriRequestBase) {
+        try {
+            return HTTP_REQUESTER.execute(httpHost, httpUriRequestBase, Timeout.ofSeconds(HttpUtils.CONNECT_TIMEOUT), CLIENT_CONTEXT,
+                responseHandler);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }

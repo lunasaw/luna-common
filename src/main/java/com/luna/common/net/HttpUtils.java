@@ -7,19 +7,25 @@ import com.luna.common.text.CharsetUtil;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.client5.http.ContextBuilder;
+import org.apache.hc.client5.http.DnsResolver;
+import org.apache.hc.client5.http.SystemDefaultDnsResolver;
 import org.apache.hc.client5.http.auth.*;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpPut;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.cookie.BasicCookieStore;
 import org.apache.hc.client5.http.cookie.StandardCookieSpec;
+import org.apache.hc.client5.http.impl.DefaultSchemePortResolver;
 import org.apache.hc.client5.http.impl.auth.*;
 import org.apache.hc.client5.http.impl.classic.BasicHttpClientResponseHandler;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.ManagedHttpClientConnectionFactory;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.client5.http.impl.routing.DefaultProxyRoutePlanner;
 import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
@@ -33,19 +39,28 @@ import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
 import org.apache.hc.client5.http.cookie.Cookie;
 import org.apache.hc.client5.http.entity.mime.HttpMultipartMode;
 import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.core5.http.impl.io.DefaultBHttpClientConnectionFactory;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.apache.hc.core5.http.io.SocketConfig;
 import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.FileEntity;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.http.message.BasicClassicHttpRequest;
+import org.apache.hc.core5.http.nio.support.AsyncRequestBuilder;
+import org.apache.hc.core5.pool.PoolConcurrencyPolicy;
+import org.apache.hc.core5.pool.PoolReusePolicy;
 import org.apache.hc.core5.ssl.SSLContextBuilder;
+import org.apache.hc.core5.util.TimeValue;
+import org.apache.hc.core5.util.Timeout;
 
 import javax.net.ssl.SSLContext;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -55,7 +70,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class HttpUtils {
 
-    private static HttpClientContext          CLIENT_CONTEXT   = HttpClientContext.create();
+    public static final HttpClientContext    CLIENT_CONTEXT   = HttpClientContext.create();
     private static final int                  MAX_REDIRECTS    = 10;
     private static CloseableHttpClient        httpClient;
 
@@ -101,11 +116,36 @@ public class HttpUtils {
             .setMaxRedirects(MAX_REDIRECTS)
             .setResponseTimeout(RESPONSE_TIMEOUT, TimeUnit.SECONDS)
             .setConnectionRequestTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
+            .setTargetPreferredAuthSchemes(Arrays.asList(StandardAuthScheme.BASIC, StandardAuthScheme.DIGEST))
+            .setProxyPreferredAuthSchemes(Collections.singletonList(StandardAuthScheme.BASIC))
             .build();
 
-        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(registry);
+        final DnsResolver dnsResolver = new SystemDefaultDnsResolver() {
+
+            @Override
+            public InetAddress[] resolve(final String host) throws UnknownHostException {
+                if (host.equalsIgnoreCase("localhost")) {
+                    return new InetAddress[] {InetAddress.getByAddress(new byte[] {127, 0, 0, 1})};
+                } else {
+                    return super.resolve(host);
+                }
+            }
+
+        };
+
+        // 链接管理器
+        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(
+            registry, PoolConcurrencyPolicy.STRICT, PoolReusePolicy.LIFO, TimeValue.ofMinutes(5),
+            DefaultSchemePortResolver.INSTANCE, dnsResolver, ManagedHttpClientConnectionFactory.INSTANCE);
+
+        // 最大链接数
         cm.setMaxTotal(MAX_CONN);
         cm.setDefaultMaxPerRoute(MAX_ROUTE);
+        cm.setDefaultConnectionConfig(ConnectionConfig.custom()
+            .setValidateAfterInactivity(TimeValue.ofSeconds(CONNECT_TIMEOUT))
+            .setTimeToLive(TimeValue.ofHours(1))
+            .build());
+        // socket 配置
         cm.setDefaultSocketConfig(SocketConfig.custom()
             .setSoTimeout(SOCKET_TIME_OUT, TimeUnit.SECONDS)
             .build());
@@ -169,6 +209,10 @@ public class HttpUtils {
         CLIENT_CONTEXT.setAuthCache(authCache);
     }
 
+    public static void setProxy(Integer port) {
+        setProxy("127.0.0.1", port);
+    }
+
     /**
      * 使用代理访问
      *
@@ -199,6 +243,13 @@ public class HttpUtils {
         headers.forEach(requestBase::addHeader);
     }
 
+    public static void builderHeader(Map<String, String> headers, AsyncRequestBuilder requestBase) {
+        if (MapUtils.isEmpty(headers)) {
+            return;
+        }
+        headers.forEach(requestBase::addHeader);
+    }
+
     public static List<Cookie> getCookie() {
         return cookieStore.getCookies();
     }
@@ -218,7 +269,7 @@ public class HttpUtils {
     private static <T> T doRequest(HttpClientResponseHandler<T> responseHandler, HttpUriRequestBase request) {
         try {
             if (responseHandler == null) {
-                return (T) httpClient.execute(request, CLIENT_CONTEXT);
+                return (T)httpClient.execute(request, CLIENT_CONTEXT);
             }
             return httpClient.execute(request, CLIENT_CONTEXT, responseHandler);
         } catch (IOException e) {

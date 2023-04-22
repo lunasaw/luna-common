@@ -16,12 +16,16 @@
 
 package com.luna.common.net.hander;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.TypeReference;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.hc.client5.http.ClientProtocolException;
 import org.apache.hc.client5.http.impl.classic.AbstractHttpClientResponseHandler;
-import org.apache.hc.core5.http.ClassicHttpResponse;
-import org.apache.hc.core5.http.HttpResponse;
-import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.*;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+
+import java.io.IOException;
 
 /**
  * Basic response handler which takes an url for documentation.
@@ -47,5 +51,21 @@ public abstract class ValidatingResponseHandler<T> extends AbstractHttpClientRes
             return;
         }
         throw new RuntimeException("Unexpected response: " + statusCode + reasonPhrase);
+    }
+
+    @Override
+    public T handleResponse(ClassicHttpResponse response) {
+        this.validateResponse(response);
+        return handleEntity(response.getEntity());
+    }
+
+    @Override
+    public T handleEntity(HttpEntity entity) {
+        try {
+            String string = EntityUtils.toString(entity);
+            return JSON.parseObject(string, new TypeReference<T>() {});
+        } catch (IOException | ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

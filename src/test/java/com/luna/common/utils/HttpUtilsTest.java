@@ -99,9 +99,4 @@ public class HttpUtilsTest {
         System.out.println(responseString);
         Assert.assertNotNull(responseString);
     }
-
-    @Test
-    public void atest() {
-
-    }
 }
