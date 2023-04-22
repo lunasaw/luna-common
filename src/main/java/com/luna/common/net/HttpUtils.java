@@ -86,13 +86,29 @@ public class HttpUtils {
     /**
      * 设置连接建立的超时时间为10s
      */
-    public static final int                   CONNECT_TIMEOUT  = 10;
+    public static  int                   CONNECT_TIMEOUT  = 10;
 
-    public static final int                   RESPONSE_TIMEOUT = 30;
+    public static  int                   RESPONSE_TIMEOUT = 30;
 
-    public static final int                   MAX_ROUTE        = 200;
+    public static  int                   MAX_ROUTE        = 200;
 
-    public static final int                   SOCKET_TIME_OUT  = 10;
+    public static  int                   SOCKET_TIME_OUT  = 10;
+
+    public static void setConnectTimeout(int connectTimeout) {
+        CONNECT_TIMEOUT = connectTimeout;
+    }
+
+    public static void setResponseTimeout(int responseTimeout) {
+        RESPONSE_TIMEOUT = responseTimeout;
+    }
+
+    public static void setMaxRoute(int maxRoute) {
+        MAX_ROUTE = maxRoute;
+    }
+
+    public static void setSocketTimeOut(int socketTimeOut) {
+        SOCKET_TIME_OUT = socketTimeOut;
+    }
 
     static {
         init();
@@ -239,6 +255,13 @@ public class HttpUtils {
             .setDefaultCookieStore(cookieStore);
 
         refresh();
+    }
+
+    public static void setProxy(String host, Integer port, String username, String password) {
+        if (StringUtils.isNotBlank(username)){
+            authContext(username, password, host, StandardAuthScheme.BASIC);
+        }
+        setProxy(host, port);
     }
 
     /**

@@ -1,7 +1,9 @@
 package com.luna.common.utils;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.luna.common.net.HttpUtils;
+import com.luna.common.net.HttpUtilsConstant;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.client5.http.utils.Base64;
 import org.apache.hc.core5.http.ClassicHttpResponse;
@@ -9,11 +11,14 @@ import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import static com.luna.common.net.HttpUtils.*;
 
@@ -49,6 +54,29 @@ public class HttpUtilsTest {
             return EntityUtils.toString(response.getEntity());
         };
         String responseString = HttpUtils.doPost("https://httpbin.org", "/post", null, null, StringUtils.EMPTY, responseHandler);
+        System.out.println(responseString);
+        Assert.assertNotNull(responseString);
+    }
+
+    @Test
+    public void get_post_2() {
+        HttpClientResponseHandler<String> responseHandler = response -> {
+            return EntityUtils.toString(response.getEntity());
+        };
+        HttpUtils.setProxy(7890);
+        Map<String, String> header = Maps.newHashMap();
+        header.put(HttpHeaders.AUTHORIZATION, "Bearer sk-xxxxx");
+        header.put(HttpHeaders.CONTENT_TYPE, HttpUtilsConstant.JSON);
+
+        StringEntity stringEntity = new StringEntity("{\n" +
+                "    \"input\": [\n" +
+                "        \"十们代存府出治对提流感形织务文。\"\n" +
+                "    ],\n" +
+                "    \"model\": \"text-moderation-latest\"\n" +
+                "}", Charset.defaultCharset());
+        String responseString =
+            HttpUtils.doPost("https://api.openai.com", "/v1/moderations", header,
+                    null,stringEntity, responseHandler);
         System.out.println(responseString);
         Assert.assertNotNull(responseString);
     }
