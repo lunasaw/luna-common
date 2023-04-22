@@ -70,7 +70,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class HttpUtils {
 
-    public static final HttpClientContext    CLIENT_CONTEXT   = HttpClientContext.create();
+    public static final HttpClientContext     CLIENT_CONTEXT   = HttpClientContext.create();
     private static final int                  MAX_REDIRECTS    = 10;
     private static CloseableHttpClient        httpClient;
 
@@ -571,7 +571,7 @@ public class HttpUtils {
      * @param httpResponse 响应体
      * @return String
      */
-    public static String checkResponseAndGetResult(ClassicHttpResponse httpResponse, boolean isEnsure) {
+    public static String checkResponseAndGetResultV2(ClassicHttpResponse httpResponse, boolean isEnsure) {
         if (httpResponse == null) {
             throw new RuntimeException();
         }
@@ -707,5 +707,9 @@ public class HttpUtils {
 
     public static String checkResponseAndGetResult(HttpResponse httpResponse) {
         return checkResponseAndGetResult((ClassicHttpResponse)httpResponse, ImmutableList.of(HttpStatus.SC_OK));
+    }
+
+    public static String checkResponseAndGetResult(HttpResponse httpResponse, Boolean isEnsure) {
+        return checkResponseAndGetResultV2((ClassicHttpResponse) httpResponse, isEnsure);
     }
 }
