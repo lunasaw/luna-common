@@ -410,25 +410,23 @@ public class HttpUtils {
      */
     public static <T> T doPost(String host, String path, Map<String, String> headers,
         Map<String, String> queries, Map<String, String> bodies, HttpClientResponseHandler<T> responseHandler) {
-        HttpPost request = new HttpPost(buildUrl(host, path, queries));
-        builderHeader(headers, request);
+
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+        // 设置浏览器兼容模式
+        builder.setMode(HttpMultipartMode.LEGACY);
+        // 设置请求的编码格式
+        builder.setCharset(CharsetUtil.defaultCharset());
+        builder.setContentType(ContentType.MULTIPART_FORM_DATA);
         if (MapUtils.isNotEmpty(bodies)) {
             bodies.forEach((k, v) -> {
                 // 传入参数可以为file或者filePath，在此处做转换
                 File file = new File(v);
-                MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-                // 设置浏览器兼容模式
-                builder.setMode(HttpMultipartMode.LEGACY);
-                // 设置请求的编码格式
-                builder.setCharset(CharsetUtil.defaultCharset());
-                builder.setContentType(ContentType.MULTIPART_FORM_DATA);
                 // 添加文件
                 builder.addBinaryBody(k, file);
-                HttpEntity reqEntity = builder.build();
-                request.setEntity(reqEntity);
             });
         }
-        return doRequest(responseHandler, request);
+        HttpEntity reqEntity = builder.build();
+        return doPost(host, path, headers, queries, reqEntity, responseHandler);
     }
 
     public static ClassicHttpResponse doPost(String host, String path, Map<String, String> headers,
@@ -449,10 +447,15 @@ public class HttpUtils {
      */
     public static <T> T doPost(String host, String path, Map<String, String> headers,
         Map<String, String> queries, String body, HttpClientResponseHandler<T> responseHandler) {
+        return doPost(host, path, headers, queries, new StringEntity(body, Charset.defaultCharset()), responseHandler);
+    }
+
+    public static <T> T doPost(String host, String path, Map<String, String> headers,
+        Map<String, String> queries, HttpEntity httpEntity, HttpClientResponseHandler<T> responseHandler) {
         HttpPost request = new HttpPost(buildUrl(host, path, queries));
         builderHeader(headers, request);
-        if (StringUtils.isNotBlank(body)) {
-            request.setEntity(new StringEntity(body, Charset.defaultCharset()));
+        if (httpEntity != null) {
+            request.setEntity(httpEntity);
         }
         return doRequest(responseHandler, request);
     }
@@ -480,12 +483,7 @@ public class HttpUtils {
      */
     public static <T> T doPost(String host, String path, Map<String, String> headers,
         Map<String, String> queries, byte[] body, HttpClientResponseHandler<T> responseHandler) {
-        HttpPost request = new HttpPost(buildUrl(host, path, queries));
-        builderHeader(headers, request);
-        if (ObjectUtils.isNotEmpty(body)) {
-            request.setEntity(new ByteArrayEntity(body, ContentType.APPLICATION_OCTET_STREAM));
-        }
-        return doRequest(responseHandler, request);
+        return doPost(host, path, headers, queries, new ByteArrayEntity(body, ContentType.APPLICATION_OCTET_STREAM), responseHandler);
     }
 
     public static HttpResponse doPost(String host, String path, Map<String, String> headers,
@@ -721,6 +719,6 @@ public class HttpUtils {
     }
 
     public static String checkResponseAndGetResult(HttpResponse httpResponse, Boolean isEnsure) {
-        return checkResponseAndGetResultV2((ClassicHttpResponse) httpResponse, isEnsure);
+        return checkResponseAndGetResultV2((ClassicHttpResponse)httpResponse, isEnsure);
     }
 }

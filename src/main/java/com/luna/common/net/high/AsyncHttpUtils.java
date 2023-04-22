@@ -48,6 +48,7 @@ import org.apache.hc.client5.http.impl.auth.CredentialsProviderBuilder;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManager;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
 import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.http.Method;
 import org.apache.hc.core5.http.config.CharCodingConfig;
 import org.apache.hc.core5.http.config.Http1Config;
 import org.apache.hc.core5.http.nio.AsyncEntityProducer;
@@ -153,32 +154,32 @@ public class AsyncHttpUtils {
     public static <T> CustomAsyncHttpResponse doPost(String host, String path, Map<String, String> headers,
         Map<String, String> queries, Path file, AsyncHttpClientResponseHandler<T> responseHandler) throws IOException {
         AsyncRequestProducer producer =
-            getProducer(host, path, headers, queries, new PathEntityProducer(file, StandardOpenOption.READ), AsyncRequestBuilder.post());
+            getProducer(host, path, headers, queries, new PathEntityProducer(file, StandardOpenOption.READ), Method.POST.toString());
         return doAsyncRequest(responseHandler, producer);
     }
 
     public static <T> CustomAsyncHttpResponse doPost(String host, String path, Map<String, String> headers,
         Map<String, String> queries, File file, AsyncHttpClientResponseHandler<T> responseHandler) {
-        AsyncRequestProducer producer = getProducer(host, path, headers, queries, new FileEntityProducer(file), AsyncRequestBuilder.post());
+        AsyncRequestProducer producer = getProducer(host, path, headers, queries, new FileEntityProducer(file), Method.POST.toString());
         return doAsyncRequest(responseHandler, producer);
     }
 
     public static <T> CustomAsyncHttpResponse doPost(String host, String path, Map<String, String> headers,
         Map<String, String> queries, String body, AsyncHttpClientResponseHandler<T> responseHandler) {
-        AsyncRequestProducer producer = getProducer(host, path, headers, queries, new StringAsyncEntityProducer(body), AsyncRequestBuilder.post());
+        AsyncRequestProducer producer = getProducer(host, path, headers, queries, new StringAsyncEntityProducer(body), Method.POST.toString());
         return doAsyncRequest(responseHandler, producer);
     }
 
     public static <T> CustomAsyncHttpResponse doGet(String host, String path, Map<String, String> headers,
         Map<String, String> queries, AsyncHttpClientResponseHandler<T> responseHandler) {
-        AsyncRequestBuilder get = AsyncRequestBuilder.get();
-        AsyncRequestProducer producer = getProducer(host, path, headers, queries, null, get);
+        AsyncRequestProducer producer = getProducer(host, path, headers, queries, null, Method.GET.toString());
         return doAsyncRequest(responseHandler, producer);
     }
 
     private static AsyncRequestProducer getProducer(String host, String path, Map<String, String> headers, Map<String, String> queries,
-        AsyncEntityProducer entityProducer,
-        AsyncRequestBuilder builder) {
+                                                    AsyncEntityProducer entityProducer,
+                                                    String method) {
+        AsyncRequestBuilder builder = AsyncRequestBuilder.create(method);
         builder.setHttpHost(HttpHighLevelUtil.getHost(host));
         builder.setUri(HttpUtils.buildUrl(host, path, queries));
         HttpUtils.builderHeader(headers, builder);
