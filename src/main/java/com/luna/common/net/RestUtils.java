@@ -1,12 +1,8 @@
 package com.luna.common.net;
 
 import java.util.Map;
-
-import com.luna.common.text.MapTools;
-import org.apache.commons.collections4.MapUtils;
-import org.apache.http.HttpResponse;
-
 import com.google.common.collect.Maps;
+import org.apache.commons.collections4.MapUtils;
 
 /**
  * @author Luna
@@ -15,26 +11,22 @@ public class RestUtils {
 
     public static String doGet(String host, String path, Map<String, String> headers,
         Map<String, String> queries, boolean isEnsure) {
-        HttpResponse httpResponse = HttpUtils.doGet(host, path, headers, queries);
-        return HttpUtils.checkResponseAndGetResult(httpResponse, isEnsure);
+        return HttpUtils.doGetHandler(host, path, headers, queries);
     }
 
     public static String doGet(String host, String path, Map<String, String> headers,
         Map<String, String> queries) {
-        HttpResponse httpResponse = HttpUtils.doGet(host, path, headers, queries);
-        return HttpUtils.checkResponseAndGetResult(httpResponse, false);
+        return HttpUtils.doGetHandler(host, path, headers, queries);
     }
 
     public static String doDelete(String host, String path, Map<String, String> headers,
-                                  Map<String, String> queries, String body){
-        HttpResponse httpResponse = HttpUtils.doDelete(host, path, headers, queries,body);
-        return HttpUtils.checkResponseAndGetResult(httpResponse,false);
+        Map<String, String> queries, String body) {
+        return HttpUtils.doDeleteHandler(host, path, headers, queries, body);
     }
 
     public static String doPut(String host, String path, Map<String, String> headers,
-                               Map<String, String> queries, String body){
-        HttpResponse httpResponse = HttpUtils.doPut(host, path, headers, queries,body);
-        return HttpUtils.checkResponseAndGetResult(httpResponse,false);
+        Map<String, String> queries, String body) {
+        return HttpUtils.doPutHandler(host, path, headers, queries, body);
     }
 
     public static String doPost(String host, String path, Map<String, String> headers,
@@ -43,8 +35,7 @@ public class RestUtils {
             headers = Maps.newHashMap();
         }
         headers.put(HttpContentTypeEnum.CONTENT_TYPE_JSON.getKey(), HttpContentTypeEnum.CONTENT_TYPE_JSON.getValue());
-        HttpResponse httpResponse = HttpUtils.doPost(host, path, headers, queries, body);
-        return HttpUtils.checkResponseAndGetResult(httpResponse, false);
+        return HttpUtils.doPostHander(host, path, headers, queries, body);
     }
 
     public static String doPost(String host, String path, Map<String, String> headers,
@@ -53,7 +44,6 @@ public class RestUtils {
             headers = Maps.newHashMap();
         }
         headers.put(HttpContentTypeEnum.CONTENT_TYPE_JSON.getKey(), HttpContentTypeEnum.CONTENT_TYPE_JSON.getValue());
-        HttpResponse httpResponse = HttpUtils.doPost(host, path, headers, queries, body);
-        return HttpUtils.checkResponseAndGetResult(httpResponse, isEnsure);
+        return HttpUtils.doPostHander(host, path, headers, queries, body);
     }
 }

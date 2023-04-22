@@ -16,16 +16,18 @@
 
 package com.luna.common.net.hander;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.TypeReference;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.hc.client5.http.ClientProtocolException;
+import java.io.IOException;
+
+import com.luna.common.net.async.CustomAsyncHttpResponse;
 import org.apache.hc.client5.http.impl.classic.AbstractHttpClientResponseHandler;
 import org.apache.hc.core5.http.*;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 
-import java.io.IOException;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.TypeReference;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Basic response handler which takes an url for documentation.
@@ -34,15 +36,8 @@ import java.io.IOException;
  * @author luna
  */
 @Slf4j
-public abstract class ValidatingResponseHandler<T> extends AbstractHttpClientResponseHandler<T> {
+public abstract class AsyncValidatingResponseHandler<T> implements AsyncHttpClientResponseHandler<T> {
 
-    /**
-     * Checks the response for a statuscode between {@link HttpStatus#SC_OK} and {@link HttpStatus#SC_MULTIPLE_CHOICES}
-     * and throws an {@link RuntimeException} otherwise.
-     *
-     * @param response to check
-     * @throws RuntimeException when the status code is not acceptable.
-     */
     protected void validateResponse(HttpResponse response) {
         String reasonPhrase = response.getReasonPhrase();
         int statusCode = response.getCode();
@@ -54,18 +49,7 @@ public abstract class ValidatingResponseHandler<T> extends AbstractHttpClientRes
     }
 
     @Override
-    public T handleResponse(ClassicHttpResponse response) {
-        this.validateResponse(response);
-        return handleEntity(response.getEntity());
-    }
-
-    @Override
-    public T handleEntity(HttpEntity entity) {
-        try {
-            String string = EntityUtils.toString(entity);
-            return JSON.parseObject(string, new TypeReference<T>() {});
-        } catch (IOException | ParseException e) {
-            throw new RuntimeException(e);
-        }
+    public void handleResponse(CustomAsyncHttpResponse response) {
+        validateResponse(response);
     }
 }

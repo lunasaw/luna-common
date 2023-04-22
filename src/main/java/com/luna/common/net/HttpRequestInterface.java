@@ -1,6 +1,7 @@
 package com.luna.common.net;
 
-import org.apache.http.client.ResponseHandler;
+
+import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 
 import java.util.Map;
 
@@ -11,19 +12,19 @@ import java.util.Map;
  */
 public interface HttpRequestInterface {
 
-    <T> T doGet(String host, String path, Map<String, String> headers, Map<String, String> queries, ResponseHandler<T> responseHandler);
+    <T> T doGet(String host, String path, Map<String, String> headers, Map<String, String> queries, HttpClientResponseHandler<T> responseHandler);
 
     <T> T doDelete(String host, String path, Map<String, String> headers,
-        Map<String, String> queries, String body, ResponseHandler<T> responseHandler);
+        Map<String, String> queries, String body, HttpClientResponseHandler<T> responseHandler);
 
     <T> T doPut(String host, String path, Map<String, String> headers,
-        Map<String, String> queries, String body, ResponseHandler<T> responseHandler);
+        Map<String, String> queries, String body, HttpClientResponseHandler<T> responseHandler);
 
     <T> T doPost(String host, String path, Map<String, String> headers,
-        Map<String, String> queries, Map<String, String> bodies, ResponseHandler<T> responseHandler);
+        Map<String, String> queries, Map<String, String> bodies, HttpClientResponseHandler<T> responseHandler);
 
     <T> T doPost(String host, String path, Map<String, String> headers,
-        Map<String, String> queries, String body, ResponseHandler<T> responseHandler);
+        Map<String, String> queries, String body, HttpClientResponseHandler<T> responseHandler);
 
     /**
      * Post stream
@@ -37,5 +38,5 @@ public interface HttpRequestInterface {
      * @throws RuntimeException
      */
     <T> T doPost(String host, String path, Map<String, String> headers,
-        Map<String, String> queries, byte[] body, ResponseHandler<T> responseHandler);
+        Map<String, String> queries, byte[] body, HttpClientResponseHandler<T> responseHandler);
 }

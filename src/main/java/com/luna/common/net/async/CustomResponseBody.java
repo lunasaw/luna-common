@@ -1,0 +1,104 @@
+/*
+ * ====================================================================
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ * ====================================================================
+ *
+ * This software consists of voluntary contributions made by many
+ * individuals on behalf of the Apache Software Foundation.  For more
+ * information on the Apache Software Foundation, please see
+ * <http://www.apache.org/>.
+ *
+ */
+
+package com.luna.common.net.async;
+
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.util.Args;
+
+/**
+ * Message body representation as a simple text string or an array of bytes.
+ *
+ * @since 5.0
+ */
+public final class CustomResponseBody {
+
+    private final byte[] bodyAsBytes;
+    private final String bodyAsText;
+    private final ContentType contentType;
+
+    CustomResponseBody(final byte[] bodyAsBytes, final String bodyAsText, final ContentType contentType) {
+        this.bodyAsBytes = bodyAsBytes;
+        this.bodyAsText = bodyAsText;
+        this.contentType = contentType;
+    }
+
+    static CustomResponseBody create(final String body, final ContentType contentType) {
+        Args.notNull(body, "Body");
+        final Charset charset = (contentType != null ? contentType : ContentType.DEFAULT_TEXT).getCharset();
+        final byte[] bytes = body.getBytes(charset != null ? charset : StandardCharsets.US_ASCII);
+        return new CustomResponseBody(bytes, null, contentType);
+    }
+
+    static CustomResponseBody create(final byte[] body, final ContentType contentType) {
+        Args.notNull(body, "Body");
+        return new CustomResponseBody(body, null, contentType);
+    }
+
+    public ContentType getContentType() {
+        return contentType;
+    }
+
+    public byte[] getBodyBytes() {
+        if (bodyAsBytes != null) {
+            return bodyAsBytes;
+        } else if (bodyAsText != null) {
+            final Charset charset = (contentType != null ? contentType : ContentType.DEFAULT_TEXT).getCharset();
+            return bodyAsText.getBytes(charset != null ? charset : StandardCharsets.US_ASCII);
+        } else {
+            return null;
+        }
+    }
+
+    public String getBodyText() {
+        if (bodyAsBytes != null) {
+            final Charset charset = (contentType != null ? contentType : ContentType.DEFAULT_TEXT).getCharset();
+            return new String(bodyAsBytes, charset != null ? charset : StandardCharsets.US_ASCII);
+        } else {
+            return bodyAsText;
+        }
+    }
+
+    public boolean isText() {
+        return bodyAsText != null;
+    }
+
+    public boolean isBytes() {
+        return bodyAsBytes != null;
+    }
+
+    @Override
+    public String toString() {
+        return "SimpleBody{content length=" + (bodyAsBytes != null ? bodyAsBytes.length : "chunked") +
+                ", content type=" + contentType + "}";
+    }
+
+}
+
