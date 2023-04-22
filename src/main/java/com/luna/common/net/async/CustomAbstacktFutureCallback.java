@@ -17,6 +17,7 @@ public abstract class CustomAbstacktFutureCallback<T> implements FutureCallback<
 
     @Override
     public void failed(Exception ex) {
+        // 请求失败处理
         log.error("failed::", ex);
     }
 

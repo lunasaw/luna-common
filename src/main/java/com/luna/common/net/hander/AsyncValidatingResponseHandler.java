@@ -38,8 +38,18 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class AsyncValidatingResponseHandler<T> implements AsyncHttpClientResponseHandler<T> {
 
+    protected void validateResponse(HttpResponse response) {
+        String reasonPhrase = response.getReasonPhrase();
+        int statusCode = response.getCode();
+
+        if (statusCode >= HttpStatus.SC_OK && statusCode < HttpStatus.SC_MULTIPLE_CHOICES) {
+            return;
+        }
+        throw new RuntimeException("Unexpected response: " + statusCode + reasonPhrase);
+    }
+
     @Override
     public void handleResponse(CustomAsyncHttpResponse response) {
-
+        validateResponse(response);
     }
 }

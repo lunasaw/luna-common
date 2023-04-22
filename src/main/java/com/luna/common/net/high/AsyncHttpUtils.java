@@ -38,12 +38,16 @@ import com.luna.common.net.async.CustomAbstacktFutureCallback;
 import com.luna.common.net.async.CustomAsyncHttpResponse;
 import com.luna.common.net.async.CustomResponseConsumer;
 import com.luna.common.net.hander.AsyncHttpClientResponseHandler;
+import org.apache.hc.client5.http.auth.CredentialsProvider;
+import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.config.TlsConfig;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClientBuilder;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
+import org.apache.hc.client5.http.impl.auth.CredentialsProviderBuilder;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManager;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
+import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.config.CharCodingConfig;
 import org.apache.hc.core5.http.config.Http1Config;
 import org.apache.hc.core5.http.nio.AsyncEntityProducer;
@@ -52,8 +56,10 @@ import org.apache.hc.core5.http.nio.entity.FileEntityProducer;
 import org.apache.hc.core5.http.nio.entity.PathEntityProducer;
 import org.apache.hc.core5.http.nio.entity.StringAsyncEntityProducer;
 import org.apache.hc.core5.http.nio.support.AsyncRequestBuilder;
+import org.apache.hc.core5.http.ssl.TLS;
 import org.apache.hc.core5.http2.HttpVersionPolicy;
 import org.apache.hc.core5.reactor.IOReactorConfig;
+import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
 
 import javax.annotation.PreDestroy;
@@ -63,7 +69,9 @@ import javax.annotation.PreDestroy;
  */
 public class AsyncHttpUtils {
 
-    private static CloseableHttpAsyncClient asyncClient;
+    private static CloseableHttpAsyncClient     asyncClient;
+
+    private static final HttpAsyncClientBuilder HTTP_ASYNC_CLIENT_BUILDER = HttpAsyncClients.custom();
 
     static {
         init();
@@ -76,7 +84,6 @@ public class AsyncHttpUtils {
     }
 
     public static void init() {
-        final HttpAsyncClientBuilder HTTP_ASYNC_CLIENT_BUILDER = HttpAsyncClients.custom();
         final IOReactorConfig ioReactorConfig = IOReactorConfig.custom()
             .setSoTimeout(Timeout.ofSeconds(HttpUtils.SOCKET_TIME_OUT))
             .build();
@@ -85,6 +92,35 @@ public class AsyncHttpUtils {
             .setDefaultTlsConfig(TlsConfig.custom()
                 .setVersionPolicy(HttpVersionPolicy.FORCE_HTTP_1)
                 .build())
+            .setConnectionConfigResolver(route -> {
+                // Use different settings for all secure (TLS) connections
+                if (route.isSecure()) {
+                    return ConnectionConfig.custom()
+                        .setConnectTimeout(Timeout.ofMinutes(2))
+                        .setSocketTimeout(Timeout.ofMinutes(2))
+                        .setValidateAfterInactivity(TimeValue.ofMinutes(1))
+                        .setTimeToLive(TimeValue.ofHours(1))
+                        .build();
+                } else {
+                    return ConnectionConfig.custom()
+                        .setConnectTimeout(Timeout.ofMinutes(1))
+                        .setSocketTimeout(Timeout.ofMinutes(1))
+                        .setValidateAfterInactivity(TimeValue.ofSeconds(15))
+                        .setTimeToLive(TimeValue.ofMinutes(15))
+                        .build();
+                }
+            })
+            .setTlsConfigResolver(host -> {
+                // Use different settings for specific hosts
+                if (host.getSchemeName().equalsIgnoreCase("localhost")) {
+                    return TlsConfig.custom()
+                        .setSupportedProtocols(TLS.V_1_3)
+                        .setHandshakeTimeout(Timeout.ofSeconds(10))
+                        .build();
+                } else {
+                    return TlsConfig.DEFAULT;
+                }
+            })
             .build();
 
         final CharCodingConfig codingConfig = CharCodingConfig.custom()
@@ -95,13 +131,29 @@ public class AsyncHttpUtils {
         asyncClient = HTTP_ASYNC_CLIENT_BUILDER.setIOReactorConfig(ioReactorConfig)
             .setConnectionManager(connectionManager)
             .setCharCodingConfig(codingConfig)
+            .evictExpiredConnections()
+            .evictIdleConnections(TimeValue.ofSeconds(HttpUtils.CONNECT_TIMEOUT))
             .setHttp1Config(Http1Config.DEFAULT)
             .build();
     }
 
+    public static void setAuth(String host, String user, String password) {
+        setAuth(host, 80, user, password);
+    }
+
+    public static void setAuth(String host, Integer port, String user, String password) {
+        CredentialsProvider provider = CredentialsProviderBuilder.create()
+            .add(new HttpHost(host, port), user, password.toCharArray())
+            .build();
+        HTTP_ASYNC_CLIENT_BUILDER.setDefaultCredentialsProvider(provider);
+        asyncClient = HTTP_ASYNC_CLIENT_BUILDER.build();
+        asyncClient.start();
+    }
+
     public static <T> CustomAsyncHttpResponse doPost(String host, String path, Map<String, String> headers,
-                                                     Map<String, String> queries, Path file, AsyncHttpClientResponseHandler<T> responseHandler) throws IOException {
-        AsyncRequestProducer producer = getProducer(host, path, headers, queries, new PathEntityProducer(file, StandardOpenOption.READ), AsyncRequestBuilder.post());
+        Map<String, String> queries, Path file, AsyncHttpClientResponseHandler<T> responseHandler) throws IOException {
+        AsyncRequestProducer producer =
+            getProducer(host, path, headers, queries, new PathEntityProducer(file, StandardOpenOption.READ), AsyncRequestBuilder.post());
         return doAsyncRequest(responseHandler, producer);
     }
 
@@ -150,6 +202,5 @@ public class AsyncHttpUtils {
             throw new RuntimeException(e);
         }
     }
-
 
 }
