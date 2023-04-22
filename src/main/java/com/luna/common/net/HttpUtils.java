@@ -11,6 +11,7 @@ import org.apache.hc.client5.http.ContextBuilder;
 import org.apache.hc.client5.http.DnsResolver;
 import org.apache.hc.client5.http.SystemDefaultDnsResolver;
 import org.apache.hc.client5.http.auth.*;
+import org.apache.hc.client5.http.classic.ExecChainHandler;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpPut;
@@ -161,6 +162,16 @@ public class HttpUtils {
 
     public static void refresh() {
         httpClient = httpClientBuilder.build();
+    }
+
+    public void addRequestInterceptorFirst(HttpRequestInterceptor httpRequestInterceptor) {
+        httpClientBuilder.addRequestInterceptorFirst(httpRequestInterceptor);
+        refresh();
+    }
+
+    public void addExecInterceptorAfter(final String existing, final String name, final ExecChainHandler interceptor) {
+        httpClientBuilder.addExecInterceptorAfter(existing, name, interceptor);
+        refresh();
     }
 
     public static void basicAuth(String userName, String password, String host) {
