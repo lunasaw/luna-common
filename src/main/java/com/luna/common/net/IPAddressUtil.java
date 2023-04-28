@@ -9,6 +9,9 @@ import java.net.URL;
 import java.util.Arrays;
 
 public class IPAddressUtil {
+
+    public static final String  LOCAL_HOST      = "127.0.0.1";
+
     private static final int    INADDR4SZ       = 4;
     private static final int    INADDR16SZ      = 16;
     private static final int    INT16SZ         = 2;

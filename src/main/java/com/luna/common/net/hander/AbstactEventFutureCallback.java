@@ -1,16 +1,20 @@
-package com.luna.common.net.async;
+package com.luna.common.net.hander;
 
 import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.core5.concurrent.FutureCallback;
 
 /**
- * @author weidian
+ * @author luna
  * @description
- * @date 2023/4/22
+ * @date 2023/4/28
  */
 @Slf4j
-public abstract class CustomAbstacktFutureCallback<T> implements FutureCallback<T> {
+public abstract class AbstactEventFutureCallback<T,E> implements FutureCallback<T> {
+
+    public void onEvent(E result) {
+        log.info("onEvent::result = {}", JSON.toJSONString(result));
+    }
 
     @Override
     public void completed(T result) {
@@ -19,11 +23,11 @@ public abstract class CustomAbstacktFutureCallback<T> implements FutureCallback<
 
     @Override
     public void failed(Exception ex) {
-        // 请求失败处理
-        log.error("failed::", ex);
+
     }
 
     @Override
     public void cancelled() {
+
     }
 }

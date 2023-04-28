@@ -2,15 +2,16 @@ package com.luna.common.net;
 
 import com.google.common.collect.ImmutableList;
 import com.luna.common.constant.StrPoolConstant;
+import com.luna.common.net.high.AsyncHttpUtils;
 import com.luna.common.net.method.HttpDelete;
 import com.luna.common.text.CharsetUtil;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hc.client5.http.ContextBuilder;
 import org.apache.hc.client5.http.DnsResolver;
 import org.apache.hc.client5.http.SystemDefaultDnsResolver;
 import org.apache.hc.client5.http.auth.*;
+import org.apache.hc.client5.http.classic.ExecChainHandler;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpPut;
@@ -39,12 +40,10 @@ import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
 import org.apache.hc.client5.http.cookie.Cookie;
 import org.apache.hc.client5.http.entity.mime.HttpMultipartMode;
 import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
-import org.apache.hc.core5.http.impl.io.DefaultBHttpClientConnectionFactory;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.apache.hc.core5.http.io.SocketConfig;
 import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
-import org.apache.hc.core5.http.io.entity.FileEntity;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.http.message.BasicClassicHttpRequest;
 import org.apache.hc.core5.http.nio.support.AsyncRequestBuilder;
@@ -52,7 +51,6 @@ import org.apache.hc.core5.pool.PoolConcurrencyPolicy;
 import org.apache.hc.core5.pool.PoolReusePolicy;
 import org.apache.hc.core5.ssl.SSLContextBuilder;
 import org.apache.hc.core5.util.TimeValue;
-import org.apache.hc.core5.util.Timeout;
 
 import javax.net.ssl.SSLContext;
 import java.io.File;
@@ -70,28 +68,44 @@ import java.util.concurrent.TimeUnit;
  */
 public class HttpUtils {
 
-    public static final HttpClientContext     CLIENT_CONTEXT   = HttpClientContext.create();
-    private static final int                  MAX_REDIRECTS    = 10;
-    private static CloseableHttpClient        httpClient;
+    public static final HttpClientContext  CLIENT_CONTEXT      = HttpClientContext.create();
+    private static CloseableHttpClient     httpClient;
 
-    private static volatile HttpClientBuilder httpClientBuilder;
+    private static final HttpClientBuilder HTTP_CLIENT_BUILDER = HttpClients.custom();
 
-    private static final BasicCookieStore     cookieStore      = new BasicCookieStore();
+    private static final BasicCookieStore  COOKIE_STORE        = new BasicCookieStore();
 
+    private static final int               MAX_REDIRECTS       = 10;
     /**
      * 最大连接数
      */
-    public static final int                   MAX_CONN         = 200;
+    public static final int                MAX_CONN            = 200;
     /**
      * 设置连接建立的超时时间为10s
      */
-    public static final int                   CONNECT_TIMEOUT  = 10;
+    public static int                      CONNECT_TIMEOUT     = 10;
 
-    public static final int                   RESPONSE_TIMEOUT = 30;
+    public static int                      RESPONSE_TIMEOUT    = 30;
 
-    public static final int                   MAX_ROUTE        = 200;
+    public static int                      MAX_ROUTE           = 200;
 
-    public static final int                   SOCKET_TIME_OUT  = 10;
+    public static int                      SOCKET_TIME_OUT     = 10;
+
+    public static void setConnectTimeout(int connectTimeout) {
+        CONNECT_TIMEOUT = connectTimeout;
+    }
+
+    public static void setResponseTimeout(int responseTimeout) {
+        RESPONSE_TIMEOUT = responseTimeout;
+    }
+
+    public static void setMaxRoute(int maxRoute) {
+        MAX_ROUTE = maxRoute;
+    }
+
+    public static void setSocketTimeOut(int socketTimeOut) {
+        SOCKET_TIME_OUT = socketTimeOut;
+    }
 
     static {
         init();
@@ -150,17 +164,25 @@ public class HttpUtils {
             .setSoTimeout(SOCKET_TIME_OUT, TimeUnit.SECONDS)
             .build());
 
-        if (httpClientBuilder == null) {
-            httpClientBuilder = HttpClients.custom();
-        }
-        httpClientBuilder.setConnectionManager(cm)
-            .setDefaultRequestConfig(defaultRequestConfig).setDefaultCookieStore(cookieStore);
+        HTTP_CLIENT_BUILDER.setConnectionManager(cm)
+            .setDefaultRequestConfig(defaultRequestConfig);
 
-        httpClient = httpClientBuilder.build();
+        httpClient = HTTP_CLIENT_BUILDER.build();
     }
 
     public static void refresh() {
-        httpClient = httpClientBuilder.build();
+        HTTP_CLIENT_BUILDER.setDefaultCookieStore(COOKIE_STORE);
+        httpClient = HTTP_CLIENT_BUILDER.build();
+    }
+
+    public void addRequestInterceptorFirst(HttpRequestInterceptor httpRequestInterceptor) {
+        HTTP_CLIENT_BUILDER.addRequestInterceptorFirst(httpRequestInterceptor);
+        refresh();
+    }
+
+    public void addExecInterceptorAfter(final String existing, final String name, final ExecChainHandler interceptor) {
+        HTTP_CLIENT_BUILDER.addExecInterceptorAfter(existing, name, interceptor);
+        refresh();
     }
 
     public static void basicAuth(String userName, String password, String host) {
@@ -210,7 +232,7 @@ public class HttpUtils {
     }
 
     public static void setProxy(Integer port) {
-        setProxy("127.0.0.1", port);
+        setProxy(IPAddressUtil.LOCAL_HOST, port);
     }
 
     /**
@@ -224,10 +246,16 @@ public class HttpUtils {
         // for proxy debug
         HttpHost proxy = new HttpHost(host, port);
         DefaultProxyRoutePlanner defaultProxyRoutePlanner = new DefaultProxyRoutePlanner(proxy);
-        httpClientBuilder.setRoutePlanner(defaultProxyRoutePlanner)
-            .setDefaultCookieStore(cookieStore);
+        HTTP_CLIENT_BUILDER.setRoutePlanner(defaultProxyRoutePlanner);
 
         refresh();
+    }
+
+    public static void setProxy(String host, Integer port, String username, String password) {
+        if (StringUtils.isNotBlank(username)) {
+            authContext(username, password, host, StandardAuthScheme.BASIC);
+        }
+        setProxy(host, port);
     }
 
     /**
@@ -251,19 +279,19 @@ public class HttpUtils {
     }
 
     public static List<Cookie> getCookie() {
-        return cookieStore.getCookies();
+        return COOKIE_STORE.getCookies();
     }
 
     public static void addCookie(Cookie cookie) {
-        cookieStore.addCookie(cookie);
+        COOKIE_STORE.addCookie(cookie);
     }
 
     public static void addCookie(List<Cookie> cookies) {
-        cookies.forEach(cookieStore::addCookie);
+        cookies.forEach(COOKIE_STORE::addCookie);
     }
 
     public static void addCookie(Cookie... cookies) {
-        Arrays.stream(cookies).forEach(cookieStore::addCookie);
+        Arrays.stream(cookies).forEach(COOKIE_STORE::addCookie);
     }
 
     private static <T> T doRequest(HttpClientResponseHandler<T> responseHandler, HttpUriRequestBase request) {
@@ -399,25 +427,23 @@ public class HttpUtils {
      */
     public static <T> T doPost(String host, String path, Map<String, String> headers,
         Map<String, String> queries, Map<String, String> bodies, HttpClientResponseHandler<T> responseHandler) {
-        HttpPost request = new HttpPost(buildUrl(host, path, queries));
-        builderHeader(headers, request);
+
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+        // 设置浏览器兼容模式
+        builder.setMode(HttpMultipartMode.LEGACY);
+        // 设置请求的编码格式
+        builder.setCharset(CharsetUtil.defaultCharset());
+        builder.setContentType(ContentType.MULTIPART_FORM_DATA);
         if (MapUtils.isNotEmpty(bodies)) {
             bodies.forEach((k, v) -> {
                 // 传入参数可以为file或者filePath，在此处做转换
                 File file = new File(v);
-                MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-                // 设置浏览器兼容模式
-                builder.setMode(HttpMultipartMode.LEGACY);
-                // 设置请求的编码格式
-                builder.setCharset(CharsetUtil.defaultCharset());
-                builder.setContentType(ContentType.MULTIPART_FORM_DATA);
                 // 添加文件
                 builder.addBinaryBody(k, file);
-                HttpEntity reqEntity = builder.build();
-                request.setEntity(reqEntity);
             });
         }
-        return doRequest(responseHandler, request);
+        HttpEntity reqEntity = builder.build();
+        return doPost(host, path, headers, queries, reqEntity, responseHandler);
     }
 
     public static ClassicHttpResponse doPost(String host, String path, Map<String, String> headers,
@@ -438,10 +464,15 @@ public class HttpUtils {
      */
     public static <T> T doPost(String host, String path, Map<String, String> headers,
         Map<String, String> queries, String body, HttpClientResponseHandler<T> responseHandler) {
+        return doPost(host, path, headers, queries, new StringEntity(body, Charset.defaultCharset()), responseHandler);
+    }
+
+    public static <T> T doPost(String host, String path, Map<String, String> headers,
+        Map<String, String> queries, HttpEntity httpEntity, HttpClientResponseHandler<T> responseHandler) {
         HttpPost request = new HttpPost(buildUrl(host, path, queries));
         builderHeader(headers, request);
-        if (StringUtils.isNotBlank(body)) {
-            request.setEntity(new StringEntity(body, Charset.defaultCharset()));
+        if (httpEntity != null) {
+            request.setEntity(httpEntity);
         }
         return doRequest(responseHandler, request);
     }
@@ -469,12 +500,7 @@ public class HttpUtils {
      */
     public static <T> T doPost(String host, String path, Map<String, String> headers,
         Map<String, String> queries, byte[] body, HttpClientResponseHandler<T> responseHandler) {
-        HttpPost request = new HttpPost(buildUrl(host, path, queries));
-        builderHeader(headers, request);
-        if (ObjectUtils.isNotEmpty(body)) {
-            request.setEntity(new ByteArrayEntity(body, ContentType.APPLICATION_OCTET_STREAM));
-        }
-        return doRequest(responseHandler, request);
+        return doPost(host, path, headers, queries, new ByteArrayEntity(body, ContentType.APPLICATION_OCTET_STREAM), responseHandler);
     }
 
     public static HttpResponse doPost(String host, String path, Map<String, String> headers,
@@ -710,6 +736,6 @@ public class HttpUtils {
     }
 
     public static String checkResponseAndGetResult(HttpResponse httpResponse, Boolean isEnsure) {
-        return checkResponseAndGetResultV2((ClassicHttpResponse) httpResponse, isEnsure);
+        return checkResponseAndGetResultV2((ClassicHttpResponse)httpResponse, isEnsure);
     }
 }
