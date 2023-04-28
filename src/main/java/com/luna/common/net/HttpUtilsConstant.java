@@ -21,4 +21,5 @@ public interface HttpUtilsConstant {
     String TEXT                       = "text/html; charset=UTF-8";
 
     String OCTET_STREAM               = "application/octet-stream";
+
 }

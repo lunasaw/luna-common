@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import com.luna.common.net.HttpUtils;
 import com.luna.common.net.HttpUtilsConstant;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.client5.http.impl.classic.BasicHttpClientResponseHandler;
 import org.apache.hc.client5.http.utils.Base64;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.HttpEntity;
@@ -36,6 +37,15 @@ public class HttpUtilsTest {
         HttpEntity entity = httpResponse.getEntity();
         String responseString = EntityUtils.toString(entity, "utf-8");
         Assert.assertNotNull(responseString);
+    }
+
+    @Test
+    public void sse_test() {
+
+        String host = "https://www.w3schools.com";
+        String path = "/html/demo_sse.php";
+        String s = doGet(host, path, null, null, new BasicHttpClientResponseHandler());
+        System.out.println(s);
     }
 
     @Test

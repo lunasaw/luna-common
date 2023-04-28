@@ -31,6 +31,7 @@ import java.io.IOException;
 import com.luna.common.net.async.CustomAsyncHttpResponse;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.HttpException;
+import org.apache.hc.core5.http.HttpResponse;
 
 /**
  * Handler that encapsulates the process of generating a response object
@@ -51,6 +52,6 @@ public interface AsyncHttpClientResponseHandler<T> {
      *
      * @throws IOException in case of a problem or the connection was aborted
      */
-    void handleResponse(CustomAsyncHttpResponse response) ;
+    <R extends HttpResponse> void  handleResponse(R  response) ;
 
 }

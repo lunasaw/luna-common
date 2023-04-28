@@ -36,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author luna
  */
 @Slf4j
-public abstract class AsyncValidatingResponseHandler<T> implements AsyncHttpClientResponseHandler<T> {
+public  abstract  class AsyncValidatingResponseHandler<T> implements AsyncHttpClientResponseHandler<T> {
 
     protected void validateResponse(HttpResponse response) {
         String reasonPhrase = response.getReasonPhrase();
@@ -49,7 +49,7 @@ public abstract class AsyncValidatingResponseHandler<T> implements AsyncHttpClie
     }
 
     @Override
-    public void handleResponse(CustomAsyncHttpResponse response) {
+    public <R extends HttpResponse> void handleResponse(R response) {
         validateResponse(response);
     }
 }

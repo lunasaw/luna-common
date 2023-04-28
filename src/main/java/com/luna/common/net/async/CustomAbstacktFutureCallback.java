@@ -1,5 +1,6 @@
 package com.luna.common.net.async;
 
+import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.core5.concurrent.FutureCallback;
 
@@ -13,6 +14,7 @@ public abstract class CustomAbstacktFutureCallback<T> implements FutureCallback<
 
     @Override
     public void completed(T result) {
+        log.info("completed::result = {}", JSON.toJSONString(result));
     }
 
     @Override

@@ -34,10 +34,11 @@ import java.nio.file.StandardOpenOption;
 import java.util.Map;
 import java.util.concurrent.Future;
 import com.luna.common.net.HttpUtils;
-import com.luna.common.net.async.CustomAbstacktFutureCallback;
+import com.luna.common.net.IPAddressUtil;
 import com.luna.common.net.async.CustomAsyncHttpResponse;
 import com.luna.common.net.async.CustomResponseConsumer;
 import com.luna.common.net.hander.AsyncHttpClientResponseHandler;
+import lombok.SneakyThrows;
 import org.apache.hc.client5.http.auth.CredentialsProvider;
 import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.config.TlsConfig;
@@ -47,18 +48,21 @@ import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
 import org.apache.hc.client5.http.impl.auth.CredentialsProviderBuilder;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManager;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
+import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.Method;
 import org.apache.hc.core5.http.config.CharCodingConfig;
 import org.apache.hc.core5.http.config.Http1Config;
 import org.apache.hc.core5.http.nio.AsyncEntityProducer;
 import org.apache.hc.core5.http.nio.AsyncRequestProducer;
+import org.apache.hc.core5.http.nio.AsyncResponseConsumer;
 import org.apache.hc.core5.http.nio.entity.FileEntityProducer;
 import org.apache.hc.core5.http.nio.entity.PathEntityProducer;
 import org.apache.hc.core5.http.nio.entity.StringAsyncEntityProducer;
 import org.apache.hc.core5.http.nio.support.AsyncRequestBuilder;
 import org.apache.hc.core5.http.ssl.TLS;
 import org.apache.hc.core5.http2.HttpVersionPolicy;
+import org.apache.hc.core5.io.CloseMode;
 import org.apache.hc.core5.reactor.IOReactorConfig;
 import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
@@ -79,9 +83,34 @@ public class AsyncHttpUtils {
         asyncClient.start();
     }
 
+    @SneakyThrows
+    public static void refresh() {
+        asyncClient = HTTP_ASYNC_CLIENT_BUILDER.build();
+        asyncClient.start();
+    }
+
+
+    public static void setProxy(Integer port) {
+        setProxy(IPAddressUtil.LOCAL_HOST, port);
+    }
+
+    /**
+     * 使用代理访问
+     *
+     * @param host 代理地址
+     * @param port 代理端口
+     * @return
+     */
+    public static void setProxy(String host, Integer port) {
+        // for proxy debug
+        HttpHost proxy = new HttpHost(host, port);
+        AsyncHttpUtils.HTTP_ASYNC_CLIENT_BUILDER.setProxy(proxy);
+        refresh();
+    }
+
     @PreDestroy
-    public void destroy() throws IOException {
-        asyncClient.close();
+    public static void destroy() throws IOException {
+        asyncClient.close(CloseMode.GRACEFUL);
     }
 
     public static void init() {
@@ -155,49 +184,77 @@ public class AsyncHttpUtils {
         Map<String, String> queries, Path file, AsyncHttpClientResponseHandler<T> responseHandler) throws IOException {
         AsyncRequestProducer producer =
             getProducer(host, path, headers, queries, new PathEntityProducer(file, StandardOpenOption.READ), Method.POST.toString());
-        return doAsyncRequest(responseHandler, producer);
+        return doAsyncRequest(producer, responseHandler);
     }
 
     public static <T> CustomAsyncHttpResponse doPost(String host, String path, Map<String, String> headers,
         Map<String, String> queries, File file, AsyncHttpClientResponseHandler<T> responseHandler) {
         AsyncRequestProducer producer = getProducer(host, path, headers, queries, new FileEntityProducer(file), Method.POST.toString());
-        return doAsyncRequest(responseHandler, producer);
+        return doAsyncRequest(producer, responseHandler);
     }
 
     public static <T> CustomAsyncHttpResponse doPost(String host, String path, Map<String, String> headers,
         Map<String, String> queries, String body, AsyncHttpClientResponseHandler<T> responseHandler) {
         AsyncRequestProducer producer = getProducer(host, path, headers, queries, new StringAsyncEntityProducer(body), Method.POST.toString());
-        return doAsyncRequest(responseHandler, producer);
+        return doAsyncRequest(producer, responseHandler);
     }
 
     public static <T> CustomAsyncHttpResponse doGet(String host, String path, Map<String, String> headers,
         Map<String, String> queries, AsyncHttpClientResponseHandler<T> responseHandler) {
-        AsyncRequestProducer producer = getProducer(host, path, headers, queries, null, Method.GET.toString());
-        return doAsyncRequest(responseHandler, producer);
+        AsyncRequestProducer producer = getProducer(host, path, headers, queries, Method.GET.toString());
+        return doAsyncRequest(producer, responseHandler);
     }
 
-    private static AsyncRequestProducer getProducer(String host, String path, Map<String, String> headers, Map<String, String> queries,
-                                                    AsyncEntityProducer entityProducer,
-                                                    String method) {
+    public static <T> CustomAsyncHttpResponse doPost(String host, String path, Map<String, String> headers,
+        Map<String, String> queries, AsyncHttpClientResponseHandler<T> responseHandler) {
+        AsyncRequestProducer producer = getProducer(host, path, headers, queries, Method.POST.toString());
+        return doAsyncRequest(producer, responseHandler);
+    }
+
+    public static AsyncRequestProducer getProducer(String host, String path, Map<String, String> headers, Map<String, String> queries,
+        String method) {
+        return getProducer(host, path, headers, queries, null, method);
+    }
+
+    public static AsyncRequestProducer getProducer(String host, String path, Map<String, String> headers, Map<String, String> queries,
+        AsyncEntityProducer entityProducer, String method) {
         AsyncRequestBuilder builder = AsyncRequestBuilder.create(method);
         builder.setHttpHost(HttpHighLevelUtil.getHost(host));
         builder.setUri(HttpUtils.buildUrl(host, path, queries));
         HttpUtils.builderHeader(headers, builder);
-        builder.setEntity(entityProducer);
+        if (entityProducer != null) {
+            builder.setEntity(entityProducer);
+        }
         return builder.build();
     }
 
-    private static <T> CustomAsyncHttpResponse doAsyncRequest(AsyncHttpClientResponseHandler<T> responseHandler, AsyncRequestProducer producer) {
-        final Future<CustomAsyncHttpResponse> future;
+    public static <T> CustomAsyncHttpResponse doAsyncRequest(AsyncRequestProducer producer, AsyncHttpClientResponseHandler<T> responseHandler) {
+        return doAsyncRequest(producer, new FutureCallback<CustomAsyncHttpResponse>() {
+            @Override
+            public void completed(CustomAsyncHttpResponse result) {
+                responseHandler.handleResponse(result);
+            }
+
+            @Override
+            public void failed(Exception ex) {
+                throw new RuntimeException(ex);
+            }
+
+            @Override
+            public void cancelled() {
+                throw new RuntimeException("cancelled");
+            }
+        });
+    }
+
+    public static CustomAsyncHttpResponse doAsyncRequest(AsyncRequestProducer producer, FutureCallback<CustomAsyncHttpResponse> callback) {
+        return doAsyncRequest(producer, CustomResponseConsumer.create(), callback);
+    }
+
+    public static <T> T doAsyncRequest(AsyncRequestProducer producer, AsyncResponseConsumer<T> consumer, FutureCallback<T> callback) {
+        final Future<T> future;
         try {
-            future = asyncClient.execute(
-                producer,
-                CustomResponseConsumer.create(), HttpUtils.CLIENT_CONTEXT, new CustomAbstacktFutureCallback<CustomAsyncHttpResponse>() {
-                    @Override
-                    public void completed(CustomAsyncHttpResponse result) {
-                        responseHandler.handleResponse(result);
-                    }
-                });
+            future = asyncClient.execute(producer, consumer, HttpUtils.CLIENT_CONTEXT, callback);
             return future.get();
         } catch (Exception e) {
             throw new RuntimeException(e);
