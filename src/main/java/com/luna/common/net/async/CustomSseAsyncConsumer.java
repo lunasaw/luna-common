@@ -83,6 +83,7 @@ public class CustomSseAsyncConsumer extends AbstractCharResponseConsumer<SseResp
         try {
             Event poll = events.poll(timeWait, TimeUnit.MILLISECONDS);
             if (poll != null) {
+                log.info("data::data = {}, endOfStream = {}", poll, endOfStream);
                 callback.onEvent(poll);
             }
         } catch (InterruptedException e) {

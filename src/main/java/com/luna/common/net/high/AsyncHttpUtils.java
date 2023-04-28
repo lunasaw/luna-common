@@ -39,7 +39,9 @@ import com.luna.common.net.async.CustomAsyncHttpResponse;
 import com.luna.common.net.async.CustomResponseConsumer;
 import com.luna.common.net.hander.AsyncHttpClientResponseHandler;
 import lombok.SneakyThrows;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.client5.http.auth.CredentialsProvider;
+import org.apache.hc.client5.http.auth.StandardAuthScheme;
 import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.config.TlsConfig;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
@@ -87,6 +89,13 @@ public class AsyncHttpUtils {
     public static void refresh() {
         asyncClient = HTTP_ASYNC_CLIENT_BUILDER.build();
         asyncClient.start();
+    }
+
+    public static void setProxy(String host, Integer port, String username, String password) {
+        if (StringUtils.isNotBlank(username)) {
+            setAuth(host,username, password);
+        }
+        setProxy(host, port);
     }
 
 
