@@ -100,14 +100,14 @@ public class AsyncHttpUtilsTest {
         StringAsyncEntityProducer stringAsyncEntityProducer = new StringAsyncEntityProducer("{\"temperature\":0,\"model\":\"text-davinci-003\",\"prompt\":\"Say this is a test\",\"stream\":true,\"max_tokens\":7}");
         AsyncRequestProducer producer = AsyncHttpUtils.getProducer("https://api.openai.com", "/v1/completions", header, new HashMap<>(), stringAsyncEntityProducer, Method.POST.toString());
 
-        CustomSseAsyncConsumer customSseAsyncConsumer = new CustomSseAsyncConsumer(new LoggingEventSourceListener<>());
+        CustomSseAsyncConsumer customSseAsyncConsumer = new CustomSseAsyncConsumer();
 
         AsyncHttpUtils.doAsyncRequest(producer, customSseAsyncConsumer, new CustomAbstacktFutureCallback<SseResponse>(){});
     }
 
     @Test
     public void test_sse() {
-        CustomSseAsyncConsumer customSseAsyncConsumer = new CustomSseAsyncConsumer(new LoggingEventSourceListener<>());
+        CustomSseAsyncConsumer customSseAsyncConsumer = new CustomSseAsyncConsumer();
 
         ImmutableMap<String, String> map = ImmutableMap.of();
         AsyncRequestProducer producer = AsyncHttpUtils.getProducer("http://localhost:6060", "/stream-sse-mvc", map, new HashMap<>(), Method.GET.toString());

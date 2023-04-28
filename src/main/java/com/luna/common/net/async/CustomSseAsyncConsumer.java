@@ -1,7 +1,7 @@
 package com.luna.common.net.async;
 
 import com.luna.common.net.hander.AbstactEventFutureCallback;
-import com.luna.common.net.hander.EventSourceListener;
+import com.luna.common.net.hander.LoggingEventSourceListener;
 import com.luna.common.net.sse.Event;
 import com.luna.common.net.sse.SseResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -33,10 +33,23 @@ public class CustomSseAsyncConsumer extends AbstractCharResponseConsumer<SseResp
 
     private final Integer              timeWait;
 
+    public CustomSseAsyncConsumer(AbstactEventFutureCallback<SseResponse, Event> callback) {
+        this.events = new ArrayBlockingQueue<>(100);
+        this.callback = callback;
+        this.timeWait = 1000;
+    }
+
+
     public CustomSseAsyncConsumer(Integer capacity, AbstactEventFutureCallback<SseResponse, Event> callback, Integer timeWait) {
         this.events = new ArrayBlockingQueue<>(capacity);
         this.callback = callback;
         this.timeWait = timeWait;
+    }
+
+    public CustomSseAsyncConsumer() {
+        this.events = new ArrayBlockingQueue<>(100);
+        this.callback = new LoggingEventSourceListener<>();
+        this.timeWait = 1000;
     }
 
     public CustomSseAsyncConsumer(FutureCallback<Event> listener) {
