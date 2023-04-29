@@ -81,11 +81,11 @@ public class HttpUtils {
 
     public static final BasicCookieStore   COOKIE_STORE        = new BasicCookieStore();
 
-    private static final int               MAX_REDIRECTS       = 10;
+    public static int                      MAX_REDIRECTS       = 10;
     /**
      * 最大连接数
      */
-    public static final int                MAX_CONN            = 200;
+    public static int                      MAX_CONN            = 200;
     /**
      * 设置连接建立的超时时间为10s
      */
@@ -96,22 +96,6 @@ public class HttpUtils {
     public static int                      MAX_ROUTE           = 200;
 
     public static int                      SOCKET_TIME_OUT     = 10;
-
-    public static void setConnectTimeout(int connectTimeout) {
-        CONNECT_TIMEOUT = connectTimeout;
-    }
-
-    public static void setResponseTimeout(int responseTimeout) {
-        RESPONSE_TIMEOUT = responseTimeout;
-    }
-
-    public static void setMaxRoute(int maxRoute) {
-        MAX_ROUTE = maxRoute;
-    }
-
-    public static void setSocketTimeOut(int socketTimeOut) {
-        SOCKET_TIME_OUT = socketTimeOut;
-    }
 
     static {
         init();
