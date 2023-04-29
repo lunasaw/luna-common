@@ -1,21 +1,23 @@
 package com.luna.common.net.async;
 
-import com.luna.common.net.hander.AbstactEventFutureCallback;
-import com.luna.common.net.hander.LoggingEventSourceListener;
-import com.luna.common.net.sse.Event;
-import com.luna.common.net.sse.SseResponse;
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.nio.CharBuffer;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.hc.client5.http.async.methods.AbstractCharResponseConsumer;
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpException;
 import org.apache.hc.core5.http.HttpResponse;
 
-import java.io.IOException;
-import java.nio.CharBuffer;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
+import com.luna.common.net.hander.AbstactEventFutureCallback;
+import com.luna.common.net.hander.LoggingEventSourceListener;
+import com.luna.common.net.sse.Event;
+import com.luna.common.net.sse.SseResponse;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author luna
@@ -25,20 +27,19 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class CustomSseAsyncConsumer extends AbstractCharResponseConsumer<SseResponse> {
 
-    private SseResponse                response;
+    private SseResponse                                          response;
 
-    private final BlockingQueue<Event> events;
+    private final BlockingQueue<Event>                           events;
 
     private final AbstactEventFutureCallback<SseResponse, Event> callback;
 
-    private final Integer              timeWait;
+    private final Integer                                        timeWait;
 
     public CustomSseAsyncConsumer(AbstactEventFutureCallback<SseResponse, Event> callback) {
         this.events = new ArrayBlockingQueue<>(100);
         this.callback = callback;
         this.timeWait = 1000;
     }
-
 
     public CustomSseAsyncConsumer(Integer capacity, AbstactEventFutureCallback<SseResponse, Event> callback, Integer timeWait) {
         this.events = new ArrayBlockingQueue<>(capacity);
@@ -92,7 +93,7 @@ public class CustomSseAsyncConsumer extends AbstractCharResponseConsumer<SseResp
     }
 
     @Override
-    protected SseResponse buildResult() throws IOException {
+    protected SseResponse buildResult() {
         return response;
     }
 

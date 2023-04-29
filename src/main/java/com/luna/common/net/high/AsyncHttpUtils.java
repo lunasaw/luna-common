@@ -173,7 +173,6 @@ public class AsyncHttpUtils {
      *
      * @param host 代理地址
      * @param port 代理端口
-     * @return
      */
     public static void setProxy(String host, Integer port) {
         // for proxy debug
@@ -183,7 +182,7 @@ public class AsyncHttpUtils {
     }
 
     @PreDestroy
-    public static void destroy() throws IOException {
+    public static void destroy() {
         asyncClient.close(CloseMode.GRACEFUL);
     }
 

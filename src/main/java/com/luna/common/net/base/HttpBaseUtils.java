@@ -1,18 +1,20 @@
 package com.luna.common.net.base;
 
-import com.luna.common.file.FileTools;
-import com.luna.common.io.IoUtil;
-import com.luna.common.net.HttpUtils;
-import com.luna.common.text.CharsetUtil;
-import com.luna.common.utils.ObjectUtils;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
-
 import java.io.*;
 import java.net.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import org.apache.commons.io.IOUtils;
+
+import com.luna.common.file.FileTools;
+import com.luna.common.io.IoUtil;
+import com.luna.common.net.HttpUtils;
+import com.luna.common.text.CharsetUtil;
+import com.luna.common.utils.ObjectUtils;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author luna@mac
@@ -38,7 +40,7 @@ public class HttpBaseUtils {
         try {
             URL realUrl = new URL(url);
             if (conn == null) {
-                synchronized (realUrl) {
+                synchronized (HttpURLConnection.class) {
                     if (conn == null) {
                         conn = (HttpURLConnection)realUrl.openConnection();
                     }
@@ -59,7 +61,6 @@ public class HttpBaseUtils {
      * @param queries 请求参数
      * @param body 请求体
      * @return 输入流
-     * @throws IOException
      */
     public static InputStream doURL(String host, String path, String method, Map<String, String> headers,
         Map<String, String> queries, String body) {
@@ -67,7 +68,7 @@ public class HttpBaseUtils {
             HttpURLConnection conn = getConnection(host, path, method, headers, queries);
             if (!Objects.isNull(body)) {
                 conn.setDoOutput(true);
-                IoUtil.write(conn.getOutputStream(), CharsetUtil.defaultCharsetName(),true,  body);
+                IoUtil.write(conn.getOutputStream(), CharsetUtil.defaultCharsetName(), true, body);
             }
             return conn.getInputStream();
         } catch (IOException e) {
@@ -83,8 +84,7 @@ public class HttpBaseUtils {
      * @param headers 请求头
      * @param queries 请求参数
      * @param file 请求体
-     * @return
-     * @throws IOException
+     * @return InputStream
      */
     public static InputStream doURL(String host, String path, String method, Map<String, String> headers,
         Map<String, String> queries, byte[] file) {
@@ -123,8 +123,8 @@ public class HttpBaseUtils {
     /**
      * 流转文件
      *
-     * @param url
-     * @param path
+     * @param url 请求地址
+     * @param path 文件路径
      */
     public static void download(String url, String path) {
         try {
@@ -139,9 +139,8 @@ public class HttpBaseUtils {
     /**
      * 流读取字节
      *
-     * @param inputStream
-     * @param bufferSize
-     * @return
+     * @param inputStream 输入流
+     * @param bufferSize 缓冲区大小
      */
     public static byte[] readWithByte(InputStream inputStream, int bufferSize) {
         try {
@@ -162,7 +161,6 @@ public class HttpBaseUtils {
      *
      * @param inputStream 输入流
      * @return String
-     * @throws IOException
      */
     public static String readWithString(InputStream inputStream, int bufferSize) {
         try {
@@ -183,7 +181,6 @@ public class HttpBaseUtils {
      *
      * @param rd 输入字符流
      * @return String
-     * @throws IOException
      */
     public static String readWithReader(Reader rd) {
         try {
@@ -219,7 +216,6 @@ public class HttpBaseUtils {
      *
      * @param inputStream 输入流
      * @return String
-     * @throws IOException
      */
     public static String readWithString(InputStream inputStream) {
         return readWithString(inputStream, DEFAULT_BUFFER_SIZE);
@@ -230,7 +226,6 @@ public class HttpBaseUtils {
      *
      * @param inputStream 输入流
      * @return String
-     * @throws IOException
      */
     public static byte[] readWithByte(InputStream inputStream) {
         return readWithByte(inputStream, DEFAULT_BUFFER_SIZE);
@@ -260,8 +255,7 @@ public class HttpBaseUtils {
         // 设置cookie策略，只接受与你对话服务器的cookie，而不接收Internet上其它服务器发送的cookie
         manager.setCookiePolicy(CookiePolicy.ACCEPT_ORIGINAL_SERVER);
         CookieHandler.setDefault(manager);
-        CookieStore cookieStore = manager.getCookieStore();
-        return cookieStore;
+        return manager.getCookieStore();
     }
 
     public static void printCookie(CookieStore cookieStore) {

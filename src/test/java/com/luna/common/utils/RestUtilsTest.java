@@ -1,10 +1,10 @@
 package com.luna.common.utils;
 
-import com.luna.common.net.RestUtils;
 import org.junit.Assert;
+import org.junit.Test;
 
 import com.google.common.collect.ImmutableMap;
-import org.junit.Test;
+import com.luna.common.net.RestUtils;
 
 public class RestUtilsTest {
     @Test

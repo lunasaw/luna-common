@@ -16,16 +16,17 @@
 
 package com.luna.common.net.hander;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.TypeReference;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.hc.client5.http.ClientProtocolException;
+import java.io.IOException;
+
 import org.apache.hc.client5.http.impl.classic.AbstractHttpClientResponseHandler;
 import org.apache.hc.core5.http.*;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 
-import java.io.IOException;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.TypeReference;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Basic response handler which takes an url for documentation.

@@ -40,8 +40,8 @@ import org.apache.hc.core5.util.Args;
  */
 public final class CustomResponseBody {
 
-    private final byte[] bodyAsBytes;
-    private final String bodyAsText;
+    private final byte[]      bodyAsBytes;
+    private final String      bodyAsText;
     private final ContentType contentType;
 
     CustomResponseBody(final byte[] bodyAsBytes, final String bodyAsText, final ContentType contentType) {
@@ -51,14 +51,12 @@ public final class CustomResponseBody {
     }
 
     static CustomResponseBody create(final String body, final ContentType contentType) {
-        Args.notNull(body, "Body");
         final Charset charset = (contentType != null ? contentType : ContentType.DEFAULT_TEXT).getCharset();
         final byte[] bytes = body.getBytes(charset != null ? charset : StandardCharsets.US_ASCII);
         return new CustomResponseBody(bytes, null, contentType);
     }
 
     static CustomResponseBody create(final byte[] body, final ContentType contentType) {
-        Args.notNull(body, "Body");
         return new CustomResponseBody(body, null, contentType);
     }
 
@@ -97,8 +95,7 @@ public final class CustomResponseBody {
     @Override
     public String toString() {
         return "SimpleBody{content length=" + (bodyAsBytes != null ? bodyAsBytes.length : "chunked") +
-                ", content type=" + contentType + "}";
+            ", content type=" + contentType + "}";
     }
 
 }
-

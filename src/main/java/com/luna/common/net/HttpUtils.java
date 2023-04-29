@@ -450,7 +450,6 @@ public class HttpUtils {
      * @param queries 请求参数
      * @param body 请求体
      * @return ClassicHttpResponse
-     * @throws RuntimeException
      */
     public static <T> T doPost(String host, String path, Map<String, String> headers,
         Map<String, String> queries, String body, HttpClientResponseHandler<T> responseHandler) {

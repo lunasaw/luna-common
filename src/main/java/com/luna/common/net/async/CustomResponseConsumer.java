@@ -26,12 +26,11 @@
  */
 package com.luna.common.net.async;
 
-import java.io.IOException;
-
-import org.apache.hc.client5.http.async.methods.*;
+import org.apache.hc.client5.http.async.methods.AbstractBinResponseConsumer;
+import org.apache.hc.client5.http.async.methods.AbstractCharResponseConsumer;
+import org.apache.hc.client5.http.async.methods.SimpleBody;
 import org.apache.hc.core5.function.Supplier;
 import org.apache.hc.core5.http.ContentType;
-import org.apache.hc.core5.http.HttpException;
 import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.nio.AsyncEntityConsumer;
 import org.apache.hc.core5.http.nio.support.AbstractAsyncResponseConsumer;
@@ -68,8 +67,7 @@ public final class CustomResponseConsumer extends AbstractAsyncResponseConsumer<
     }
 
     @Override
-    public void informationResponse(final HttpResponse response, final HttpContext context) throws HttpException, IOException {
-    }
+    public void informationResponse(final HttpResponse response, final HttpContext context) {}
 
     @Override
     protected CustomAsyncHttpResponse buildResult(final HttpResponse response, final byte[] entity, final ContentType contentType) {

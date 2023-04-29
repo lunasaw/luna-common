@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * @author weidian
+ * @author luna
  */
 public class ValidDataUtil {
 
