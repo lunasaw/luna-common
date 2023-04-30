@@ -46,4 +46,5 @@ com.luna.common.sensitive
 com.luna.common.text
 com.luna.common.thread
 com.luna.common.utils
+com.luna.common.worker
 com.luna.common.xml
