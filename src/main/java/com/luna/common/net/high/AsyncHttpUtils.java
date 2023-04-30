@@ -33,12 +33,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Map;
 import java.util.concurrent.Future;
-import com.luna.common.net.HttpUtils;
-import com.luna.common.net.IPAddressUtil;
-import com.luna.common.net.async.CustomAsyncHttpResponse;
-import com.luna.common.net.async.CustomResponseConsumer;
-import com.luna.common.net.hander.AsyncHttpClientResponseHandler;
-import lombok.SneakyThrows;
+
+import javax.annotation.PreDestroy;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.client5.http.auth.CredentialsProvider;
 import org.apache.hc.client5.http.auth.StandardAuthScheme;
@@ -69,7 +66,13 @@ import org.apache.hc.core5.reactor.IOReactorConfig;
 import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
 
-import javax.annotation.PreDestroy;
+import com.luna.common.net.HttpUtils;
+import com.luna.common.net.IPAddressUtil;
+import com.luna.common.net.async.CustomAsyncHttpResponse;
+import com.luna.common.net.async.CustomResponseConsumer;
+import com.luna.common.net.hander.AsyncHttpClientResponseHandler;
+
+import lombok.SneakyThrows;
 
 /**
  * Example of asynchronous HTTP/1.1 request execution.
@@ -87,39 +90,9 @@ public class AsyncHttpUtils {
 
     @SneakyThrows
     public static void refresh() {
+        HTTP_ASYNC_CLIENT_BUILDER.setDefaultCookieStore(HttpUtils.COOKIE_STORE);
         asyncClient = HTTP_ASYNC_CLIENT_BUILDER.build();
         asyncClient.start();
-    }
-
-    public static void setProxy(String host, Integer port, String username, String password) {
-        if (StringUtils.isNotBlank(username)) {
-            setAuth(host,username, password);
-        }
-        setProxy(host, port);
-    }
-
-
-    public static void setProxy(Integer port) {
-        setProxy(IPAddressUtil.LOCAL_HOST, port);
-    }
-
-    /**
-     * 使用代理访问
-     *
-     * @param host 代理地址
-     * @param port 代理端口
-     * @return
-     */
-    public static void setProxy(String host, Integer port) {
-        // for proxy debug
-        HttpHost proxy = new HttpHost(host, port);
-        AsyncHttpUtils.HTTP_ASYNC_CLIENT_BUILDER.setProxy(proxy);
-        refresh();
-    }
-
-    @PreDestroy
-    public static void destroy() throws IOException {
-        asyncClient.close(CloseMode.GRACEFUL);
     }
 
     public static void init() {
@@ -176,17 +149,53 @@ public class AsyncHttpUtils {
             .build();
     }
 
+    public static void basicAuth(String userName, String password, String host) {
+        HttpUtils.authContext(userName, password, host, StandardAuthScheme.BASIC);
+    }
+
+    public static void digestAuth(String userName, String password, String host) {
+        HttpUtils.authContext(userName, password, host, StandardAuthScheme.DIGEST);
+    }
+
+    public static void setProxy(String host, Integer port, String username, String password) {
+        if (StringUtils.isNotBlank(username)) {
+            setAuth(host, port, username, password);
+        }
+        setProxy(host, port);
+    }
+
+    public static void setProxy(Integer port) {
+        setProxy(IPAddressUtil.LOCAL_HOST, port);
+    }
+
+    /**
+     * 使用代理访问
+     *
+     * @param host 代理地址
+     * @param port 代理端口
+     */
+    public static void setProxy(String host, Integer port) {
+        // for proxy debug
+        HttpHost proxy = new HttpHost(host, port);
+        AsyncHttpUtils.HTTP_ASYNC_CLIENT_BUILDER.setProxy(proxy);
+        refresh();
+    }
+
+    @PreDestroy
+    public static void destroy() {
+        asyncClient.close(CloseMode.GRACEFUL);
+    }
+
     public static void setAuth(String host, String user, String password) {
         setAuth(host, 80, user, password);
     }
 
     public static void setAuth(String host, Integer port, String user, String password) {
         CredentialsProvider provider = CredentialsProviderBuilder.create()
-            .add(new HttpHost(host, port), user, password.toCharArray())
-            .build();
+            .add(new HttpHost(host, port), user, password.toCharArray()).build();
+
         HTTP_ASYNC_CLIENT_BUILDER.setDefaultCredentialsProvider(provider);
-        asyncClient = HTTP_ASYNC_CLIENT_BUILDER.build();
-        asyncClient.start();
+        refresh();
     }
 
     public static <T> CustomAsyncHttpResponse doPost(String host, String path, Map<String, String> headers,

@@ -46,7 +46,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 /**
- * @author weidian
+ * @author luna
  * @description
  * @date 2023/4/22
  */
@@ -84,10 +84,12 @@ public class AsyncHttpUtilsTest {
 
     @Test
     public void auth_test() {
-        AsyncHttpUtils.setAuth("httpbin.org", "user", "passwd");
+        AsyncHttpUtils.setProxy(7890);
+        AsyncHttpUtils.setAuth("https://httpbin.org", "user", "passwd");
+        AsyncHttpUtils.basicAuth("user", "passwd", "https://httpbin.org");
         CustomAsyncHttpResponse httpResponse =
-            AsyncHttpUtils.doGet("http://httpbin.org", "/basic-auth/user/passwd", null, null, new AsyncValidatingResponseHandler<String>() {});
-        System.out.println(JSON.toJSONString(httpResponse.getBodyText()));
+            AsyncHttpUtils.doGet("https://httpbin.org", "/basic-auth/user/passwd", null, null, new AsyncValidatingResponseHandler<String>() {});
+        System.out.println(JSON.toJSONString(httpResponse));
     }
 
     @Test
@@ -101,6 +103,7 @@ public class AsyncHttpUtilsTest {
         AsyncRequestProducer producer = AsyncHttpUtils.getProducer("https://api.openai.com", "/v1/completions", header, new HashMap<>(), stringAsyncEntityProducer, Method.POST.toString());
 
         CustomSseAsyncConsumer customSseAsyncConsumer = new CustomSseAsyncConsumer();
+
 
         AsyncHttpUtils.doAsyncRequest(producer, customSseAsyncConsumer, new CustomAbstacktFutureCallback<SseResponse>(){});
     }

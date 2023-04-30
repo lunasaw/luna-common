@@ -1,7 +1,8 @@
 package com.luna.common.utils;
 
-import com.luna.common.file.FileNameUtil;
 import org.junit.Test;
+
+import com.luna.common.file.FileNameUtil;
 
 /**
  * @author luna
@@ -15,22 +16,22 @@ public class FileToolsTest {
         org.junit.Assert.assertEquals("ccc/", subPath);
 
         subPath = FileNameUtil.subPath("d:/aaa/bbb", "d:/aaa/bbb/ccc/");
-         org.junit.Assert.assertEquals("ccc/", subPath);
+        org.junit.Assert.assertEquals("ccc/", subPath);
 
         subPath = FileNameUtil.subPath("d:/aaa/bbb", "d:/aaa/bbb/ccc/test.txt");
-         org.junit.Assert.assertEquals("ccc/test.txt", subPath);
+        org.junit.Assert.assertEquals("ccc/test.txt", subPath);
 
         subPath = FileNameUtil.subPath("d:/aaa/bbb/", "d:/aaa/bbb/ccc");
-         org.junit.Assert.assertEquals("ccc", subPath);
+        org.junit.Assert.assertEquals("ccc", subPath);
 
         subPath = FileNameUtil.subPath("d:/aaa/bbb", "d:/aaa/bbb/ccc");
-         org.junit.Assert.assertEquals("ccc", subPath);
+        org.junit.Assert.assertEquals("ccc", subPath);
 
         subPath = FileNameUtil.subPath("d:/aaa/bbb", "d:/aaa/bbb");
-         org.junit.Assert.assertEquals("", subPath);
+        org.junit.Assert.assertEquals("", subPath);
 
         subPath = FileNameUtil.subPath("d:/aaa/bbb/", "d:/aaa/bbb");
-         org.junit.Assert.assertEquals("", subPath);
+        org.junit.Assert.assertEquals("", subPath);
     }
-    
+
 }

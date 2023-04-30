@@ -1,35 +1,33 @@
 package com.luna.common.net.high;
 
-import com.luna.common.net.HttpUtils;
-import lombok.extern.slf4j.Slf4j;
+import java.net.InetSocketAddress;
+import java.net.URISyntaxException;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.client5.http.classic.methods.*;
-import org.apache.hc.client5.http.impl.classic.BasicHttpClientResponseHandler;
-import org.apache.hc.client5.http.protocol.HttpClientContext;
-import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.impl.bootstrap.HttpRequester;
 import org.apache.hc.core5.http.impl.bootstrap.RequesterBootstrap;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.apache.hc.core5.http.io.SocketConfig;
 import org.apache.hc.core5.util.Timeout;
 
-import java.net.InetSocketAddress;
-import java.net.URISyntaxException;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import com.luna.common.net.HttpUtils;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * @author weidian
+ * @author luna
  * @description
  * @date 2023/4/21
  */
 @Slf4j
 public class HttpHighLevelUtil {
 
-    public static final RequesterBootstrap BOOTSTRAP      = RequesterBootstrap.bootstrap();
+    public static final RequesterBootstrap BOOTSTRAP = RequesterBootstrap.bootstrap();
     public static HttpRequester            HTTP_REQUESTER;
-
-    public static final HttpClientContext  CLIENT_CONTEXT = HttpClientContext.create();
 
     static {
         init();
@@ -100,7 +98,7 @@ public class HttpHighLevelUtil {
 
     public static <T> T doRequest(HttpClientResponseHandler<T> responseHandler, HttpHost httpHost, HttpUriRequestBase httpUriRequestBase) {
         try {
-            return HTTP_REQUESTER.execute(httpHost, httpUriRequestBase, Timeout.ofSeconds(HttpUtils.CONNECT_TIMEOUT), CLIENT_CONTEXT,
+            return HTTP_REQUESTER.execute(httpHost, httpUriRequestBase, Timeout.ofSeconds(HttpUtils.CONNECT_TIMEOUT), HttpUtils.CLIENT_CONTEXT,
                 responseHandler);
         } catch (Exception e) {
             throw new RuntimeException(e);

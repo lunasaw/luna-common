@@ -1,16 +1,26 @@
 package com.luna.common.net;
 
-import com.google.common.collect.ImmutableList;
-import com.luna.common.constant.StrPoolConstant;
-import com.luna.common.net.high.AsyncHttpUtils;
-import com.luna.common.net.method.HttpDelete;
-import com.luna.common.text.CharsetUtil;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
+import java.net.URLEncoder;
+import java.net.UnknownHostException;
+import java.nio.charset.Charset;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.SSLContext;
+
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.client5.http.DnsResolver;
 import org.apache.hc.client5.http.SystemDefaultDnsResolver;
-import org.apache.hc.client5.http.auth.*;
+import org.apache.hc.client5.http.auth.AuthCache;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.StandardAuthScheme;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
 import org.apache.hc.client5.http.classic.ExecChainHandler;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
@@ -19,9 +29,15 @@ import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.cookie.BasicCookieStore;
+import org.apache.hc.client5.http.cookie.Cookie;
 import org.apache.hc.client5.http.cookie.StandardCookieSpec;
+import org.apache.hc.client5.http.entity.mime.HttpMultipartMode;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
 import org.apache.hc.client5.http.impl.DefaultSchemePortResolver;
-import org.apache.hc.client5.http.impl.auth.*;
+import org.apache.hc.client5.http.impl.auth.BasicAuthCache;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.client5.http.impl.auth.BasicScheme;
+import org.apache.hc.client5.http.impl.auth.DigestScheme;
 import org.apache.hc.client5.http.impl.classic.BasicHttpClientResponseHandler;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
@@ -29,17 +45,13 @@ import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.ManagedHttpClientConnectionFactory;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.client5.http.impl.routing.DefaultProxyRoutePlanner;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
+import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
 import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
 import org.apache.hc.core5.http.*;
 import org.apache.hc.core5.http.config.Registry;
 import org.apache.hc.core5.http.config.RegistryBuilder;
-import org.apache.hc.client5.http.protocol.HttpClientContext;
-
-import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
-import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
-import org.apache.hc.client5.http.cookie.Cookie;
-import org.apache.hc.client5.http.entity.mime.HttpMultipartMode;
-import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.apache.hc.core5.http.io.SocketConfig;
 import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
@@ -52,16 +64,10 @@ import org.apache.hc.core5.pool.PoolReusePolicy;
 import org.apache.hc.core5.ssl.SSLContextBuilder;
 import org.apache.hc.core5.util.TimeValue;
 
-import javax.net.ssl.SSLContext;
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
-import java.net.URLEncoder;
-import java.net.UnknownHostException;
-import java.nio.charset.Charset;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import com.google.common.collect.ImmutableList;
+import com.luna.common.constant.StrPoolConstant;
+import com.luna.common.net.method.HttpDelete;
+import com.luna.common.text.CharsetUtil;
 
 /**
  * @author Luna
@@ -73,13 +79,13 @@ public class HttpUtils {
 
     private static final HttpClientBuilder HTTP_CLIENT_BUILDER = HttpClients.custom();
 
-    private static final BasicCookieStore  COOKIE_STORE        = new BasicCookieStore();
+    public static final BasicCookieStore   COOKIE_STORE        = new BasicCookieStore();
 
-    private static final int               MAX_REDIRECTS       = 10;
+    public static int                      MAX_REDIRECTS       = 10;
     /**
      * 最大连接数
      */
-    public static final int                MAX_CONN            = 200;
+    public static int                      MAX_CONN            = 200;
     /**
      * 设置连接建立的超时时间为10s
      */
@@ -90,22 +96,6 @@ public class HttpUtils {
     public static int                      MAX_ROUTE           = 200;
 
     public static int                      SOCKET_TIME_OUT     = 10;
-
-    public static void setConnectTimeout(int connectTimeout) {
-        CONNECT_TIMEOUT = connectTimeout;
-    }
-
-    public static void setResponseTimeout(int responseTimeout) {
-        RESPONSE_TIMEOUT = responseTimeout;
-    }
-
-    public static void setMaxRoute(int maxRoute) {
-        MAX_ROUTE = maxRoute;
-    }
-
-    public static void setSocketTimeOut(int socketTimeOut) {
-        SOCKET_TIME_OUT = socketTimeOut;
-    }
 
     static {
         init();
@@ -460,7 +450,6 @@ public class HttpUtils {
      * @param queries 请求参数
      * @param body 请求体
      * @return ClassicHttpResponse
-     * @throws RuntimeException
      */
     public static <T> T doPost(String host, String path, Map<String, String> headers,
         Map<String, String> queries, String body, HttpClientResponseHandler<T> responseHandler) {

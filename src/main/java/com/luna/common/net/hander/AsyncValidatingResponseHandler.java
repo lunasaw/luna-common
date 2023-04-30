@@ -16,16 +16,10 @@
 
 package com.luna.common.net.hander;
 
-import java.io.IOException;
-
-import com.luna.common.net.async.CustomAsyncHttpResponse;
-import org.apache.hc.client5.http.impl.classic.AbstractHttpClientResponseHandler;
-import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
-import org.apache.hc.core5.http.io.entity.EntityUtils;
-
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.TypeReference;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author luna
  */
 @Slf4j
-public  abstract  class AsyncValidatingResponseHandler<T> implements AsyncHttpClientResponseHandler<T> {
+public abstract class AsyncValidatingResponseHandler<T> implements AsyncHttpClientResponseHandler<T> {
 
     protected void validateResponse(HttpResponse response) {
         String reasonPhrase = response.getReasonPhrase();

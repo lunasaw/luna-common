@@ -27,11 +27,9 @@
 
 package com.luna.common.net.async;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.apache.hc.core5.http.ContentType;
-import org.apache.hc.core5.http.HttpException;
 import org.apache.hc.core5.http.nio.entity.AbstractBinAsyncEntityConsumer;
 import org.apache.hc.core5.util.ByteArrayBuffer;
 
@@ -45,8 +43,7 @@ final class CustomAsyncEntityConsumer extends AbstractBinAsyncEntityConsumer<byt
     }
 
     @Override
-    protected void streamStart(final ContentType contentType) throws HttpException, IOException {
-    }
+    protected void streamStart(final ContentType contentType) {}
 
     @Override
     protected int capacityIncrement() {
@@ -54,7 +51,7 @@ final class CustomAsyncEntityConsumer extends AbstractBinAsyncEntityConsumer<byt
     }
 
     @Override
-    protected void data(final ByteBuffer src, final boolean endOfStream) throws IOException {
+    protected void data(final ByteBuffer src, final boolean endOfStream) {
         if (src == null) {
             return;
         }
@@ -68,7 +65,7 @@ final class CustomAsyncEntityConsumer extends AbstractBinAsyncEntityConsumer<byt
     }
 
     @Override
-    protected byte[] generateContent() throws IOException {
+    protected byte[] generateContent() {
         return buffer.toByteArray();
     }
 

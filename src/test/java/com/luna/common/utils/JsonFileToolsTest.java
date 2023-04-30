@@ -1,11 +1,12 @@
 package com.luna.common.utils;
 
-import com.luna.common.encrypt.HashUtils;
-import com.luna.common.file.FileTools;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+
+import com.luna.common.encrypt.HashUtils;
+import com.luna.common.file.FileTools;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class JsonFileToolsTest {

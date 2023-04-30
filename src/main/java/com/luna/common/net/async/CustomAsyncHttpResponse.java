@@ -32,13 +32,10 @@ import java.util.Iterator;
 import org.apache.hc.client5.http.async.methods.AbstractBinResponseConsumer;
 import org.apache.hc.client5.http.async.methods.AbstractCharResponseConsumer;
 import org.apache.hc.client5.http.async.methods.SimpleBody;
-import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.message.BasicClassicHttpResponse;
-import org.apache.hc.core5.http.message.BasicHttpResponse;
-import org.apache.hc.core5.util.Args;
 
 /**
  * HTTP response that can enclose a body represented as a simple text string or an array of bytes.
@@ -56,7 +53,7 @@ import org.apache.hc.core5.util.Args;
  */
 public final class CustomAsyncHttpResponse extends BasicClassicHttpResponse {
 
-    private static final long serialVersionUID = 1L;
+    private static final long  serialVersionUID = 1L;
     private CustomResponseBody body;
 
     public CustomAsyncHttpResponse(final int code) {
@@ -68,10 +65,9 @@ public final class CustomAsyncHttpResponse extends BasicClassicHttpResponse {
     }
 
     public static CustomAsyncHttpResponse copy(final HttpResponse original) {
-        Args.notNull(original, "HTTP response");
         final CustomAsyncHttpResponse copy = new CustomAsyncHttpResponse(original.getCode());
         copy.setVersion(original.getVersion());
-        for (final Iterator<Header> it = original.headerIterator(); it.hasNext(); ) {
+        for (final Iterator<Header> it = original.headerIterator(); it.hasNext();) {
             copy.addHeader(it.next());
         }
         return copy;
@@ -133,4 +129,3 @@ public final class CustomAsyncHttpResponse extends BasicClassicHttpResponse {
         return body != null ? body.getBodyBytes() : null;
     }
 }
-
