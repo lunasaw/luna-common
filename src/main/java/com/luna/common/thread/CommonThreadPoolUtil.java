@@ -1,51 +1,56 @@
 package com.luna.common.thread;
 
-import com.luna.common.dto.ResultDTO;
-import com.luna.common.dto.ResultDTOUtils;
-import com.luna.common.dto.constant.ResultCode;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.*;
+import com.luna.common.dto.ResultDTO;
+import com.luna.common.dto.ResultDTOUtils;
+import com.luna.common.dto.constant.ResultCode;
+
+import lombok.Data;
 
 /**
  * ClassName:CommenThreadPoolUtil <br/>
  * Function:线程池公共入口处理类. <br/>
  *
  */
+@Data
 public class CommonThreadPoolUtil {
 
+    private static final long KEEP_ALIVE_TIME = 0L;
     /** 核心线程数(默认初始化为10) */
-    private int                                cacheCorePoolSize     = 10;
+    private static int cacheCorePoolSize     = 10;
 
     /** 核心线程控制的最大数目 */
-    private int                                maxCorePoolSize       = 160;
+    private static int maxCorePoolSize       = 160;
 
     /** 队列等待线程数阈值 */
-    private int                                blockingQueueWaitSize = 16;
+    private static int blockingQueueWaitSize = 16;
 
     /** 核心线程数自动调整的增量幅度 */
-    private int                                incrementCorePoolSize = 4;
+    private static int incrementCorePoolSize = 4;
+
+    public static void refresh() {
+        threadPool = new MyselfThreadPoolExecutor(cacheCorePoolSize, cacheCorePoolSize, KEEP_ALIVE_TIME,
+            TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
+    }
 
     /** 初始化线程对象ThreadLocal,重写initialValue()，保证ThreadLocal首次执行get方法时不会null异常 */
-    private final ThreadLocal<List<Future<?>>> threadLocal           = new ThreadLocal<List<Future<?>>>() {
+    private final ThreadLocal<List<Future<?>>> threadLocal = ThreadLocal.withInitial(ArrayList::new);
 
-                                                                         @Override
-                                                                         protected List<Future<?>> initialValue() {
-
-                                                                             return new ArrayList<Future<?>>();
-                                                                         }
-                                                                     };
-
-    private static final Logger log = LoggerFactory.getLogger(CommonThreadPoolUtil.class);
-
+    private static final Logger                log         = LoggerFactory.getLogger(CommonThreadPoolUtil.class);
 
     /** 初始化线程池 */
-    private MyselfThreadPoolExecutor           threadPool            =
-        new MyselfThreadPoolExecutor(cacheCorePoolSize, cacheCorePoolSize, 0L,
-            TimeUnit.MILLISECONDS, new LinkedBlockingDeque<Runnable>());
+    private static MyselfThreadPoolExecutor    threadPool  =
+        new MyselfThreadPoolExecutor(cacheCorePoolSize, cacheCorePoolSize, KEEP_ALIVE_TIME,
+            TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
 
     /**
      *
@@ -58,7 +63,6 @@ public class CommonThreadPoolUtil {
      * @return
      */
     public ResultDTO<Void> dealTask(Callable<?> callable) {
-
         try {
             // 动态更改核心线程数大小
             dynamicTuningPoolSize();

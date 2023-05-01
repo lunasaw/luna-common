@@ -1,7 +1,7 @@
 package com.luna.common.io;
 
 import com.luna.common.constant.StreamProgress;
-import com.luna.common.utils.Assert;
+import com.luna.common.check.Assert;
 import com.luna.common.text.CharsetUtil;
 
 import java.io.IOException;

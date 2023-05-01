@@ -36,9 +36,9 @@ public class IdWorkerUtil {
     /** 数据中心标识位数 */
     private final static long datacenterIdBits   = 5L;
     /** 机器ID最大值 */
-    private final static long maxWorkerId        = -1L ^ (-1L << workerIdBits);
+    private final static long maxWorkerId        = ~(-1L << workerIdBits);
     /** 数据中心ID最大值 */
-    private final static long maxDatacenterId    = -1L ^ (-1L << datacenterIdBits);
+    private final static long maxDatacenterId    = ~(-1L << datacenterIdBits);
     /** 毫秒内自增位 */
     private final static long sequenceBits       = 12L;
     /** 机器ID偏左移12位 */
@@ -48,7 +48,7 @@ public class IdWorkerUtil {
     /** 时间毫秒左移22位 */
     private final static long timestampLeftShift = sequenceBits + workerIdBits + datacenterIdBits;
 
-    private final static long sequenceMask       = -1L ^ (-1L << sequenceBits);
+    private final static long sequenceMask       = ~(-1L << sequenceBits);
     /* 上次生产id时间戳 */
     private static long       lastTimestamp      = -1L;
     /** 0，并发控制 */

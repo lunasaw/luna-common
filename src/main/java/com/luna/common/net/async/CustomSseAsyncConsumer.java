@@ -36,9 +36,7 @@ public class CustomSseAsyncConsumer extends AbstractCharResponseConsumer<SseResp
     private final Integer                                        timeWait;
 
     public CustomSseAsyncConsumer(AbstactEventFutureCallback<SseResponse, Event> callback) {
-        this.events = new ArrayBlockingQueue<>(100);
-        this.callback = callback;
-        this.timeWait = 1000;
+        this(100, callback, 1000);
     }
 
     public CustomSseAsyncConsumer(Integer capacity, AbstactEventFutureCallback<SseResponse, Event> callback, Integer timeWait) {
@@ -48,20 +46,16 @@ public class CustomSseAsyncConsumer extends AbstractCharResponseConsumer<SseResp
     }
 
     public CustomSseAsyncConsumer() {
-        this.events = new ArrayBlockingQueue<>(100);
-        this.callback = new LoggingEventSourceListener<>();
-        this.timeWait = 1000;
+        this(100, new LoggingEventSourceListener<>(), 1000);
     }
 
     public CustomSseAsyncConsumer(FutureCallback<Event> listener) {
-        this.events = new ArrayBlockingQueue<>(100);
-        this.callback = new AbstactEventFutureCallback<SseResponse, Event>() {
+        this(100, new AbstactEventFutureCallback<SseResponse, Event>() {
             @Override
             public void onEvent(Event result) {
                 listener.completed(result);
             }
-        };
-        this.timeWait = 1000;
+        }, 1000);
     }
 
     @Override

@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 import com.google.common.base.Objects;
 import com.luna.common.date.DateUtils;
-import com.luna.common.utils.Assert;
+import com.luna.common.check.Assert;
 import com.luna.common.text.RandomIDCardUtil;
 import com.luna.common.text.StringTools;
 

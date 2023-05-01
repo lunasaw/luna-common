@@ -2,7 +2,7 @@ package com.luna.common.file;
 
 import com.luna.common.io.IoUtil;
 import com.luna.common.math.ComputeIter;
-import com.luna.common.utils.Assert;
+import com.luna.common.check.Assert;
 import com.luna.common.utils.IterableIter;
 
 import java.io.*;

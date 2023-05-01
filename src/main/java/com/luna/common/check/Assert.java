@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.luna.common.utils;
+package com.luna.common.check;
 
 import java.util.Collection;
 import java.util.Map;

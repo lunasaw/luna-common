@@ -8,7 +8,7 @@ import com.luna.common.io.IoUtil;
 import com.luna.common.map.BiMap;
 import com.luna.common.text.CharsetUtil;
 import com.luna.common.text.StringTools;
-import com.luna.common.utils.Assert;
+import com.luna.common.check.Assert;
 import org.apache.commons.collections4.MapUtils;
 import org.w3c.dom.*;
 import org.xml.sax.ContentHandler;
@@ -32,7 +32,6 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.beans.XMLEncoder;
 import java.io.*;
-import java.nio.file.Files;
 import java.util.*;
 
 /**

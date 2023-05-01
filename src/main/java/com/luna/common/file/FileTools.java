@@ -13,11 +13,10 @@ import com.luna.common.constant.Constant;
 import com.luna.common.exception.BaseException;
 import com.luna.common.file.visitor.MoveVisitor;
 import com.luna.common.io.IoUtil;
-import com.luna.common.utils.Assert;
+import com.luna.common.check.Assert;
 import com.luna.common.text.CharsetUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import oshi.util.FileUtil;
 
 import static com.luna.common.file.PathUtil.del;
 import static java.nio.file.Files.isDirectory;
