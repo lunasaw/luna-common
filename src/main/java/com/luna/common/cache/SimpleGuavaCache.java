@@ -24,19 +24,32 @@ public class SimpleGuavaCache<K, V> {
 
     private RemovalListener<K, V> listener;
 
+    private CacheLoader<K, V>     loader;
+
+    private Integer               expressTime = 2;
+
     /** LRU缓存的最大个数 */
     private Long                  maximumSize = 200L;
 
     public SimpleGuavaCache(CacheLoader<K, V> loader) {
         this(loader, new DefaultRemovalListener<>());
+        this.loader = loader;
     }
 
     public SimpleGuavaCache(CacheLoader<K, V> loader, RemovalListener<K, V> listener) {
         this.cache = CacheBuilder.newBuilder()
             .maximumSize(maximumSize)
-            .expireAfterWrite(2, TimeUnit.MINUTES)
+            .expireAfterWrite(expressTime, TimeUnit.MINUTES)
             .removalListener(listener)
             .build(loader);
+    }
+
+    public void refresh() {
+        this.cache = CacheBuilder.newBuilder()
+            .maximumSize(maximumSize)
+            .expireAfterWrite(expressTime, TimeUnit.MINUTES)
+            .removalListener(listener)
+            .build(this.loader);
     }
 
     @SneakyThrows
