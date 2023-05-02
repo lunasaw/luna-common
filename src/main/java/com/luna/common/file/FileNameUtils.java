@@ -1,12 +1,15 @@
 package com.luna.common.file;
 
-import com.luna.common.constant.Constant;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang3.ObjectUtils;
 
-import java.io.*;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import com.luna.common.constant.Constant;
 
 /**
  * @author luna

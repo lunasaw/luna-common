@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 
 public class Convert {
 
-
     private final static String DEFAULT_MASK = "*";
 
     /**
@@ -12,7 +11,7 @@ public class Convert {
      *
      * @param prefixNoMaskLen 左侧需要保留几位明文字段
      * @param suffixNoMaskLen 右侧需要保留几位明文字段
-     * @param maskStr         用于遮罩的字符串, 如'*'
+     * @param maskStr 用于遮罩的字符串, 如'*'
      * @Param origin 原始字符串
      * @Return 脱敏后结果
      */
@@ -52,7 +51,6 @@ public class Convert {
     public static String chineseNameFirst(String fullName) {
         return maskValue(fullName, 1, 0, DEFAULT_MASK);
     }
-
 
     /**
      * 显示前六位, 后四位，其他隐藏。比如：140101*******1234
@@ -120,6 +118,5 @@ public class Convert {
     public static String key(String key) {
         return maskValue(key, 0, 3, DEFAULT_MASK);
     }
-
 
 }

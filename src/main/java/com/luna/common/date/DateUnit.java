@@ -40,23 +40,6 @@ public enum DateUnit {
     }
 
     /**
-     * @return 单位对应的毫秒数
-     */
-    public long getMillis() {
-        return this.millis;
-    }
-
-    /**
-     * 单位兼容转换，将DateUnit转换为对应的{@link ChronoUnit}
-     *
-     * @return {@link ChronoUnit}
-     * @since 5.4.5
-     */
-    public ChronoUnit toChronoUnit() {
-        return DateUnit.toChronoUnit(this);
-    }
-
-    /**
      * 单位兼容转换，将{@link ChronoUnit}转换为对应的DateUnit
      *
      * @param unit {@link ChronoUnit}
@@ -104,5 +87,22 @@ public enum DateUnit {
                 return ChronoUnit.WEEKS;
         }
         return null;
+    }
+
+    /**
+     * @return 单位对应的毫秒数
+     */
+    public long getMillis() {
+        return this.millis;
+    }
+
+    /**
+     * 单位兼容转换，将DateUnit转换为对应的{@link ChronoUnit}
+     *
+     * @return {@link ChronoUnit}
+     * @since 5.4.5
+     */
+    public ChronoUnit toChronoUnit() {
+        return DateUnit.toChronoUnit(this);
     }
 }

@@ -10,16 +10,17 @@ import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
 import java.util.zip.Checksum;
 
+import org.apache.commons.io.input.BOMInputStream;
+import org.apache.commons.io.output.NullOutputStream;
+
+import com.luna.common.check.Assert;
 import com.luna.common.constant.StrPoolConstant;
 import com.luna.common.constant.StreamProgress;
 import com.luna.common.exception.UtilException;
 import com.luna.common.reflect.ConvertUtil;
-import com.luna.common.check.Assert;
 import com.luna.common.text.CharsetUtil;
 import com.luna.common.text.HexUtil;
 import com.luna.common.text.StringTools;
-import org.apache.commons.io.input.BOMInputStream;
-import org.apache.commons.io.output.NullOutputStream;
 
 /**
  * IO工具类<br>
@@ -419,7 +420,7 @@ public class IoUtil extends NioUtil {
         final CharBuffer buffer = CharBuffer.allocate(DEFAULT_BUFFER_SIZE);
         try {
             while (-1 != reader.read(buffer)) {
-                builder.append(buffer.flip().toString());
+                builder.append(buffer.flip());
             }
         } catch (IOException e) {
             throw new IOException(e);
@@ -915,7 +916,7 @@ public class IoUtil extends NioUtil {
         if (null == in) {
             return null;
         }
-        if (false == in.markSupported()) {
+        if (!in.markSupported()) {
             return new BufferedInputStream(in);
         }
         return in;

@@ -2,7 +2,6 @@ package com.luna.common.text;
 
 import org.apache.commons.lang3.StringUtils;
 
-
 /**
  * @author Luna
  */
@@ -19,7 +18,6 @@ public class MaskUtils {
 
     /** 11位整数支持 */
     private static final String ELEVEN_NUMBER                     = "\\d{11}";
-
 
     /**
      * 判断是不是邮箱.

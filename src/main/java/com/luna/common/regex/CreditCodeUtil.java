@@ -1,11 +1,11 @@
 package com.luna.common.regex;
 
-import com.luna.common.text.StringTools;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
+
+import com.luna.common.text.StringTools;
 
 /**
  * 统一社会信用代码工具类

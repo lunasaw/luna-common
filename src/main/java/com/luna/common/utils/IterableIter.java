@@ -11,8 +11,8 @@ import java.util.Iterator;
  */
 public interface IterableIter<T> extends Iterable<T>, Iterator<T> {
 
-	@Override
-	default Iterator<T> iterator() {
-		return this;
-	}
+    @Override
+    default Iterator<T> iterator() {
+        return this;
+    }
 }

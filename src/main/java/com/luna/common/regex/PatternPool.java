@@ -1,8 +1,8 @@
 package com.luna.common.regex;
 
-import com.luna.common.cache.SimpleCache;
-
 import java.util.regex.Pattern;
+
+import com.luna.common.cache.SimpleCache;
 
 /**
  * 常用正则表达式集合，更多正则见:https://any86.github.io/any-rule/

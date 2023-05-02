@@ -6,7 +6,7 @@ import com.luna.common.dto.constant.ResultCode;
  * @author luna
  */
 public class BaseException extends RuntimeException {
-    /** 错误码 {@link  ResultCode} */
+    /** 错误码 {@link ResultCode} */
     private int    code;
     /** 错误消息 */
     private String message;
@@ -22,15 +22,6 @@ public class BaseException extends RuntimeException {
         this.message = msg;
     }
 
-    public int getCode() {
-        return code;
-    }
-
-    @Override
-    public String getMessage() {
-        return message;
-    }
-
     public BaseException(int code, String message) {
         this.code = code;
         this.message = message;
@@ -39,10 +30,6 @@ public class BaseException extends RuntimeException {
     public BaseException(int status, Throwable throwable) {
         super(throwable);
         this.code = status;
-    }
-
-    public static boolean isBaseException(Throwable t) {
-        return t instanceof BaseException;
     }
 
     public BaseException(String message) {
@@ -61,4 +48,17 @@ public class BaseException extends RuntimeException {
     }
 
     public BaseException() {}
+
+    public static boolean isBaseException(Throwable t) {
+        return t instanceof BaseException;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    @Override
+    public String getMessage() {
+        return message;
+    }
 }

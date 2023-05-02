@@ -1,9 +1,8 @@
 package com.luna.common.net.method;
 
-import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
-import org.apache.hc.core5.http.message.BasicClassicHttpRequest;
-
 import java.net.URI;
+
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 
 /**
  * @author luna@mac

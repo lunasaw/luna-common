@@ -1,10 +1,11 @@
 package com.luna.common.encrypt;
 
-import com.luna.common.text.CharsetUtil;
+import java.io.InputStream;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.*;
+import com.luna.common.text.CharsetUtil;
 
 /**
  * Md5加密方法
@@ -20,7 +21,7 @@ public class HashUtils {
      * @return
      */
     public static String md5(String data) {
-        return EncryptUtils.dataEncryptByJdk(data,  HashMode.MODE_0.getName());
+        return EncryptUtils.dataEncryptByJdk(data, HashMode.MODE_0.getName());
     }
 
     public static String md5WithFile(String path) {
@@ -28,11 +29,11 @@ public class HashUtils {
     }
 
     public static String md5(InputStream inputStream) {
-        return EncryptUtils.streamEncryptByJdk(inputStream,  HashMode.MODE_0.getName());
+        return EncryptUtils.streamEncryptByJdk(inputStream, HashMode.MODE_0.getName());
     }
 
     public static String sha256(String data) {
-        return EncryptUtils.dataEncryptByJdk(data,  HashMode.MODE_1.getName());
+        return EncryptUtils.dataEncryptByJdk(data, HashMode.MODE_1.getName());
     }
 
     public static String sha256WithFile(String path) {
@@ -45,6 +46,7 @@ public class HashUtils {
 
     /**
      * 检查输入流hash
+     * 
      * @param path 文件路径
      * @param sha256 hash值
      * @return
@@ -55,6 +57,7 @@ public class HashUtils {
 
     /**
      * 检查文件hash
+     * 
      * @param path 文件路径
      * @param md5 md5值
      * @return
@@ -65,6 +68,7 @@ public class HashUtils {
 
     /**
      * 检查输入流hash
+     * 
      * @param path 文件路径
      * @param md5 md5值
      * @return
@@ -75,6 +79,7 @@ public class HashUtils {
 
     /**
      * 检查输入流hash
+     * 
      * @param path 文件路径
      * @param md5 md5值
      * @return

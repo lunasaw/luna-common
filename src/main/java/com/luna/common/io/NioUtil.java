@@ -1,9 +1,5 @@
 package com.luna.common.io;
 
-import com.luna.common.constant.StreamProgress;
-import com.luna.common.check.Assert;
-import com.luna.common.text.CharsetUtil;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -14,6 +10,10 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
+
+import com.luna.common.check.Assert;
+import com.luna.common.constant.StreamProgress;
+import com.luna.common.text.CharsetUtil;
 
 /**
  * NIO相关工具封装，主要针对Channel读写、拷贝等封装

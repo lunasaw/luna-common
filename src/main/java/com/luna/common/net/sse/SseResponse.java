@@ -1,6 +1,7 @@
 package com.luna.common.net.sse;
 
-import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.message.BasicClassicHttpResponse;
 
 public class SseResponse extends BasicClassicHttpResponse {

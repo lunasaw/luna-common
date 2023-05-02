@@ -1,9 +1,8 @@
 package com.luna.common.net;
 
+import java.util.Map;
 
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
-
-import java.util.Map;
 
 /**
  * @author luna

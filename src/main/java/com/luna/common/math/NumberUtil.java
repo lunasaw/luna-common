@@ -1,11 +1,5 @@
 package com.luna.common.math;
 
-import com.luna.common.exception.UtilException;
-import com.luna.common.text.StringTools;
-import com.luna.common.check.Assert;
-import com.luna.common.text.Calculator;
-import com.luna.common.utils.ObjectUtils;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -14,6 +8,12 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+
+import com.luna.common.check.Assert;
+import com.luna.common.exception.UtilException;
+import com.luna.common.text.Calculator;
+import com.luna.common.text.StringTools;
+import com.luna.common.utils.ObjectUtils;
 
 /**
  * 数字工具类<br>
@@ -1189,7 +1189,7 @@ public class NumberUtil {
                     // two E's
                     return false;
                 }
-                if (false == foundDigit) {
+                if (!foundDigit) {
                     return false;
                 }
                 hasExp = true;
@@ -1234,7 +1234,7 @@ public class NumberUtil {
         }
         // allowSigns is true iff the val ends in 'E'
         // found digit it to make sure weird stuff like '.' and '1E-' doesn't pass
-        return false == allowSigns && foundDigit;
+        return !allowSigns && foundDigit;
     }
 
     /**
@@ -2439,9 +2439,9 @@ public class NumberUtil {
      */
     public static boolean isValidNumber(Number number) {
         if (number instanceof Double) {
-            return (false == ((Double)number).isInfinite()) && (false == ((Double)number).isNaN());
+            return (!((Double) number).isInfinite()) && (!((Double) number).isNaN());
         } else if (number instanceof Float) {
-            return (false == ((Float)number).isInfinite()) && (false == ((Float)number).isNaN());
+            return (!((Float) number).isInfinite()) && (!((Float) number).isNaN());
         }
         return true;
     }
@@ -2455,7 +2455,7 @@ public class NumberUtil {
      * @since 5.7.0
      */
     public static boolean isValid(double number) {
-        return false == (Double.isNaN(number) || Double.isInfinite(number));
+        return !(Double.isNaN(number) || Double.isInfinite(number));
     }
 
     /**
@@ -2467,7 +2467,7 @@ public class NumberUtil {
      * @since 5.7.0
      */
     public static boolean isValid(float number) {
-        return false == (Float.isNaN(number) || Float.isInfinite(number));
+        return !(Float.isNaN(number) || Float.isInfinite(number));
     }
 
     /**

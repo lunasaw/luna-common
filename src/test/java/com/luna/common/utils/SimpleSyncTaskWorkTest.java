@@ -1,14 +1,15 @@
 package com.luna.common.utils;
 
-import com.luna.common.worker.SyncTaskWorker;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomUtils;
-
 import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import org.apache.commons.lang3.RandomUtils;
+
+import com.luna.common.worker.SyncTaskWorker;
+
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author weidian
@@ -21,6 +22,10 @@ public class SimpleSyncTaskWorkTest extends SyncTaskWorker<Integer> {
         super(null);
     }
 
+    public static void main(String[] args) {
+        new SimpleSyncTaskWorkTest().run();
+    }
+
     @Override
     public void init() {
 
@@ -28,16 +33,12 @@ public class SimpleSyncTaskWorkTest extends SyncTaskWorker<Integer> {
 
     @Override
     public List<Integer> getTaskList() {
-       return IntStream.range(0, 1).map(i -> RandomUtils.nextInt(0, 100)).boxed().collect(Collectors.toList());
+        return IntStream.range(0, 1).map(i -> RandomUtils.nextInt(0, 100)).boxed().collect(Collectors.toList());
     }
 
     @SneakyThrows
     @Override
     public void handleTask(Integer task) {
         log.info("handleTask::task = {}", task);
-    }
-
-    public static void main(String[] args) {
-        new SimpleSyncTaskWorkTest().run();
     }
 }

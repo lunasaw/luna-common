@@ -1,25 +1,17 @@
 package com.luna.common.text;
+
 import java.util.regex.Pattern;
 
-public final class CT{
-    private static final long serialVersionUID = 3070917046443378762L;
+public final class CT {
+    private static final long    serialVersionUID = 3070917046443378762L;
 
-    private static final Pattern PATTERN = Pattern.compile("^\\+\\d+_\\d+$");
-    private String countryCode;
-    private String telephone;
+    private static final Pattern PATTERN          = Pattern.compile("^\\+\\d+_\\d+$");
+    private String               countryCode;
+    private String               telephone;
 
-    private CT() {
-    }
+    private CT() {}
 
-    public static CT build(String s) {
-        return new CT(s);
-    }
-
-    public static CT build(String countryCode, String telephone) {
-        return new CT(countryCode, telephone);
-    }
-
-    private CT(String s)  {
+    private CT(String s) {
         if (null == s || !PATTERN.matcher(s).find()) {
             throw new RuntimeException("区域号不合法");
         }
@@ -33,6 +25,14 @@ public final class CT{
         this.setTelephone(telephone);
     }
 
+    public static CT build(String s) {
+        return new CT(s);
+    }
+
+    public static CT build(String countryCode, String telephone) {
+        return new CT(countryCode, telephone);
+    }
+
     public String getCountryCode() {
         return this.countryCode;
     }
@@ -41,7 +41,6 @@ public final class CT{
         assertIsNumber(countryCode);
         this.countryCode = countryCode;
     }
-
 
     public String getTelephone() {
         return this.telephone;
@@ -59,8 +58,8 @@ public final class CT{
 
     @Override
     public boolean equals(Object obj) {
-        return !(!(obj instanceof CT))
-                && this.toString().equals(obj.toString());
+        return obj instanceof CT
+            && this.toString().equals(obj.toString());
     }
 
     @Override
@@ -314,10 +313,10 @@ public final class CT{
         MO("853", "Z", "中国澳门特别行政区", "F"),
         HK("852", "Z", "中国香港特别行政区", "T");
 
-        private final String c;//国家码
-        private final String i;//索引
-        private final String n;//国家名
-        private final String s;//是否常用
+        private final String c;// 国家码
+        private final String i;// 索引
+        private final String n;// 国家名
+        private final String s;// 是否常用
 
         CC(String c, String i, String n, String s) {
             this.c = c;

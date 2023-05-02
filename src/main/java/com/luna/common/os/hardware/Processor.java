@@ -5,15 +5,15 @@ package com.luna.common.os.hardware;
  */
 public class Processor {
     /** 名字 */
-    private String name;
+    private String  name;
     /** 处理器id */
-    private String processorId;
+    private String  processorId;
     /** 物理安装数量，实际上装了几个CPU */
-    private Integer    physicalPackageCount;
+    private Integer physicalPackageCount;
     /** 物理核心数量 */
-    private Integer    physicalProcessorCount;
+    private Integer physicalProcessorCount;
     /** 逻辑核心数量 */
-    private Integer    logicalProcessorCount;
+    private Integer logicalProcessorCount;
 
     /**
      * 总计使用
@@ -123,16 +123,16 @@ public class Processor {
     @Override
     public String toString() {
         return "ProcessorDTO{" +
-                "name='" + name + '\'' +
-                ", processorId='" + processorId + '\'' +
-                ", physicalPackageCount=" + physicalPackageCount +
-                ", physicalProcessorCount=" + physicalProcessorCount +
-                ", logicalProcessorCount=" + logicalProcessorCount +
+            "name='" + name + '\'' +
+            ", processorId='" + processorId + '\'' +
+            ", physicalPackageCount=" + physicalPackageCount +
+            ", physicalProcessorCount=" + physicalProcessorCount +
+            ", logicalProcessorCount=" + logicalProcessorCount +
             ", nice='" + nice + '\'' +
             ", system='" + system + '\'' +
             ", user='" + user + '\'' +
             ", wait='" + wait + '\'' +
             ", idle='" + idle + '\'' +
-                '}';
+            '}';
     }
 }

@@ -49,10 +49,10 @@ public class Memory {
     @Override
     public String toString() {
         return "MemoryDTO{" +
-                "memeryTotal=" + memeryTotal +
-                ", swapTotal=" + swapTotal +
+            "memeryTotal=" + memeryTotal +
+            ", swapTotal=" + swapTotal +
             ", used=" + used +
             ", free=" + free +
-                '}';
+            '}';
     }
 }

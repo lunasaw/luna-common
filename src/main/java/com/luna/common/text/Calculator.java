@@ -1,10 +1,10 @@
 package com.luna.common.text;
 
-import com.luna.common.math.NumberUtil;
-
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Stack;
+
+import com.luna.common.math.NumberUtil;
 
 /**
  * 数学表达式计算工具类<br>
@@ -64,6 +64,41 @@ public class Calculator {
     }
 
     /**
+     * 字节转kb/mb/gb
+     *
+     * @param size
+     * @return
+     */
+    public static String getPrintSize(long size) {
+        // 如果字节数少于1024，则直接以B为单位，否则先除于1024，后3位因太少无意义
+        if (size < 1024) {
+            return size + "B";
+        } else {
+            size = size / 1024;
+        }
+        // 如果原字节数除于1024之后，少于1024，则可以直接以KB作为单位
+        // 因为还没有到达要使用另一个单位的时候
+        // 接下去以此类推
+        if (size < 1024) {
+            return size + "KB";
+        } else {
+            size = size / 1024;
+        }
+        if (size < 1024) {
+            // 因为如果以MB为单位的话，要保留最后1位小数，
+            // 因此，把此数乘以100之后再取余
+            size = size * 100;
+            return size / 100 + "."
+                + size % 100 + "MB";
+        } else {
+            // 否则如果要以GB为单位的，先除于1024再作同样的处理
+            size = size * 100 / 1024;
+            return size / 100 + "."
+                + size % 100 + "GB";
+        }
+    }
+
+    /**
      * 按照给定的表达式计算
      *
      * @param expression 要计算的表达式例如:5+12*(3+5)/7
@@ -74,9 +109,9 @@ public class Calculator {
         prepare(expression);
         Collections.reverse(postfixStack);// 将后缀式栈反转
         String firstValue, secondValue, currentValue;// 参与计算的第一个值，第二个值和算术运算符
-        while (false == postfixStack.isEmpty()) {
+        while (!postfixStack.isEmpty()) {
             currentValue = postfixStack.pop();
-            if (false == isOperator(currentValue.charAt(0))) {// 如果不是运算符则存入操作数栈中
+            if (!isOperator(currentValue.charAt(0))) {// 如果不是运算符则存入操作数栈中
                 currentValue = currentValue.replace("~", "-");
                 resultStack.push(currentValue);
             } else {// 如果是运算符则从操作数栈中取两个值和该数值一起参与运算
@@ -200,40 +235,5 @@ public class Calculator {
                 throw new IllegalStateException("Unexpected value: " + currentOp);
         }
         return result;
-    }
-
-    /**
-     * 字节转kb/mb/gb
-     * 
-     * @param size
-     * @return
-     */
-    public static String getPrintSize(long size) {
-        // 如果字节数少于1024，则直接以B为单位，否则先除于1024，后3位因太少无意义
-        if (size < 1024) {
-            return String.valueOf(size) + "B";
-        } else {
-            size = size / 1024;
-        }
-        // 如果原字节数除于1024之后，少于1024，则可以直接以KB作为单位
-        // 因为还没有到达要使用另一个单位的时候
-        // 接下去以此类推
-        if (size < 1024) {
-            return String.valueOf(size) + "KB";
-        } else {
-            size = size / 1024;
-        }
-        if (size < 1024) {
-            // 因为如果以MB为单位的话，要保留最后1位小数，
-            // 因此，把此数乘以100之后再取余
-            size = size * 100;
-            return String.valueOf((size / 100)) + "."
-                + String.valueOf((size % 100)) + "MB";
-        } else {
-            // 否则如果要以GB为单位的，先除于1024再作同样的处理
-            size = size * 100 / 1024;
-            return String.valueOf((size / 100)) + "."
-                + String.valueOf((size % 100)) + "GB";
-        }
     }
 }

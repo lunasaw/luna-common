@@ -1,11 +1,11 @@
 package com.luna.common.text;
 
-import com.luna.common.constant.Constant;
-import com.luna.common.constant.StrPoolConstant;
-
 import java.security.SecureRandom;
 import java.util.Random;
 import java.util.UUID;
+
+import com.luna.common.constant.Constant;
+import com.luna.common.constant.StrPoolConstant;
 
 /**
  * 随机字符串

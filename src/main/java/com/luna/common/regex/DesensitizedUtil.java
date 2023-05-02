@@ -25,36 +25,8 @@ import com.luna.common.text.StringTools;
 public class DesensitizedUtil {
 
     /**
-     * 支持的脱敏类型枚举
-     *
-     * @author dazer and neusoft and qiaomu
-     */
-    public enum DesensitizedType {
-        // 用户id
-        USER_ID,
-        // 中文名
-        CHINESE_NAME,
-        // 身份证号
-        ID_CARD,
-        // 座机号
-        FIXED_PHONE,
-        // 手机号
-        MOBILE_PHONE,
-        // 地址
-        ADDRESS,
-        // 电子邮件
-        EMAIL,
-        // 密码
-        PASSWORD,
-        // 中国大陆车牌，包含普通车辆、新能源车辆
-        CAR_LICENSE,
-        // 银行卡
-        BANK_CARD
-    }
-
-    /**
      * 脱敏，使用默认的脱敏策略
-     * 
+     *
      * <pre>
      * DesensitizedUtil.desensitized("100", DesensitizedUtils.DesensitizedType.USER_ID)) =  "0"
      * DesensitizedUtil.desensitized("段正淳", DesensitizedUtils.DesensitizedType.CHINESE_NAME)) = "段**"
@@ -287,5 +259,33 @@ public class DesensitizedUtil {
         }
         buf.append(CharPoolConstant.SPACE).append(bankCardNo, length - 4, length);
         return buf.toString();
+    }
+
+    /**
+     * 支持的脱敏类型枚举
+     *
+     * @author dazer and neusoft and qiaomu
+     */
+    public enum DesensitizedType {
+        // 用户id
+        USER_ID,
+        // 中文名
+        CHINESE_NAME,
+        // 身份证号
+        ID_CARD,
+        // 座机号
+        FIXED_PHONE,
+        // 手机号
+        MOBILE_PHONE,
+        // 地址
+        ADDRESS,
+        // 电子邮件
+        EMAIL,
+        // 密码
+        PASSWORD,
+        // 中国大陆车牌，包含普通车辆、新能源车辆
+        CAR_LICENSE,
+        // 银行卡
+        BANK_CARD
     }
 }

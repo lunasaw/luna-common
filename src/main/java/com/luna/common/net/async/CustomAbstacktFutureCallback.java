@@ -1,8 +1,10 @@
 package com.luna.common.net.async;
 
-import com.alibaba.fastjson2.JSON;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.core5.concurrent.FutureCallback;
+
+import com.alibaba.fastjson2.JSON;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author luna
@@ -24,6 +26,5 @@ public abstract class CustomAbstacktFutureCallback<T> implements FutureCallback<
     }
 
     @Override
-    public void cancelled() {
-    }
+    public void cancelled() {}
 }

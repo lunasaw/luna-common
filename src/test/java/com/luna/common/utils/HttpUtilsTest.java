@@ -126,7 +126,7 @@ public class HttpUtilsTest {
     public void auth_basic_header_test() {
         final String auth = "user2" + ":" + "passwd";
         final byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.UTF_8));
-        final String authHeader = StandardAuthScheme.BASIC+ " " + new String(encodedAuth);
+        final String authHeader = StandardAuthScheme.BASIC + " " + new String(encodedAuth);
         String responseString =
             doGetHandler("https://httpbin.org", "/basic-auth/user2/passwd", ImmutableMap.of(HttpHeaders.AUTHORIZATION, authHeader), null);
         Assert.assertNotNull(responseString);

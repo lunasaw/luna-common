@@ -1,21 +1,25 @@
 package com.luna.common.text;
 
+import java.io.ByteArrayOutputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.nio.charset.Charset;
+import java.util.*;
+
+import javax.annotation.Nullable;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import com.luna.common.anno.Filter;
 import com.luna.common.anno.Func1;
 import com.luna.common.anno.Matcher;
+import com.luna.common.check.Assert;
 import com.luna.common.constant.CharPoolConstant;
 import com.luna.common.constant.StrPoolConstant;
 import com.luna.common.regex.DesensitizedUtil;
 import com.luna.common.regex.ReUtil;
-import com.luna.common.check.Assert;
 import com.luna.common.utils.ObjectUtils;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import javax.annotation.Nullable;
-import java.io.*;
-import java.nio.charset.Charset;
-import java.util.*;
 
 /**
  * @author luna
@@ -36,7 +40,7 @@ public class StringTools extends StringUtils {
     /**
      * 过滤字符串
      *
-     * @param str    字符串
+     * @param str 字符串
      * @param filter 过滤器，{@link Filter#accept(Object)}返回为{@code true}的保留字符
      * @return 过滤后的字符串
      * @since 5.4.0
@@ -93,7 +97,7 @@ public class StringTools extends StringUtils {
                 // checking hex (it can't be anything else)
                 for (; i < chars.length; i++) {
                     if ((chars[i] < '0' || chars[i] > '9') && (chars[i] < 'a' || chars[i] > 'f')
-                            && (chars[i] < 'A' || chars[i] > 'F')) {
+                        && (chars[i] < 'A' || chars[i] > 'F')) {
                         return false;
                     }
                 }
@@ -122,7 +126,7 @@ public class StringTools extends StringUtils {
                     // two E's
                     return false;
                 }
-                if (false == foundDigit) {
+                if (!foundDigit) {
                     return false;
                 }
                 hasExp = true;
@@ -167,7 +171,7 @@ public class StringTools extends StringUtils {
         }
         // allowSigns is true iff the val ends in 'E'
         // found digit it to make sure weird stuff like '.' and '1E-' doesn't pass
-        return false == allowSigns && foundDigit;
+        return !allowSigns && foundDigit;
     }
 
     // ------------------------------------------------------------------------ startWith
@@ -199,7 +203,7 @@ public class StringTools extends StringUtils {
      * 字符串是否以给定字符开始
      *
      * @param str 字符串
-     * @param c   字符
+     * @param c 字符
      * @return 是否开始
      */
     public static boolean startWith(CharSequence str, char c) {
@@ -213,8 +217,8 @@ public class StringTools extends StringUtils {
      * 是否以指定字符串开头<br>
      * 如果给定的字符串和开头字符串都为null则返回true，否则任意一个值为null返回false
      *
-     * @param str        被监测字符串
-     * @param prefix     开头字符串
+     * @param str 被监测字符串
+     * @param prefix 开头字符串
      * @param ignoreCase 是否忽略大小写
      * @return 是否以指定字符串开头
      * @since 5.4.3
@@ -227,9 +231,9 @@ public class StringTools extends StringUtils {
      * 是否以指定字符串开头<br>
      * 如果给定的字符串和开头字符串都为null则返回true，否则任意一个值为null返回false
      *
-     * @param str          被监测字符串
-     * @param prefix       开头字符串
-     * @param ignoreCase   是否忽略大小写
+     * @param str 被监测字符串
+     * @param prefix 开头字符串
+     * @param ignoreCase 是否忽略大小写
      * @param ignoreEquals 是否忽略字符串相等的情况
      * @return 是否以指定字符串开头
      * @since 5.4.3
@@ -264,7 +268,7 @@ public class StringTools extends StringUtils {
     /**
      * 是否以指定字符串开头
      *
-     * @param str    被监测字符串
+     * @param str 被监测字符串
      * @param prefix 开头字符串
      * @return 是否以指定字符串开头
      */
@@ -275,7 +279,7 @@ public class StringTools extends StringUtils {
     /**
      * 是否以指定字符串开头，忽略相等字符串的情况
      *
-     * @param str    被监测字符串
+     * @param str 被监测字符串
      * @param prefix 开头字符串
      * @return 是否以指定字符串开头并且两个字符串不相等
      */
@@ -286,7 +290,7 @@ public class StringTools extends StringUtils {
     /**
      * 是否以指定字符串开头，忽略大小写
      *
-     * @param str    被监测字符串
+     * @param str 被监测字符串
      * @param prefix 开头字符串
      * @return 是否以指定字符串开头
      */
@@ -298,7 +302,7 @@ public class StringTools extends StringUtils {
      * 给定字符串是否以任何一个字符串开始<br>
      * 给定字符串和数组为空都返回false
      *
-     * @param str      给定字符串
+     * @param str 给定字符串
      * @param prefixes 需要检测的开始字符串
      * @return 给定字符串是否以任何一个字符串开始
      * @since 3.0.6
@@ -320,17 +324,17 @@ public class StringTools extends StringUtils {
      * 截取两个字符串的不同部分（长度一致），判断截取的子串是否相同<br>
      * 任意一个字符串为null返回false
      *
-     * @param str1       第一个字符串
-     * @param start1     第一个字符串开始的位置
-     * @param str2       第二个字符串
-     * @param start2     第二个字符串开始的位置
-     * @param length     截取长度
+     * @param str1 第一个字符串
+     * @param start1 第一个字符串开始的位置
+     * @param str2 第二个字符串
+     * @param start2 第二个字符串开始的位置
+     * @param length 截取长度
      * @param ignoreCase 是否忽略大小写
      * @return 子串是否相同
      * @since 3.2.1
      */
     public static boolean isSubEquals(CharSequence str1, int start1, CharSequence str2, int start2, int length,
-                                      boolean ignoreCase) {
+        boolean ignoreCase) {
         if (null == str1 || null == str2) {
             return false;
         }
@@ -341,9 +345,9 @@ public class StringTools extends StringUtils {
     /**
      * 指定范围内查找字符串
      *
-     * @param str        字符串
-     * @param searchStr  需要查找位置的字符串
-     * @param fromIndex  起始位置
+     * @param str 字符串
+     * @param searchStr 需要查找位置的字符串
+     * @param fromIndex 起始位置
      * @param ignoreCase 是否忽略大小写
      * @return 位置
      * @since 3.2.1
@@ -380,7 +384,7 @@ public class StringTools extends StringUtils {
     /**
      * 去掉指定后缀
      *
-     * @param str    字符串
+     * @param str 字符串
      * @param suffix 后缀
      * @return 切掉后的字符串，若后缀不是 suffix， 返回原字符串
      */
@@ -399,7 +403,7 @@ public class StringTools extends StringUtils {
     /**
      * 切割指定位置之后部分的字符串
      *
-     * @param string    字符串
+     * @param string 字符串
      * @param fromIndex 切割开始的位置（包括）
      * @return 切割后后剩余的后半部分字符串
      */
@@ -423,8 +427,8 @@ public class StringTools extends StringUtils {
     /**
      * 替换字符串中的指定字符串，忽略大小写
      *
-     * @param str         字符串
-     * @param searchStr   被查找的字符串
+     * @param str 字符串
+     * @param searchStr 被查找的字符串
      * @param replacement 被替换的字符串
      * @return 替换后的字符串
      * @since 4.0.3
@@ -436,8 +440,8 @@ public class StringTools extends StringUtils {
     /**
      * 替换字符串中的指定字符串
      *
-     * @param str         字符串
-     * @param searchStr   被查找的字符串
+     * @param str 字符串
+     * @param searchStr 被查找的字符串
      * @param replacement 被替换的字符串
      * @return 替换后的字符串
      * @since 4.0.3
@@ -449,31 +453,31 @@ public class StringTools extends StringUtils {
     /**
      * 替换字符串中的指定字符串
      *
-     * @param str         字符串
-     * @param searchStr   被查找的字符串
+     * @param str 字符串
+     * @param searchStr 被查找的字符串
      * @param replacement 被替换的字符串
-     * @param ignoreCase  是否忽略大小写
+     * @param ignoreCase 是否忽略大小写
      * @return 替换后的字符串
      * @since 4.0.3
      */
     public static String replace(CharSequence str, CharSequence searchStr, CharSequence replacement,
-                                 boolean ignoreCase) {
+        boolean ignoreCase) {
         return replace(str, 0, searchStr, replacement, ignoreCase);
     }
 
     /**
      * 替换字符串中的指定字符串
      *
-     * @param str         字符串
-     * @param fromIndex   开始位置（包括）
-     * @param searchStr   被查找的字符串
+     * @param str 字符串
+     * @param fromIndex 开始位置（包括）
+     * @param searchStr 被查找的字符串
      * @param replacement 被替换的字符串
-     * @param ignoreCase  是否忽略大小写
+     * @param ignoreCase 是否忽略大小写
      * @return 替换后的字符串
      * @since 4.0.3
      */
     public static String replace(CharSequence str, int fromIndex, CharSequence searchStr, CharSequence replacement,
-                                 boolean ignoreCase) {
+        boolean ignoreCase) {
         if (isEmpty(str) || isEmpty(searchStr)) {
             return str(str);
         }
@@ -512,9 +516,9 @@ public class StringTools extends StringUtils {
     /**
      * 替换指定字符串的指定区间内字符为固定字符
      *
-     * @param str          字符串
+     * @param str 字符串
      * @param startInclude 开始位置（包含）
-     * @param endExclude   结束位置（不包含）
+     * @param endExclude 结束位置（不包含）
      * @param replacedChar 被替换的字符
      * @return 替换后的字符串
      * @since 3.2.1
@@ -555,23 +559,23 @@ public class StringTools extends StringUtils {
      * // 结果为："ZZZaaabbbccc中文-1234-"
      * </pre>
      *
-     * @param str        要替换的字符串
-     * @param pattern    用于匹配的正则式
+     * @param str 要替换的字符串
+     * @param pattern 用于匹配的正则式
      * @param replaceFun 决定如何替换的函数
      * @return 替换后的字符串
      * @see ReUtil#replaceAll(CharSequence, java.util.regex.Pattern, Func1)
      * @since 4.2.2
      */
     public static String replace(CharSequence str, java.util.regex.Pattern pattern,
-                                 Func1<java.util.regex.Matcher, String> replaceFun) {
+        Func1<java.util.regex.Matcher, String> replaceFun) {
         return ReUtil.replaceAll(str, pattern, replaceFun);
     }
 
     /**
      * 替换所有正则匹配的文本，并使用自定义函数决定如何替换
      *
-     * @param str        要替换的字符串
-     * @param regex      用于匹配的正则式
+     * @param str 要替换的字符串
+     * @param regex 用于匹配的正则式
      * @param replaceFun 决定如何替换的函数
      * @return 替换后的字符串
      * @see ReUtil#replaceAll(CharSequence, String, Func1)
@@ -595,9 +599,9 @@ public class StringTools extends StringUtils {
      * StrUtil.hide("jackduan@163.com",16,17)  jackduan@163.com
      * </pre>
      *
-     * @param str          字符串
+     * @param str 字符串
      * @param startInclude 开始位置（包含）
-     * @param endExclude   结束位置（不包含）
+     * @param endExclude 结束位置（不包含）
      * @return 替换后的字符串
      * @since 4.1.14
      */
@@ -621,7 +625,7 @@ public class StringTools extends StringUtils {
      * StrUtil.desensitized("11011111222233333256", DesensitizedType.BANK_CARD)) = "1101 **** **** **** 3256"
      * </pre>
      *
-     * @param str              字符串
+     * @param str 字符串
      * @param desensitizedType 脱敏类型;可以脱敏：用户id、中文名、身份证号、座机号、手机号、地址、电子邮件、密码
      * @return 脱敏之后的字符串
      * @see DesensitizedUtil 如果需要自定义，脱敏规则，请使用该工具类；
@@ -635,8 +639,8 @@ public class StringTools extends StringUtils {
      * 替换字符字符数组中所有的字符为replacedStr<br>
      * 提供的chars为所有需要被替换的字符，例如："\r\n"，则"\r"和"\n"都会被替换，哪怕他们单独存在
      *
-     * @param str         被检查的字符串
-     * @param chars       需要替换的字符列表，用一个字符串表示这个字符列表
+     * @param str 被检查的字符串
+     * @param chars 需要替换的字符列表，用一个字符串表示这个字符列表
      * @param replacedStr 替换成的字符串
      * @return 新字符串
      * @since 3.2.2
@@ -651,8 +655,8 @@ public class StringTools extends StringUtils {
     /**
      * 替换字符字符数组中所有的字符为replacedStr
      *
-     * @param str         被检查的字符串
-     * @param chars       需要替换的字符列表
+     * @param str 被检查的字符串
+     * @param chars 需要替换的字符列表
      * @param replacedStr 替换成的字符串
      * @return 新字符串
      * @since 3.2.2
@@ -679,7 +683,7 @@ public class StringTools extends StringUtils {
     /**
      * 字符串的每一个字符是否都与定义的匹配器匹配
      *
-     * @param value   字符串
+     * @param value 字符串
      * @param matcher 匹配器
      * @return 是否全部匹配
      * @since 3.2.3
@@ -688,7 +692,7 @@ public class StringTools extends StringUtils {
         if (isBlank(value)) {
             return false;
         }
-        for (int i = value.length(); --i >= 0; ) {
+        for (int i = value.length(); --i >= 0;) {
             if (!matcher.match(value.charAt(i))) {
                 return false;
             }
@@ -708,25 +712,25 @@ public class StringTools extends StringUtils {
         }
 
         if (obj instanceof long[]) {
-            return Arrays.toString((long[]) obj);
+            return Arrays.toString((long[])obj);
         } else if (obj instanceof int[]) {
-            return Arrays.toString((int[]) obj);
+            return Arrays.toString((int[])obj);
         } else if (obj instanceof short[]) {
-            return Arrays.toString((short[]) obj);
+            return Arrays.toString((short[])obj);
         } else if (obj instanceof char[]) {
-            return Arrays.toString((char[]) obj);
+            return Arrays.toString((char[])obj);
         } else if (obj instanceof byte[]) {
-            return Arrays.toString((byte[]) obj);
+            return Arrays.toString((byte[])obj);
         } else if (obj instanceof boolean[]) {
-            return Arrays.toString((boolean[]) obj);
+            return Arrays.toString((boolean[])obj);
         } else if (obj instanceof float[]) {
-            return Arrays.toString((float[]) obj);
+            return Arrays.toString((float[])obj);
         } else if (obj instanceof double[]) {
-            return Arrays.toString((double[]) obj);
+            return Arrays.toString((double[])obj);
         } else if (obj.getClass().isArray()) {
             // 对象数组
             try {
-                return Arrays.deepToString((Object[]) obj);
+                return Arrays.deepToString((Object[])obj);
             } catch (Exception ignore) {
                 // ignore
             }
@@ -738,7 +742,7 @@ public class StringTools extends StringUtils {
     /**
      * 查找指定字符串是否包含指定字符串列表中的任意一个字符串，如果包含返回找到的第一个字符串
      *
-     * @param str      指定字符串
+     * @param str 指定字符串
      * @param testStrs 需要检查的字符串数组
      * @return 被包含的第一个字符串
      * @since 3.2.0
@@ -758,7 +762,7 @@ public class StringTools extends StringUtils {
     /**
      * 查找指定字符串是否包含指定字符串列表中的任意一个字符串
      *
-     * @param str      指定字符串
+     * @param str 指定字符串
      * @param testStrs 需要检查的字符串数组
      * @return 是否包含任意一个字符串
      * @since 3.2.0
@@ -770,7 +774,7 @@ public class StringTools extends StringUtils {
     /**
      * 查找指定字符串是否包含指定字符列表中的任意一个字符
      *
-     * @param str       指定字符串
+     * @param str 指定字符串
      * @param testChars 需要检查的字符数组
      * @return 是否包含任意一个字符
      * @since 4.1.11
@@ -791,7 +795,7 @@ public class StringTools extends StringUtils {
     /**
      * 切割指定位置之前部分的字符串
      *
-     * @param string         字符串
+     * @param string 字符串
      * @param toIndexExclude 切割到的位置（不包括）
      * @return 切割后的剩余的前半部分字符串
      */
@@ -808,9 +812,9 @@ public class StringTools extends StringUtils {
      * abcdefgh 2 3 =》 c <br>
      * abcdefgh 2 -3 =》 cde <br>
      *
-     * @param str              String
+     * @param str String
      * @param fromIndexInclude 开始的index（包括）
-     * @param toIndexExclude   结束的index（不包括）
+     * @param toIndexExclude 结束的index（不包括）
      * @return 字串
      */
     public static String sub(CharSequence str, int fromIndexInclude, int toIndexExclude) {
@@ -855,7 +859,7 @@ public class StringTools extends StringUtils {
      * map = {a: "aValue", b: "bValue"} format("{a} and {b}", map) ---=》 aValue and bValue
      *
      * @param template 文本模板，被替换的部分用 {key} 表示
-     * @param map      参数值对
+     * @param map 参数值对
      * @return 格式化后的文本
      */
     public static String format(CharSequence template, Map<?, ?> map) {
@@ -866,8 +870,8 @@ public class StringTools extends StringUtils {
      * 格式化文本，使用 {varName} 占位<br>
      * map = {a: "aValue", b: "bValue"} format("{a} and {b}", map) ---=》 aValue and bValue
      *
-     * @param template   文本模板，被替换的部分用 {key} 表示
-     * @param map        参数值对
+     * @param template 文本模板，被替换的部分用 {key} 表示
+     * @param map 参数值对
      * @param ignoreNull 是否忽略 {@code null} 值，忽略则 {@code null} 值对应的变量不被替换，否则替换为""
      * @return 格式化后的文本
      * @since 5.4.3
@@ -880,8 +884,8 @@ public class StringTools extends StringUtils {
      * 格式化文本，使用 'special'{varName} 特殊字符占位<br>
      * map = {a: "aValue", b: "bValue"} format("${a} and ${b}", map) ---=》 aValue and bValue
      *
-     * @param template   文本模板，被替换的部分用 ${key} 表示
-     * @param map        参数值对
+     * @param template 文本模板，被替换的部分用 ${key} 表示
+     * @param map 参数值对
      * @param ignoreNull 是否忽略 {@code null} 值，忽略则 {@code null} 值对应的变量不被替换，否则替换为""
      * @return 格式化后的文本
      * @since 5.4.3
@@ -920,7 +924,7 @@ public class StringTools extends StringUtils {
      * 转义\： format("this is \\\\{} for {}", "a", "b") =》 this is \a for b<br>
      *
      * @param template 文本模板，被替换的部分用 {} 表示，如果模板为null，返回"null"
-     * @param params   参数值
+     * @param params 参数值
      * @return 格式化后的文本，如果模板为null，返回"null"
      */
     public static String format(CharSequence template, Object... params) {
@@ -1058,7 +1062,7 @@ public class StringTools extends StringUtils {
      * @see #containsWhitespace(CharSequence)
      */
     public static boolean containsWhitespace(@Nullable String str) {
-        return containsWhitespace((CharSequence) str);
+        return containsWhitespace((CharSequence)str);
     }
 
     /**
@@ -1152,7 +1156,7 @@ public class StringTools extends StringUtils {
     /**
      * Trim all occurrences of the supplied leading character from the given {@code String}.
      *
-     * @param str              the {@code String} to check
+     * @param str the {@code String} to check
      * @param leadingCharacter the leading character to be trimmed
      * @return the trimmed {@code String}
      */
@@ -1171,7 +1175,7 @@ public class StringTools extends StringUtils {
     /**
      * Trim all occurrences of the supplied trailing character from the given {@code String}.
      *
-     * @param str               the {@code String} to check
+     * @param str the {@code String} to check
      * @param trailingCharacter the trailing character to be trimmed
      * @return the trimmed {@code String}
      */
@@ -1191,34 +1195,34 @@ public class StringTools extends StringUtils {
      * Test if the given {@code String} starts with the specified prefix,
      * ignoring upper/lower case.
      *
-     * @param str    the {@code String} to check
+     * @param str the {@code String} to check
      * @param prefix the prefix to look for
      * @see String#startsWith
      */
     public static boolean startsWithIgnoreCase(@Nullable String str, @Nullable String prefix) {
         return (str != null && prefix != null && str.length() >= prefix.length() &&
-                str.regionMatches(true, 0, prefix, 0, prefix.length()));
+            str.regionMatches(true, 0, prefix, 0, prefix.length()));
     }
 
     /**
      * Test if the given {@code String} ends with the specified suffix,
      * ignoring upper/lower case.
      *
-     * @param str    the {@code String} to check
+     * @param str the {@code String} to check
      * @param suffix the suffix to look for
      * @see String#endsWith
      */
     public static boolean endsWithIgnoreCase(@Nullable String str, @Nullable String suffix) {
         return (str != null && suffix != null && str.length() >= suffix.length() &&
-                str.regionMatches(true, str.length() - suffix.length(), suffix, 0, suffix.length()));
+            str.regionMatches(true, str.length() - suffix.length(), suffix, 0, suffix.length()));
     }
 
     /**
      * Test whether the given string matches the given substring
      * at the given index.
      *
-     * @param str       the original string (or StringBuilder)
-     * @param index     the index in the original string to start matching against
+     * @param str the original string (or StringBuilder)
+     * @param index the index in the original string to start matching against
      * @param substring the substring to match at the given index
      */
     public static boolean substringMatch(CharSequence str, int index, CharSequence substring) {
@@ -1257,7 +1261,7 @@ public class StringTools extends StringUtils {
     /**
      * Replace all occurrences of a substring within a string with another string.
      *
-     * @param inString   {@code String} to examine
+     * @param inString {@code String} to examine
      * @param oldPattern {@code String} to replace
      * @param newPattern {@code String} to insert
      * @return a {@code String} with the replacements
@@ -1281,7 +1285,7 @@ public class StringTools extends StringUtils {
         int pos = 0; // our position in the old string
         int patLen = oldPattern.length();
         while (index >= 0) {
-            sb.append(inString.substring(pos, index));
+            sb.append(inString, pos, index);
             sb.append(newPattern);
             pos = index + patLen;
             index = inString.indexOf(oldPattern, pos);
@@ -1296,7 +1300,7 @@ public class StringTools extends StringUtils {
      * Delete all occurrences of the given substring.
      *
      * @param inString the original {@code String}
-     * @param pattern  the pattern to delete all occurrences of
+     * @param pattern the pattern to delete all occurrences of
      * @return the resulting {@code String}
      */
     public static String delete(String inString, String pattern) {
@@ -1306,9 +1310,9 @@ public class StringTools extends StringUtils {
     /**
      * Delete any character in a given {@code String}.
      *
-     * @param inString      the original {@code String}
+     * @param inString the original {@code String}
      * @param charsToDelete a set of characters to delete.
-     *                      E.g. "az\n" will delete 'a's, 'z's and new lines.
+     * E.g. "az\n" will delete 'a's, 'z's and new lines.
      * @return the resulting {@code String}
      */
     public static String deleteAny(String inString, @Nullable String charsToDelete) {
@@ -1352,7 +1356,7 @@ public class StringTools extends StringUtils {
      */
     @Nullable
     public static Object quoteIfString(@Nullable Object obj) {
-        return (obj instanceof String ? quote((String) obj) : obj);
+        return (obj instanceof String ? quote((String)obj) : obj);
     }
 
     /**
@@ -1370,7 +1374,7 @@ public class StringTools extends StringUtils {
      * "this:name:is:qualified" returns "qualified" if using a ':' separator.
      *
      * @param qualifiedName the qualified name
-     * @param separator     the separator
+     * @param separator the separator
      */
     public static String unqualify(String qualifiedName, char separator) {
         return qualifiedName.substring(qualifiedName.lastIndexOf(separator) + 1);
@@ -1418,7 +1422,7 @@ public class StringTools extends StringUtils {
 
         char[] chars = str.toCharArray();
         chars[0] = updatedChar;
-        return new String(chars, 0, chars.length);
+        return new String(chars);
     }
 
     /**
@@ -1489,9 +1493,9 @@ public class StringTools extends StringUtils {
      * Apply the given relative path to the given Java resource path,
      * assuming standard Java folder separation (i.e. "/" separators).
      *
-     * @param path         the path to start from (usually a full file path)
+     * @param path the path to start from (usually a full file path)
      * @param relativePath the relative path to apply
-     *                     (relative to the full file path above)
+     * (relative to the full file path above)
      * @return the full file path that results from applying the relative path
      */
     public static String applyRelativePath(String path, String relativePath) {
@@ -1601,7 +1605,7 @@ public class StringTools extends StringUtils {
      * <li>A sequence "{@code %<i>xy</i>}" is interpreted as a hexadecimal representation of the character.</li>
      * </ul>
      *
-     * @param source  the encoded String
+     * @param source the encoded String
      * @param charset the character set
      * @return the decoded value
      * @throws IllegalArgumentException when the given source contains invalid encoded sequences
@@ -1628,7 +1632,7 @@ public class StringTools extends StringUtils {
                     if (u == -1 || l == -1) {
                         throw new IllegalArgumentException("Invalid encoded sequence \"" + source.substring(i) + "\"");
                     }
-                    bos.write((char) ((u << 4) + l));
+                    bos.write((char)((u << 4) + l));
                     i += 2;
                     changed = true;
                 } else {
@@ -1646,9 +1650,9 @@ public class StringTools extends StringUtils {
      * the {@link Locale#toString} format as well as BCP 47 language tags.
      *
      * @param localeValue the locale value: following either {@code Locale's}
-     *                    {@code toString()} format ("en", "en_UK", etc), also accepting spaces as
-     *                    separators (as an alternative to underscores), or BCP 47 (e.g. "en-UK")
-     *                    as specified by {@link Locale#forLanguageTag} on Java 7+
+     * {@code toString()} format ("en", "en_UK", etc), also accepting spaces as
+     * separators (as an alternative to underscores), or BCP 47 (e.g. "en-UK")
+     * as specified by {@link Locale#forLanguageTag} on Java 7+
      * @return a corresponding {@code Locale} instance, or {@code null} if none
      * @throws IllegalArgumentException in case of an invalid locale specification
      * @see #parseLocaleString
@@ -1680,8 +1684,8 @@ public class StringTools extends StringUtils {
      * Please use {@link #parseLocale} for lenient parsing of both formats.</b>
      *
      * @param localeString the locale {@code String}: following {@code Locale's}
-     *                     {@code toString()} format ("en", "en_UK", etc), also accepting spaces as
-     *                     separators (as an alternative to underscores)
+     * {@code toString()} format ("en", "en_UK", etc), also accepting spaces as
+     * separators (as an alternative to underscores)
      * @return a corresponding {@code Locale} instance, or {@code null} if none
      * @throws IllegalArgumentException in case of an invalid locale specification
      */
@@ -1726,7 +1730,7 @@ public class StringTools extends StringUtils {
             char ch = localePart.charAt(i);
             if (ch != ' ' && ch != '_' && ch != '-' && ch != '#' && !Character.isLetterOrDigit(ch)) {
                 throw new IllegalArgumentException(
-                        "Locale part \"" + localePart + "\" contains invalid characters");
+                    "Locale part \"" + localePart + "\" contains invalid characters");
             }
         }
     }
@@ -1748,7 +1752,7 @@ public class StringTools extends StringUtils {
      * Parse the given {@code timeZoneString} value into a {@link TimeZone}.
      *
      * @param timeZoneString the time zone {@code String}, following {@link TimeZone#getTimeZone(String)}
-     *                       but throwing {@link IllegalArgumentException} in case of an invalid time zone specification
+     * but throwing {@link IllegalArgumentException} in case of an invalid time zone specification
      * @return a corresponding {@link TimeZone} instance
      * @throws IllegalArgumentException in case of an invalid time zone specification
      */
@@ -1771,7 +1775,7 @@ public class StringTools extends StringUtils {
      * The {@code Collection} must contain {@code String} elements only.
      *
      * @param collection the {@code Collection} to copy
-     *                   (potentially {@code null} or empty)
+     * (potentially {@code null} or empty)
      * @return the resulting {@code String} array
      */
     public static String[] toStringArray(@Nullable Collection<String> collection) {
@@ -1784,7 +1788,7 @@ public class StringTools extends StringUtils {
      * The {@code Enumeration} must contain {@code String} elements only.
      *
      * @param enumeration the {@code Enumeration} to copy
-     *                    (potentially {@code null} or empty)
+     * (potentially {@code null} or empty)
      * @return the resulting {@code String} array
      */
     public static String[] toStringArray(@Nullable Enumeration<String> enumeration) {
@@ -1797,12 +1801,12 @@ public class StringTools extends StringUtils {
      * the given {@code String}.
      *
      * @param array the array to append to (can be {@code null})
-     * @param str   the {@code String} to append
+     * @param str the {@code String} to append
      * @return the new array (never {@code null})
      */
     public static String[] addStringToArray(@Nullable String[] array, String str) {
         if (ObjectUtils.isEmpty(array)) {
-            return new String[]{str};
+            return new String[] {str};
         }
 
         String[] newArr = new String[array.length + 1];
@@ -1925,7 +1929,7 @@ public class StringTools extends StringUtils {
      * Split a {@code String} at the first occurrence of the delimiter.
      * Does not include the delimiter in the result.
      *
-     * @param toSplit   the string to split (potentially {@code null} or empty)
+     * @param toSplit the string to split (potentially {@code null} or empty)
      * @param delimiter to split the string up with (potentially {@code null} or empty)
      * @return a two element array with index 0 being before the delimiter, and
      * index 1 being after the delimiter (neither element includes the delimiter);
@@ -1943,7 +1947,7 @@ public class StringTools extends StringUtils {
 
         String beforeDelimiter = toSplit.substring(0, offset);
         String afterDelimiter = toSplit.substring(offset + delimiter.length());
-        return new String[]{beforeDelimiter, afterDelimiter};
+        return new String[] {beforeDelimiter, afterDelimiter};
     }
 
     /**
@@ -1954,7 +1958,7 @@ public class StringTools extends StringUtils {
      * <p>
      * Will trim both the key and value before adding them to the {@code Properties}.
      *
-     * @param array     the array to process
+     * @param array the array to process
      * @param delimiter to split each element using (typically the equals symbol)
      * @return a {@code Properties} instance representing the array contents,
      * or {@code null} if the array to process was {@code null} or empty
@@ -1973,17 +1977,17 @@ public class StringTools extends StringUtils {
      * Will trim both the key and value before adding them to the
      * {@code Properties} instance.
      *
-     * @param array         the array to process
-     * @param delimiter     to split each element using (typically the equals symbol)
+     * @param array the array to process
+     * @param delimiter to split each element using (typically the equals symbol)
      * @param charsToDelete one or more characters to remove from each element
-     *                      prior to attempting the split operation (typically the quotation mark
-     *                      symbol), or {@code null} if no removal should occur
+     * prior to attempting the split operation (typically the quotation mark
+     * symbol), or {@code null} if no removal should occur
      * @return a {@code Properties} instance representing the array contents,
      * or {@code null} if the array to process was {@code null} or empty
      */
     @Nullable
     public static Properties splitArrayElementsIntoProperties(
-            String[] array, String delimiter, @Nullable String charsToDelete) {
+        String[] array, String delimiter, @Nullable String charsToDelete) {
 
         if (ObjectUtils.isEmpty(array)) {
             return null;
@@ -2014,9 +2018,9 @@ public class StringTools extends StringUtils {
      * tokens. A delimiter is always a single character; for multi-character
      * delimiters, consider using {@link #delimitedListToStringArray}.
      *
-     * @param str        the {@code String} to tokenize (potentially {@code null} or empty)
+     * @param str the {@code String} to tokenize (potentially {@code null} or empty)
      * @param delimiters the delimiter characters, assembled as a {@code String}
-     *                   (each of the characters is individually considered as a delimiter)
+     * (each of the characters is individually considered as a delimiter)
      * @return an array of the tokens
      * @see StringTokenizer
      * @see String#trim()
@@ -2035,20 +2039,20 @@ public class StringTools extends StringUtils {
      * tokens. A delimiter is always a single character; for multi-character
      * delimiters, consider using {@link #delimitedListToStringArray}.
      *
-     * @param str               the {@code String} to tokenize (potentially {@code null} or empty)
-     * @param delimiters        the delimiter characters, assembled as a {@code String}
-     *                          (each of the characters is individually considered as a delimiter)
-     * @param trimTokens        trim the tokens via {@link String#trim()}
+     * @param str the {@code String} to tokenize (potentially {@code null} or empty)
+     * @param delimiters the delimiter characters, assembled as a {@code String}
+     * (each of the characters is individually considered as a delimiter)
+     * @param trimTokens trim the tokens via {@link String#trim()}
      * @param ignoreEmptyTokens omit empty tokens from the result array
-     *                          (only applies to tokens that are empty after trimming; StringTokenizer
-     *                          will not consider subsequent delimiters as token in the first place).
+     * (only applies to tokens that are empty after trimming; StringTokenizer
+     * will not consider subsequent delimiters as token in the first place).
      * @return an array of the tokens
      * @see StringTokenizer
      * @see String#trim()
      * @see #delimitedListToStringArray
      */
     public static String[] tokenizeToStringArray(
-            @Nullable String str, String delimiters, boolean trimTokens, boolean ignoreEmptyTokens) {
+        @Nullable String str, String delimiters, boolean trimTokens, boolean ignoreEmptyTokens) {
 
         if (str == null) {
             return new String[0];
@@ -2077,9 +2081,9 @@ public class StringTools extends StringUtils {
      * than as bunch of potential delimiter characters, in contrast to
      * {@link #tokenizeToStringArray}.
      *
-     * @param str       the input {@code String} (potentially {@code null} or empty)
+     * @param str the input {@code String} (potentially {@code null} or empty)
      * @param delimiter the delimiter between elements (this is a single delimiter,
-     *                  rather than a bunch individual delimiter characters)
+     * rather than a bunch individual delimiter characters)
      * @return an array of the tokens in the list
      * @see #tokenizeToStringArray
      */
@@ -2096,22 +2100,22 @@ public class StringTools extends StringUtils {
      * than as bunch of potential delimiter characters, in contrast to
      * {@link #tokenizeToStringArray}.
      *
-     * @param str           the input {@code String} (potentially {@code null} or empty)
-     * @param delimiter     the delimiter between elements (this is a single delimiter,
-     *                      rather than a bunch individual delimiter characters)
+     * @param str the input {@code String} (potentially {@code null} or empty)
+     * @param delimiter the delimiter between elements (this is a single delimiter,
+     * rather than a bunch individual delimiter characters)
      * @param charsToDelete a set of characters to delete; useful for deleting unwanted
-     *                      line breaks: e.g. "\r\n\f" will delete all new lines and line feeds in a {@code String}
+     * line breaks: e.g. "\r\n\f" will delete all new lines and line feeds in a {@code String}
      * @return an array of the tokens in the list
      * @see #tokenizeToStringArray
      */
     public static String[] delimitedListToStringArray(
-            @Nullable String str, @Nullable String delimiter, @Nullable String charsToDelete) {
+        @Nullable String str, @Nullable String delimiter, @Nullable String charsToDelete) {
 
         if (str == null) {
             return new String[0];
         }
         if (delimiter == null) {
-            return new String[]{str};
+            return new String[] {str};
         }
 
         List<String> result = new ArrayList<>();
@@ -2166,14 +2170,14 @@ public class StringTools extends StringUtils {
      * <p>
      * Useful for {@code toString()} implementations.
      *
-     * @param coll   the {@code Collection} to convert (potentially {@code null} or empty)
-     * @param delim  the delimiter to use (typically a ",")
+     * @param coll the {@code Collection} to convert (potentially {@code null} or empty)
+     * @param delim the delimiter to use (typically a ",")
      * @param prefix the {@code String} to start each element with
      * @param suffix the {@code String} to end each element with
      * @return the delimited {@code String}
      */
     public static String collectionToDelimitedString(
-            @Nullable Collection<?> coll, String delim, String prefix, String suffix) {
+        @Nullable Collection<?> coll, String delim, String prefix, String suffix) {
 
         if (CollectionUtils.isEmpty(coll)) {
             return "";
@@ -2195,7 +2199,7 @@ public class StringTools extends StringUtils {
      * <p>
      * Useful for {@code toString()} implementations.
      *
-     * @param coll  the {@code Collection} to convert (potentially {@code null} or empty)
+     * @param coll the {@code Collection} to convert (potentially {@code null} or empty)
      * @param delim the delimiter to use (typically a ",")
      * @return the delimited {@code String}
      */
@@ -2220,7 +2224,7 @@ public class StringTools extends StringUtils {
      * <p>
      * Useful for {@code toString()} implementations.
      *
-     * @param arr   the array to display (potentially {@code null} or empty)
+     * @param arr the array to display (potentially {@code null} or empty)
      * @param delim the delimiter to use (typically a ",")
      * @return the delimited {@code String}
      */

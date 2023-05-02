@@ -1,10 +1,11 @@
 package com.luna.common.net.high;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.core5.http.HttpConnection;
 import org.apache.hc.core5.http.HttpRequest;
 import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.impl.Http1StreamListener;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author luna

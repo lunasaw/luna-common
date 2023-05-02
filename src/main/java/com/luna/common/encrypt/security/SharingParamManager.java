@@ -1,19 +1,15 @@
 package com.luna.common.encrypt.security;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
-import com.luna.common.constant.Constant;
-import com.luna.common.constant.StrPoolConstant;
-import com.luna.common.net.HttpUtils;
-import com.luna.common.text.CharsetUtil;
-import org.apache.commons.lang3.CharUtils;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.util.List;
+import com.google.common.base.Joiner;
+import com.luna.common.constant.StrPoolConstant;
+import com.luna.common.net.HttpUtils;
+import com.luna.common.text.CharsetUtil;
 
 /**
  * @author luna
@@ -50,6 +46,8 @@ public class SharingParamManager {
         this.param = param;
         this.securityManager = securityManager;
     }
+
+    public SharingParamManager() {}
 
     /**
      * 生成分享参数
@@ -123,9 +121,6 @@ public class SharingParamManager {
 
     public void setVersion(String version) {
         this.version = version;
-    }
-
-    public SharingParamManager() {
     }
 
     public String[] getParam() {

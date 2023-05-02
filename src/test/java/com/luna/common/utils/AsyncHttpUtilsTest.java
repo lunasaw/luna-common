@@ -34,6 +34,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AsyncHttpUtilsTest {
 
+    public static void main(final String[] args) throws Exception {
+
+    }
+
     @Test
     public void async_test() throws Exception {
 
@@ -105,10 +109,6 @@ public class AsyncHttpUtilsTest {
             }
         });
         System.out.println(JSON.toJSONString(sseResponse));
-    }
-
-    public static void main(final String[] args) throws Exception {
-
     }
 
 }

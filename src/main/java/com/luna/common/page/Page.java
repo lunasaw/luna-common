@@ -5,37 +5,51 @@ import java.util.List;
 
 public class Page<T> implements Serializable {
 
+    /** 全局偏移量 */
+    public int      offsize = 2;
     /** 页数（第几页） */
     private long    currentpage;
-
     /** 查询数据库里面对应的数据有多少条 从数据库查处的总记录数 */
     private long    total;
-
     /** 每页查5条 */
     private int     size;
-
     /** 下页 */
     private int     next;
-
     private List<?> list;
-
     /** 最后一页 */
     private int     last;
-
     /** 左边的开始的页码 */
     private int     lpage;
-
     /** 右边额开始的页码 */
     private int     rpage;
-
     /** 从哪条开始查 */
     private long    start;
 
-    /** 全局偏移量 */
-    public int      offsize = 2;
-
     public Page() {
         super();
+    }
+
+    /****
+     * 带有偏移量设置的分页
+     *
+     * @param currentpage 页码
+     * @param total 总计
+     * @param pagesize 每页多少个
+     * @param offsize 偏移量
+     */
+    public Page(long total, int currentpage, int pagesize, int offsize) {
+        this.offsize = offsize;
+        initPage(total, currentpage, pagesize);
+    }
+
+    /****
+     *
+     * @param total 总记录数
+     * @param currentpage 当前页
+     * @param pagesize 每页显示多少条
+     */
+    public Page(long total, int currentpage, int pagesize) {
+        initPage(total, currentpage, pagesize);
     }
 
     /****
@@ -67,43 +81,11 @@ public class Page<T> implements Serializable {
 
     /**
      * 上一页
-     * 
+     *
      * @return
      */
     public long getUpper() {
         return currentpage > 1 ? currentpage - 1 : currentpage;
-    }
-
-    /**
-     * 总共有多少页，即末页
-     * 
-     * @param last
-     */
-    public void setLast(int last) {
-        this.last = (int)(total % size == 0 ? total / size : (total / size) + 1);
-    }
-
-    /****
-     * 带有偏移量设置的分页
-     *
-     * @param currentpage 页码
-     * @param total 总计
-     * @param pagesize 每页多少个
-     * @param offsize 偏移量
-     */
-    public Page(long total, int currentpage, int pagesize, int offsize) {
-        this.offsize = offsize;
-        initPage(total, currentpage, pagesize);
-    }
-
-    /****
-     *
-     * @param total 总记录数
-     * @param currentpage 当前页
-     * @param pagesize 每页显示多少条
-     */
-    public Page(long total, int currentpage, int pagesize) {
-        initPage(total, currentpage, pagesize);
     }
 
     /****
@@ -178,6 +160,10 @@ public class Page<T> implements Serializable {
         return currentpage;
     }
 
+    public void setCurrentpage(long currentpage) {
+        this.currentpage = currentpage;
+    }
+
     public long getTotal() {
         return total;
     }
@@ -196,6 +182,15 @@ public class Page<T> implements Serializable {
 
     public long getLast() {
         return last;
+    }
+
+    /**
+     * 总共有多少页，即末页
+     *
+     * @param last
+     */
+    public void setLast(int last) {
+        this.last = (int)(total % size == 0 ? total / size : (total / size) + 1);
     }
 
     public long getLpage() {
@@ -220,10 +215,6 @@ public class Page<T> implements Serializable {
 
     public void setStart(long start) {
         this.start = start;
-    }
-
-    public void setCurrentpage(long currentpage) {
-        this.currentpage = currentpage;
     }
 
     /**

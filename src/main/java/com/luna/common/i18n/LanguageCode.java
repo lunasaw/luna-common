@@ -2147,240 +2147,7 @@ public enum LanguageCode {
         }
     };
 
-    private LanguageCode() {}
-
-    /**
-     * Get the language name.
-     *
-     * @return
-     * The language name.
-     */
-    public String getName() {
-        return getAlpha3().getName();
-    }
-
-    /**
-     * Convert this {@code LanguageCode} instance to a {@link Locale} instance.
-     *
-     * <p>
-     * In most cases, this method creates a new {@code Locale} instance
-     * every time it is called, but some {@code LanguageCode} instances return
-     * their corresponding entries in {@code Locale} class. For example,
-     * {@link #ja LanguageCode.ja} always returns {@link Locale#JAPANESE}.
-     * </p>
-     *
-     * <p>
-     * The table below lists {@code LanguageCode} entries whose {@code toLocale()}
-     * do not create new {@code Locale} instances but return entries in
-     * {@code Locale} class.
-     * </p>
-     *
-     * <table border="1" style="border-collapse: collapse;" cellpadding="5">
-     * <tr bgcolor="#FF8C00">
-     * <th>LanguageCode</th>
-     * <th>Locale</th>
-     * </tr>
-     * <tr>
-     * <td>{@link LanguageCode#de LanguageCode.de}</td>
-     * <td>{@link Locale#GERMAN}</td>
-     * </tr>
-     * <tr>
-     * <td>{@link LanguageCode#en LanguageCode.en}</td>
-     * <td>{@link Locale#ENGLISH}</td>
-     * </tr>
-     * <tr>
-     * <td>{@link LanguageCode#fr LanguageCode.fr}</td>
-     * <td>{@link Locale#FRENCH}</td>
-     * </tr>
-     * <tr>
-     * <td>{@link LanguageCode#it LanguageCode.it}</td>
-     * <td>{@link Locale#ITALIAN}</td>
-     * </tr>
-     * <tr>
-     * <td>{@link LanguageCode#ja LanguageCode.ja}</td>
-     * <td>{@link Locale#JAPANESE}</td>
-     * </tr>
-     * <tr>
-     * <td>{@link LanguageCode#ko LanguageCode.ko}</td>
-     * <td>{@link Locale#KOREAN}</td>
-     * </tr>
-     * <tr>
-     * <td>{@link LanguageCode#zh LanguageCode.zh}</td>
-     * <td>{@link Locale#CHINESE}</td>
-     * </tr>
-     * </table>
-     *
-     * @return
-     * A {@code Locale} instance that matches this {@code LanguageCode}.
-     */
-    public Locale toLocale() {
-        return new Locale(name());
-    }
-
-    /**
-     * Get <a href="http://en.wikipedia.org/wiki/ISO_639-2">ISO 639-2</a>
-     * language code (3-letter lowercase code(s)).
-     *
-     * <p>
-     * Most languages have just one corresponding ISO 639-2 code, but
-     * some languages have two ISO 639-2 codes. They are known as
-     * "bibliographic" code (ISO 639-2/B code) and "terminological"
-     * code (ISO 639-2/T code). This method returns ISO 639-2/T code.
-     * If you want to get ISO 639-2/B code, write like below.
-     * </p>
-     *
-     * <pre style="background-color: #EEEEEE; margin-left: 2em; margin-right: 2em; border: 1px solid black;">
-     *
-     * LanguageCode alpha2 = ...;
-     *
-     * {@link LanguageAlpha3Code} alpha3B = alpha2.{@link #getAlpha3()}.{@link
-     * LanguageAlpha3Code#getAlpha3B() getAlpha3B()};
-     * </pre>
-     *
-     * <p>
-     * The above code does no harm for most {@code LanguageCode}s that have
-     * just one ISO 639-2 code. {@link LanguageAlpha3Code#getAlpha3B()
-     * getAlpha3B()} of such {@code LanguageAlpha3Code} instances just return
-     * themselves (= <code>this</code> object).
-     * </p>
-     *
-     * <p>
-     * The table below lists languages having two ISO 639-2 codes.
-     * </p>
-     *
-     * <table border="1" style="border-collapse: collapse" cellpadding="5">
-     * <tr bgcolor="orange">
-     * <th>ISO 639-1</th>
-     * <th>ISO 639-2/T</th>
-     * <th>ISO 639-2/B</th>
-     * <th>Language</th>
-     * </tr>
-     * <tr>
-     * <td>{@link LanguageCode#bo bo}</td>
-     * <td>{@link LanguageAlpha3Code#bod bod}</td>
-     * <td>{@link LanguageAlpha3Code#tib tib}</td>
-     * <td><a href="http://en.wikipedia.org/wiki/Standard_Tibetan">Tibetan</a></td>
-     * </tr>
-     * <tr>
-     * <td>{@link LanguageCode#eu eu}</td>
-     * <td>{@link LanguageAlpha3Code#eus eus}</td>
-     * <td>{@link LanguageAlpha3Code#baq baq}</td>
-     * <td><a href="http://en.wikipedia.org/wiki/Basque_language">Basque</a></td>
-     * </tr>
-     * <tr>
-     * <td>{@link LanguageCode#cs cs}</td>
-     * <td>{@link LanguageAlpha3Code#ces ces}</td>
-     * <td>{@link LanguageAlpha3Code#cze cze}</td>
-     * <td><a href="http://en.wikipedia.org/wiki/Czech_language">Czech</a></td>
-     * </tr>
-     * <tr>
-     * <td>{@link LanguageCode#cy cy}</td>
-     * <td>{@link LanguageAlpha3Code#cym cym}</td>
-     * <td>{@link LanguageAlpha3Code#wel wel}</td>
-     * <td><a href="http://en.wikipedia.org/wiki/Welsh_language">Welsh</a></td>
-     * </tr>
-     * <tr>
-     * <td>{@link LanguageCode#de de}</td>
-     * <td>{@link LanguageAlpha3Code#deu deu}</td>
-     * <td>{@link LanguageAlpha3Code#ger ger}</td>
-     * <td><a href="http://en.wikipedia.org/wiki/German_language">German</a></td>
-     * </tr>
-     * <tr>
-     * <td>{@link LanguageCode#el el}</td>
-     * <td>{@link LanguageAlpha3Code#ell ell}</td>
-     * <td>{@link LanguageAlpha3Code#gre gre}</td>
-     * <td><a href="http://en.wikipedia.org/wiki/Greek_language">Greek</a></td>
-     * </tr>
-     * <tr>
-     * <td>{@link LanguageCode#fa fa}</td>
-     * <td>{@link LanguageAlpha3Code#fas fas}</td>
-     * <td>{@link LanguageAlpha3Code#per per}</td>
-     * <td><a href="http://en.wikipedia.org/wiki/Persian_language">Persian</a></td>
-     * </tr>
-     * <tr>
-     * <td>{@link LanguageCode#fr fr}</td>
-     * <td>{@link LanguageAlpha3Code#fra fra}</td>
-     * <td>{@link LanguageAlpha3Code#fre fre}</td>
-     * <td><a href="http://en.wikipedia.org/wiki/French_language">French</a></td>
-     * </tr>
-     * <tr>
-     * <td>{@link LanguageCode#hy hy}</td>
-     * <td>{@link LanguageAlpha3Code#hye hye}</td>
-     * <td>{@link LanguageAlpha3Code#arm arm}</td>
-     * <td><a href="http://en.wikipedia.org/wiki/Armenian_language">Armenian</a></td>
-     * </tr>
-     * <tr>
-     * <td>{@link LanguageCode#is is}</td>
-     * <td>{@link LanguageAlpha3Code#isl isl}</td>
-     * <td>{@link LanguageAlpha3Code#ice ice}</td>
-     * <td><a href="http://en.wikipedia.org/wiki/Icelandic_language">Icelandic</a></td>
-     * </tr>
-     * <tr>
-     * <td>{@link LanguageCode#ka ka}</td>
-     * <td>{@link LanguageAlpha3Code#kat kat}</td>
-     * <td>{@link LanguageAlpha3Code#geo geo}</td>
-     * <td><a href="http://en.wikipedia.org/wiki/Georgian_language">Georgian</a></td>
-     * </tr>
-     * <tr>
-     * <td>{@link LanguageCode#mi mi}</td>
-     * <td>{@link LanguageAlpha3Code#mri mri}</td>
-     * <td>{@link LanguageAlpha3Code#mao mao}</td>
-     * <td><a href="http://en.wikipedia.org/wiki/M%C4%81ori_language">M&#257;ori</a></td>
-     * </tr>
-     * <tr>
-     * <td>{@link LanguageCode#mk mk}</td>
-     * <td>{@link LanguageAlpha3Code#mkd mkd}</td>
-     * <td>{@link LanguageAlpha3Code#mac mac}</td>
-     * <td><a href="http://en.wikipedia.org/wiki/Macedonian_language">Macedonian</a></td>
-     * </tr>
-     * <tr>
-     * <td>{@link LanguageCode#ms ms}</td>
-     * <td>{@link LanguageAlpha3Code#msa msa}</td>
-     * <td>{@link LanguageAlpha3Code#may may}</td>
-     * <td><a href="http://en.wikipedia.org/wiki/Malay_language">Malay</a></td>
-     * </tr>
-     * <tr>
-     * <td>{@link LanguageCode#my my}</td>
-     * <td>{@link LanguageAlpha3Code#mya mya}</td>
-     * <td>{@link LanguageAlpha3Code#bur bur}</td>
-     * <td><a href="http://en.wikipedia.org/wiki/Burmese_language">Burmese</a></td>
-     * </tr>
-     * <tr>
-     * <td>{@link LanguageCode#nl nl}</td>
-     * <td>{@link LanguageAlpha3Code#nld nld}</td>
-     * <td>{@link LanguageAlpha3Code#dut dut}</td>
-     * <td><a href="http://en.wikipedia.org/wiki/Dutch_language">Dutch</a></td>
-     * </tr>
-     * <tr>
-     * <td>{@link LanguageCode#ro ro}</td>
-     * <td>{@link LanguageAlpha3Code#ron ron}</td>
-     * <td>{@link LanguageAlpha3Code#rum rum}</td>
-     * <td><a href="http://en.wikipedia.org/wiki/Romanian_language">Romanian</a></td>
-     * </tr>
-     * <tr>
-     * <td>{@link LanguageCode#sk sk}</td>
-     * <td>{@link LanguageAlpha3Code#slk slk}</td>
-     * <td>{@link LanguageAlpha3Code#slo slo}</td>
-     * <td><a href="http://en.wikipedia.org/wiki/Slovak_language">Slovak</a></td>
-     * </tr>
-     * <tr>
-     * <td>{@link LanguageCode#sq sq}</td>
-     * <td>{@link LanguageAlpha3Code#sqi sqi}</td>
-     * <td>{@link LanguageAlpha3Code#alb alb}</td>
-     * <td><a href="http://en.wikipedia.org/wiki/Albanian_language">Albanian</a></td>
-     * </tr>
-     * </table>
-     *
-     *
-     * @return
-     * <a href="http://en.wikipedia.org/wiki/ISO_639-2">ISO 639-2</a>
-     * language code.
-     *
-     * @since 1.1
-     */
-    public LanguageAlpha3Code getAlpha3() {
-        return null;
-    }
+    LanguageCode() {}
 
     /**
      * Get a {@code LanguageCode} that corresponds to a given
@@ -2681,5 +2448,238 @@ public enum LanguageCode {
         }
 
         return list;
+    }
+
+    /**
+     * Get the language name.
+     *
+     * @return
+     * The language name.
+     */
+    public String getName() {
+        return getAlpha3().getName();
+    }
+
+    /**
+     * Convert this {@code LanguageCode} instance to a {@link Locale} instance.
+     *
+     * <p>
+     * In most cases, this method creates a new {@code Locale} instance
+     * every time it is called, but some {@code LanguageCode} instances return
+     * their corresponding entries in {@code Locale} class. For example,
+     * {@link #ja LanguageCode.ja} always returns {@link Locale#JAPANESE}.
+     * </p>
+     *
+     * <p>
+     * The table below lists {@code LanguageCode} entries whose {@code toLocale()}
+     * do not create new {@code Locale} instances but return entries in
+     * {@code Locale} class.
+     * </p>
+     *
+     * <table border="1" style="border-collapse: collapse;" cellpadding="5">
+     * <tr bgcolor="#FF8C00">
+     * <th>LanguageCode</th>
+     * <th>Locale</th>
+     * </tr>
+     * <tr>
+     * <td>{@link LanguageCode#de LanguageCode.de}</td>
+     * <td>{@link Locale#GERMAN}</td>
+     * </tr>
+     * <tr>
+     * <td>{@link LanguageCode#en LanguageCode.en}</td>
+     * <td>{@link Locale#ENGLISH}</td>
+     * </tr>
+     * <tr>
+     * <td>{@link LanguageCode#fr LanguageCode.fr}</td>
+     * <td>{@link Locale#FRENCH}</td>
+     * </tr>
+     * <tr>
+     * <td>{@link LanguageCode#it LanguageCode.it}</td>
+     * <td>{@link Locale#ITALIAN}</td>
+     * </tr>
+     * <tr>
+     * <td>{@link LanguageCode#ja LanguageCode.ja}</td>
+     * <td>{@link Locale#JAPANESE}</td>
+     * </tr>
+     * <tr>
+     * <td>{@link LanguageCode#ko LanguageCode.ko}</td>
+     * <td>{@link Locale#KOREAN}</td>
+     * </tr>
+     * <tr>
+     * <td>{@link LanguageCode#zh LanguageCode.zh}</td>
+     * <td>{@link Locale#CHINESE}</td>
+     * </tr>
+     * </table>
+     *
+     * @return
+     * A {@code Locale} instance that matches this {@code LanguageCode}.
+     */
+    public Locale toLocale() {
+        return new Locale(name());
+    }
+
+    /**
+     * Get <a href="http://en.wikipedia.org/wiki/ISO_639-2">ISO 639-2</a>
+     * language code (3-letter lowercase code(s)).
+     *
+     * <p>
+     * Most languages have just one corresponding ISO 639-2 code, but
+     * some languages have two ISO 639-2 codes. They are known as
+     * "bibliographic" code (ISO 639-2/B code) and "terminological"
+     * code (ISO 639-2/T code). This method returns ISO 639-2/T code.
+     * If you want to get ISO 639-2/B code, write like below.
+     * </p>
+     *
+     * <pre style="background-color: #EEEEEE; margin-left: 2em; margin-right: 2em; border: 1px solid black;">
+     *
+     * LanguageCode alpha2 = ...;
+     *
+     * {@link LanguageAlpha3Code} alpha3B = alpha2.{@link #getAlpha3()}.{@link
+     * LanguageAlpha3Code#getAlpha3B() getAlpha3B()};
+     * </pre>
+     *
+     * <p>
+     * The above code does no harm for most {@code LanguageCode}s that have
+     * just one ISO 639-2 code. {@link LanguageAlpha3Code#getAlpha3B()
+     * getAlpha3B()} of such {@code LanguageAlpha3Code} instances just return
+     * themselves (= <code>this</code> object).
+     * </p>
+     *
+     * <p>
+     * The table below lists languages having two ISO 639-2 codes.
+     * </p>
+     *
+     * <table border="1" style="border-collapse: collapse" cellpadding="5">
+     * <tr bgcolor="orange">
+     * <th>ISO 639-1</th>
+     * <th>ISO 639-2/T</th>
+     * <th>ISO 639-2/B</th>
+     * <th>Language</th>
+     * </tr>
+     * <tr>
+     * <td>{@link LanguageCode#bo bo}</td>
+     * <td>{@link LanguageAlpha3Code#bod bod}</td>
+     * <td>{@link LanguageAlpha3Code#tib tib}</td>
+     * <td><a href="http://en.wikipedia.org/wiki/Standard_Tibetan">Tibetan</a></td>
+     * </tr>
+     * <tr>
+     * <td>{@link LanguageCode#eu eu}</td>
+     * <td>{@link LanguageAlpha3Code#eus eus}</td>
+     * <td>{@link LanguageAlpha3Code#baq baq}</td>
+     * <td><a href="http://en.wikipedia.org/wiki/Basque_language">Basque</a></td>
+     * </tr>
+     * <tr>
+     * <td>{@link LanguageCode#cs cs}</td>
+     * <td>{@link LanguageAlpha3Code#ces ces}</td>
+     * <td>{@link LanguageAlpha3Code#cze cze}</td>
+     * <td><a href="http://en.wikipedia.org/wiki/Czech_language">Czech</a></td>
+     * </tr>
+     * <tr>
+     * <td>{@link LanguageCode#cy cy}</td>
+     * <td>{@link LanguageAlpha3Code#cym cym}</td>
+     * <td>{@link LanguageAlpha3Code#wel wel}</td>
+     * <td><a href="http://en.wikipedia.org/wiki/Welsh_language">Welsh</a></td>
+     * </tr>
+     * <tr>
+     * <td>{@link LanguageCode#de de}</td>
+     * <td>{@link LanguageAlpha3Code#deu deu}</td>
+     * <td>{@link LanguageAlpha3Code#ger ger}</td>
+     * <td><a href="http://en.wikipedia.org/wiki/German_language">German</a></td>
+     * </tr>
+     * <tr>
+     * <td>{@link LanguageCode#el el}</td>
+     * <td>{@link LanguageAlpha3Code#ell ell}</td>
+     * <td>{@link LanguageAlpha3Code#gre gre}</td>
+     * <td><a href="http://en.wikipedia.org/wiki/Greek_language">Greek</a></td>
+     * </tr>
+     * <tr>
+     * <td>{@link LanguageCode#fa fa}</td>
+     * <td>{@link LanguageAlpha3Code#fas fas}</td>
+     * <td>{@link LanguageAlpha3Code#per per}</td>
+     * <td><a href="http://en.wikipedia.org/wiki/Persian_language">Persian</a></td>
+     * </tr>
+     * <tr>
+     * <td>{@link LanguageCode#fr fr}</td>
+     * <td>{@link LanguageAlpha3Code#fra fra}</td>
+     * <td>{@link LanguageAlpha3Code#fre fre}</td>
+     * <td><a href="http://en.wikipedia.org/wiki/French_language">French</a></td>
+     * </tr>
+     * <tr>
+     * <td>{@link LanguageCode#hy hy}</td>
+     * <td>{@link LanguageAlpha3Code#hye hye}</td>
+     * <td>{@link LanguageAlpha3Code#arm arm}</td>
+     * <td><a href="http://en.wikipedia.org/wiki/Armenian_language">Armenian</a></td>
+     * </tr>
+     * <tr>
+     * <td>{@link LanguageCode#is is}</td>
+     * <td>{@link LanguageAlpha3Code#isl isl}</td>
+     * <td>{@link LanguageAlpha3Code#ice ice}</td>
+     * <td><a href="http://en.wikipedia.org/wiki/Icelandic_language">Icelandic</a></td>
+     * </tr>
+     * <tr>
+     * <td>{@link LanguageCode#ka ka}</td>
+     * <td>{@link LanguageAlpha3Code#kat kat}</td>
+     * <td>{@link LanguageAlpha3Code#geo geo}</td>
+     * <td><a href="http://en.wikipedia.org/wiki/Georgian_language">Georgian</a></td>
+     * </tr>
+     * <tr>
+     * <td>{@link LanguageCode#mi mi}</td>
+     * <td>{@link LanguageAlpha3Code#mri mri}</td>
+     * <td>{@link LanguageAlpha3Code#mao mao}</td>
+     * <td><a href="http://en.wikipedia.org/wiki/M%C4%81ori_language">M&#257;ori</a></td>
+     * </tr>
+     * <tr>
+     * <td>{@link LanguageCode#mk mk}</td>
+     * <td>{@link LanguageAlpha3Code#mkd mkd}</td>
+     * <td>{@link LanguageAlpha3Code#mac mac}</td>
+     * <td><a href="http://en.wikipedia.org/wiki/Macedonian_language">Macedonian</a></td>
+     * </tr>
+     * <tr>
+     * <td>{@link LanguageCode#ms ms}</td>
+     * <td>{@link LanguageAlpha3Code#msa msa}</td>
+     * <td>{@link LanguageAlpha3Code#may may}</td>
+     * <td><a href="http://en.wikipedia.org/wiki/Malay_language">Malay</a></td>
+     * </tr>
+     * <tr>
+     * <td>{@link LanguageCode#my my}</td>
+     * <td>{@link LanguageAlpha3Code#mya mya}</td>
+     * <td>{@link LanguageAlpha3Code#bur bur}</td>
+     * <td><a href="http://en.wikipedia.org/wiki/Burmese_language">Burmese</a></td>
+     * </tr>
+     * <tr>
+     * <td>{@link LanguageCode#nl nl}</td>
+     * <td>{@link LanguageAlpha3Code#nld nld}</td>
+     * <td>{@link LanguageAlpha3Code#dut dut}</td>
+     * <td><a href="http://en.wikipedia.org/wiki/Dutch_language">Dutch</a></td>
+     * </tr>
+     * <tr>
+     * <td>{@link LanguageCode#ro ro}</td>
+     * <td>{@link LanguageAlpha3Code#ron ron}</td>
+     * <td>{@link LanguageAlpha3Code#rum rum}</td>
+     * <td><a href="http://en.wikipedia.org/wiki/Romanian_language">Romanian</a></td>
+     * </tr>
+     * <tr>
+     * <td>{@link LanguageCode#sk sk}</td>
+     * <td>{@link LanguageAlpha3Code#slk slk}</td>
+     * <td>{@link LanguageAlpha3Code#slo slo}</td>
+     * <td><a href="http://en.wikipedia.org/wiki/Slovak_language">Slovak</a></td>
+     * </tr>
+     * <tr>
+     * <td>{@link LanguageCode#sq sq}</td>
+     * <td>{@link LanguageAlpha3Code#sqi sqi}</td>
+     * <td>{@link LanguageAlpha3Code#alb alb}</td>
+     * <td><a href="http://en.wikipedia.org/wiki/Albanian_language">Albanian</a></td>
+     * </tr>
+     * </table>
+     *
+     *
+     * @return
+     * <a href="http://en.wikipedia.org/wiki/ISO_639-2">ISO 639-2</a>
+     * language code.
+     *
+     * @since 1.1
+     */
+    public LanguageAlpha3Code getAlpha3() {
+        return null;
     }
 }

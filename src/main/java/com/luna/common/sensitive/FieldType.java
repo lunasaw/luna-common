@@ -23,43 +23,44 @@ public enum FieldType {
     // 中文名，脱敏后：张*伦
     CHINESE_NAME(Convert::chineseName);
 
+    // 字段名和字段类型关系表，用于非注解方式脱敏
+    // 字段名会忽略字母大小写
+    private final static Map<String, FieldType> fieldTypeMap = new HashMap<>();
+
+    static {
+        fieldTypeMap.put("mobile", MOBILE);
+        fieldTypeMap.put("telephone", MOBILE);
+        fieldTypeMap.put("address", ADDRESS);
+        fieldTypeMap.put("email", EMAIL);
+        fieldTypeMap.put("bankcard", BANKCARD);
+        fieldTypeMap.put("idcard", IDCARD);
+        fieldTypeMap.put("password", PASSWORD);
+        fieldTypeMap.put("chinesename", CHINESE_NAME);
+    }
+
     // 默认脱敏实现
-    private Function<String,String> defaultFunction;
+    private final Function<String, String> defaultFunction;
 
     FieldType(Function<String, String> defaultFunction) {
         this.defaultFunction = defaultFunction;
     }
 
-    public String convert(String value, FieldConfig fieldConfig){
+    public static FieldType parseFieldType(String fieldName) {
+        if (fieldTypeMap.containsKey(fieldName)) {
+            return fieldTypeMap.get(fieldName);
+        }
+        return null;
+    }
+
+    public String convert(String value, FieldConfig fieldConfig) {
         // 如果此字段不需要脱敏，则字节返回。
-        if(fieldConfig != null && fieldConfig.getNeed() != null && fieldConfig.getNeed() == Boolean.FALSE){
+        if (fieldConfig != null && fieldConfig.getNeed() != null && fieldConfig.getNeed() == Boolean.FALSE) {
             return value;
         }
         // 如果存在自定义脱敏规则，则使用自定义，否则使用默认。
         Function<String, String> function =
-                (fieldConfig != null && fieldConfig.getFunction() != null) ? fieldConfig.getFunction() : defaultFunction;
+            (fieldConfig != null && fieldConfig.getFunction() != null) ? fieldConfig.getFunction() : defaultFunction;
         return function.apply(value);
-    }
-
-
-    // 字段名和字段类型关系表，用于非注解方式脱敏
-    // 字段名会忽略字母大小写
-    private final static Map<String,FieldType> fieldTypeMap = new HashMap<>();
-    static{
-        fieldTypeMap.put("mobile",MOBILE);
-        fieldTypeMap.put("telephone",MOBILE);
-        fieldTypeMap.put("address",ADDRESS);
-        fieldTypeMap.put("email",EMAIL);
-        fieldTypeMap.put("bankcard",BANKCARD);
-        fieldTypeMap.put("idcard",IDCARD);
-        fieldTypeMap.put("password",PASSWORD);
-        fieldTypeMap.put("chinesename",CHINESE_NAME);
-    }
-    public static FieldType parseFieldType(String fieldName){
-        if(fieldTypeMap.containsKey(fieldName)){
-            return fieldTypeMap.get(fieldName);
-        }
-        return null;
     }
 
 }

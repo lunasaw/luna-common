@@ -1,10 +1,11 @@
 package com.luna.common.encrypt;
 
-import com.luna.common.text.CharsetUtil;
+import java.io.InputStream;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import java.io.IOException;
-import java.io.InputStream;
+
+import com.luna.common.text.CharsetUtil;
 
 /**
  * @author luna@mac

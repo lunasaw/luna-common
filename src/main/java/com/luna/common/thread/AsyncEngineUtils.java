@@ -3,9 +3,10 @@ package com.luna.common.thread;
 import java.util.List;
 import java.util.concurrent.*;
 
-import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Lists;
 
 /**
  * @version 1.0

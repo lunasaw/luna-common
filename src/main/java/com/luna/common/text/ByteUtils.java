@@ -5,21 +5,17 @@
 
 package com.luna.common.text;
 
-import com.luna.common.dto.constant.ResultCode;
-import com.luna.common.exception.BaseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.luna.common.dto.constant.ResultCode;
+import com.luna.common.exception.BaseException;
 
 public class ByteUtils {
 
@@ -80,7 +76,7 @@ public class ByteUtils {
     }
 
     public static List<byte[]> subToSmallBytes(File file, int subLen) throws FileNotFoundException {
-        return subToSmallBytes((InputStream)(new FileInputStream(file)), subLen);
+        return subToSmallBytes(new FileInputStream(file), subLen);
     }
 
     public static List<byte[]> subToSmallBytes(InputStream inputStream, int subLen) {
@@ -99,12 +95,12 @@ public class ByteUtils {
                 }
             }
         } catch (IOException var14) {
-           throw  new BaseException(ResultCode.ERROR_SYSTEM_EXCEPTION,"Unexpected IOException: " + var14.getMessage());
+            throw new BaseException(ResultCode.ERROR_SYSTEM_EXCEPTION, "Unexpected IOException: " + var14.getMessage());
         } finally {
             try {
                 inputStream.close();
             } catch (Exception ignored) {
-                log.warn("inputStream clone error ignored={}",ignored);
+                log.warn("inputStream clone error ignored={}", ignored);
             }
         }
 

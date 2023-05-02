@@ -15,12 +15,7 @@
  */
 package com.luna.common.i18n;
 
-import java.util.ArrayList;
-import java.util.Currency;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -2160,64 +2155,6 @@ public enum CountryCode {
     ZW("Zimbabwe", "ZWE", 716, Assignment.OFFICIALLY_ASSIGNED),
     ;
 
-    /**
-     * Code assignment state in <a href="http://en.wikipedia.org/wiki/ISO_3166-1"
-     * >ISO 3166-1</a>.
-     *
-     * @see <a href="http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Decoding_table"
-     * >Decoding table of ISO 3166-1 alpha-2 codes</a>
-     */
-    public enum Assignment {
-        /**
-         * <a href="http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements"
-         * >Officially assigned</a>.
-         *
-         * Assigned to a country, territory, or area of geographical interest.
-         */
-        OFFICIALLY_ASSIGNED,
-
-        /**
-         * <a href="http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#User-assigned_code_elements"
-         * >User assigned</a>.
-         *
-         * Free for assignment at the disposal of users.
-         */
-        USER_ASSIGNED,
-
-        /**
-         * <a href="http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Exceptional_reservations"
-         * >Exceptionally reserved</a>.
-         *
-         * Reserved on request for restricted use.
-         */
-        EXCEPTIONALLY_RESERVED,
-
-        /**
-         * <a href="http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Transitional_reservations"
-         * >Transitionally reserved</a>.
-         *
-         * Deleted from ISO 3166-1 but reserved transitionally.
-         */
-        TRANSITIONALLY_RESERVED,
-
-        /**
-         * <a href="http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Indeterminate_reservations"
-         * >Indeterminately reserved</a>.
-         *
-         * Used in coding systems associated with ISO 3166-1.
-         */
-        INDETERMINATELY_RESERVED,
-
-        /**
-         * <a href="http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Codes_currently_agreed_not_to_use"
-         * >Not used</a>.
-         *
-         * Not used in ISO 3166-1 in deference to international property
-         * organization names.
-         */
-        NOT_USED
-    }
-
     private static final Map<String, CountryCode>  alpha3Map  = new HashMap<String, CountryCode>();
     private static final Map<String, CountryCode>  alpha4Map  = new HashMap<String, CountryCode>();
     private static final Map<Integer, CountryCode> numericMap = new HashMap<Integer, CountryCode>();
@@ -2268,202 +2205,11 @@ public enum CountryCode {
     private final String     alpha3;
     private final int        numeric;
     private final Assignment assignment;
-
-    private CountryCode(String name, String alpha3, int numeric, Assignment assignment) {
+    CountryCode(String name, String alpha3, int numeric, Assignment assignment) {
         this.name = name;
         this.alpha3 = alpha3;
         this.numeric = numeric;
         this.assignment = assignment;
-    }
-
-    /**
-     * Get the country name.
-     *
-     * @return
-     * The country name.
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Get the <a href="http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2"
-     * >ISO 3166-1 alpha-2</a> code.
-     *
-     * @return
-     * The <a href="http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2"
-     * >ISO 3166-1 alpha-2</a> code.
-     * {@link CountryCode#UNDEFINED} returns {@code "UNDEFINED"}
-     * which is not an official ISO 3166-1 alpha-2 code.
-     */
-    public String getAlpha2() {
-        return name();
-    }
-
-    /**
-     * Get the <a href="http://en.wikipedia.org/wiki/ISO_3166-1_alpha-3"
-     * >ISO 3166-1 alpha-3</a> code.
-     *
-     * @return
-     * The <a href="http://en.wikipedia.org/wiki/ISO_3166-1_alpha-3"
-     * >ISO 3166-1 alpha-3</a> code.
-     * Some country codes reserved exceptionally (such as {@link #EU})
-     * returns {@code null}.
-     * {@link CountryCode#UNDEFINED} returns {@code null}, too.
-     */
-    public String getAlpha3() {
-        return alpha3;
-    }
-
-    /**
-     * Get the <a href="http://en.wikipedia.org/wiki/ISO_3166-1_numeric"
-     * >ISO 3166-1 numeric</a> code.
-     *
-     * @return
-     * The <a href="http://en.wikipedia.org/wiki/ISO_3166-1_numeric"
-     * >ISO 3166-1 numeric</a> code.
-     * Country codes reserved exceptionally (such as {@link #EU})
-     * returns {@code -1}.
-     * {@link CountryCode#UNDEFINED} returns {@code -1}, too.
-     */
-    public int getNumeric() {
-        return numeric;
-    }
-
-    /**
-     * Get the assignment state of this country code in ISO 3166-1.
-     *
-     * @return
-     * The assignment state.
-     *
-     * @see <a href="http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Decoding_table"
-     * >Decoding table of ISO 3166-1 alpha-2 codes</a>
-     */
-    public Assignment getAssignment() {
-        return assignment;
-    }
-
-    /**
-     * Convert this {@code CountryCode} instance to a {@link Locale} instance.
-     *
-     * <p>
-     * In most cases, this method creates a new {@code Locale} instance
-     * every time it is called, but some {@code CountryCode} instances return
-     * their corresponding entries in {@code Locale} class. For example,
-     * {@link #CA CountryCode.CA} always returns {@link Locale#CANADA}.
-     * </p>
-     *
-     * <p>
-     * The table below lists {@code CountryCode} entries whose {@code toLocale()}
-     * do not create new Locale instances but return entries in
-     * {@code Locale} class.
-     * </p>
-     *
-     * <table border="1" style="border-collapse: collapse;" cellpadding="5">
-     * <tr bgcolor="#FF8C00">
-     * <th>CountryCode</th>
-     * <th>Locale</th>
-     * </tr>
-     * <tr>
-     * <td>{@link CountryCode#CA CountryCode.CA}</td>
-     * <td>{@link Locale#CANADA}</td>
-     * </tr>
-     * <tr>
-     * <td>{@link CountryCode#CN CountryCode.CN}</td>
-     * <td>{@link Locale#CHINA}</td>
-     * </tr>
-     * <tr>
-     * <td>{@link CountryCode#DE CountryCode.DE}</td>
-     * <td>{@link Locale#GERMANY}</td>
-     * </tr>
-     * <tr>
-     * <td>{@link CountryCode#FR CountryCode.FR}</td>
-     * <td>{@link Locale#FRANCE}</td>
-     * </tr>
-     * <tr>
-     * <td>{@link CountryCode#GB CountryCode.GB}</td>
-     * <td>{@link Locale#UK}</td>
-     * </tr>
-     * <tr>
-     * <td>{@link CountryCode#IT CountryCode.IT}</td>
-     * <td>{@link Locale#ITALY}</td>
-     * </tr>
-     * <tr>
-     * <td>{@link CountryCode#JP CountryCode.JP}</td>
-     * <td>{@link Locale#JAPAN}</td>
-     * </tr>
-     * <tr>
-     * <td>{@link CountryCode#KR CountryCode.KR}</td>
-     * <td>{@link Locale#KOREA}</td>
-     * </tr>
-     * <tr>
-     * <td>{@link CountryCode#TW CountryCode.TW}</td>
-     * <td>{@link Locale#TAIWAN}</td>
-     * </tr>
-     * <tr>
-     * <td>{@link CountryCode#US CountryCode.US}</td>
-     * <td>{@link Locale#US}</td>
-     * </tr>
-     * </table>
-     *
-     * <p>
-     * In addition, {@code toLocale()} of {@link CountryCode#UNDEFINED
-     * CountryCode.UNDEFINED} behaves a bit differently. It returns
-     * {@link Locale#ROOT Locale.ROOT} when it is available (i.e. when
-     * the version of Java SE is 1.6 or higher). Otherwise, it returns
-     * a {@code Locale} instance whose language and country are empty
-     * strings. Even in the latter case, the same instance is returned
-     * on every call.
-     * </p>
-     *
-     * @return
-     * A {@code Locale} instance that matches this {@code CountryCode}.
-     */
-    public Locale toLocale() {
-        return new Locale("", name());
-    }
-
-    /**
-     * Get the currency.
-     *
-     * <p>
-     * This method is an alias of {@link Currency}{@code .}{@link
-     * Currency#getInstance(Locale) getInstance}{@code (}{@link
-     * #toLocale()}{@code )}. The only difference is that this method
-     * returns {@code null} when {@code Currency.getInstance(Locale)}
-     * throws {@code IllegalArgumentException}.
-     * </p>
-     *
-     * <p>
-     * This method returns {@code null} when the territory represented by
-     * this {@code CountryCode} instance does not have a currency.
-     * {@link #AQ} (Antarctica) is one example.
-     * </p>
-     *
-     * <p>
-     * In addition, this method returns {@code null} also when the ISO 3166
-     * code represented by this {@code CountryCode} instance is not
-     * supported by the implementation of {@link
-     * Currency#getInstance(Locale)}. At the time of this writing,
-     * {@link #SS} (South Sudan) is one example.
-     * </p>
-     *
-     * @return
-     * A {@code Currency} instance. In some cases, null
-     * is returned.
-     *
-     * @since 1.4
-     *
-     * @see Currency#getInstance(Locale)
-     */
-    public Currency getCurrency() {
-        try {
-            return Currency.getInstance(toLocale());
-        } catch (IllegalArgumentException e) {
-            // Currency.getInstance(Locale) throws IllegalArgumentException
-            // when the given ISO 3166 code is not supported.
-            return null;
-        }
     }
 
     /**
@@ -2890,5 +2636,253 @@ public enum CountryCode {
         }
 
         return list;
+    }
+
+    /**
+     * Get the country name.
+     *
+     * @return
+     * The country name.
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Get the <a href="http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2"
+     * >ISO 3166-1 alpha-2</a> code.
+     *
+     * @return
+     * The <a href="http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2"
+     * >ISO 3166-1 alpha-2</a> code.
+     * {@link CountryCode#UNDEFINED} returns {@code "UNDEFINED"}
+     * which is not an official ISO 3166-1 alpha-2 code.
+     */
+    public String getAlpha2() {
+        return name();
+    }
+
+    /**
+     * Get the <a href="http://en.wikipedia.org/wiki/ISO_3166-1_alpha-3"
+     * >ISO 3166-1 alpha-3</a> code.
+     *
+     * @return
+     * The <a href="http://en.wikipedia.org/wiki/ISO_3166-1_alpha-3"
+     * >ISO 3166-1 alpha-3</a> code.
+     * Some country codes reserved exceptionally (such as {@link #EU})
+     * returns {@code null}.
+     * {@link CountryCode#UNDEFINED} returns {@code null}, too.
+     */
+    public String getAlpha3() {
+        return alpha3;
+    }
+
+    /**
+     * Get the <a href="http://en.wikipedia.org/wiki/ISO_3166-1_numeric"
+     * >ISO 3166-1 numeric</a> code.
+     *
+     * @return
+     * The <a href="http://en.wikipedia.org/wiki/ISO_3166-1_numeric"
+     * >ISO 3166-1 numeric</a> code.
+     * Country codes reserved exceptionally (such as {@link #EU})
+     * returns {@code -1}.
+     * {@link CountryCode#UNDEFINED} returns {@code -1}, too.
+     */
+    public int getNumeric() {
+        return numeric;
+    }
+
+    /**
+     * Get the assignment state of this country code in ISO 3166-1.
+     *
+     * @return
+     * The assignment state.
+     *
+     * @see <a href="http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Decoding_table"
+     * >Decoding table of ISO 3166-1 alpha-2 codes</a>
+     */
+    public Assignment getAssignment() {
+        return assignment;
+    }
+
+    /**
+     * Convert this {@code CountryCode} instance to a {@link Locale} instance.
+     *
+     * <p>
+     * In most cases, this method creates a new {@code Locale} instance
+     * every time it is called, but some {@code CountryCode} instances return
+     * their corresponding entries in {@code Locale} class. For example,
+     * {@link #CA CountryCode.CA} always returns {@link Locale#CANADA}.
+     * </p>
+     *
+     * <p>
+     * The table below lists {@code CountryCode} entries whose {@code toLocale()}
+     * do not create new Locale instances but return entries in
+     * {@code Locale} class.
+     * </p>
+     *
+     * <table border="1" style="border-collapse: collapse;" cellpadding="5">
+     * <tr bgcolor="#FF8C00">
+     * <th>CountryCode</th>
+     * <th>Locale</th>
+     * </tr>
+     * <tr>
+     * <td>{@link CountryCode#CA CountryCode.CA}</td>
+     * <td>{@link Locale#CANADA}</td>
+     * </tr>
+     * <tr>
+     * <td>{@link CountryCode#CN CountryCode.CN}</td>
+     * <td>{@link Locale#CHINA}</td>
+     * </tr>
+     * <tr>
+     * <td>{@link CountryCode#DE CountryCode.DE}</td>
+     * <td>{@link Locale#GERMANY}</td>
+     * </tr>
+     * <tr>
+     * <td>{@link CountryCode#FR CountryCode.FR}</td>
+     * <td>{@link Locale#FRANCE}</td>
+     * </tr>
+     * <tr>
+     * <td>{@link CountryCode#GB CountryCode.GB}</td>
+     * <td>{@link Locale#UK}</td>
+     * </tr>
+     * <tr>
+     * <td>{@link CountryCode#IT CountryCode.IT}</td>
+     * <td>{@link Locale#ITALY}</td>
+     * </tr>
+     * <tr>
+     * <td>{@link CountryCode#JP CountryCode.JP}</td>
+     * <td>{@link Locale#JAPAN}</td>
+     * </tr>
+     * <tr>
+     * <td>{@link CountryCode#KR CountryCode.KR}</td>
+     * <td>{@link Locale#KOREA}</td>
+     * </tr>
+     * <tr>
+     * <td>{@link CountryCode#TW CountryCode.TW}</td>
+     * <td>{@link Locale#TAIWAN}</td>
+     * </tr>
+     * <tr>
+     * <td>{@link CountryCode#US CountryCode.US}</td>
+     * <td>{@link Locale#US}</td>
+     * </tr>
+     * </table>
+     *
+     * <p>
+     * In addition, {@code toLocale()} of {@link CountryCode#UNDEFINED
+     * CountryCode.UNDEFINED} behaves a bit differently. It returns
+     * {@link Locale#ROOT Locale.ROOT} when it is available (i.e. when
+     * the version of Java SE is 1.6 or higher). Otherwise, it returns
+     * a {@code Locale} instance whose language and country are empty
+     * strings. Even in the latter case, the same instance is returned
+     * on every call.
+     * </p>
+     *
+     * @return
+     * A {@code Locale} instance that matches this {@code CountryCode}.
+     */
+    public Locale toLocale() {
+        return new Locale("", name());
+    }
+
+    /**
+     * Get the currency.
+     *
+     * <p>
+     * This method is an alias of {@link Currency}{@code .}{@link
+     * Currency#getInstance(Locale) getInstance}{@code (}{@link
+     * #toLocale()}{@code )}. The only difference is that this method
+     * returns {@code null} when {@code Currency.getInstance(Locale)}
+     * throws {@code IllegalArgumentException}.
+     * </p>
+     *
+     * <p>
+     * This method returns {@code null} when the territory represented by
+     * this {@code CountryCode} instance does not have a currency.
+     * {@link #AQ} (Antarctica) is one example.
+     * </p>
+     *
+     * <p>
+     * In addition, this method returns {@code null} also when the ISO 3166
+     * code represented by this {@code CountryCode} instance is not
+     * supported by the implementation of {@link
+     * Currency#getInstance(Locale)}. At the time of this writing,
+     * {@link #SS} (South Sudan) is one example.
+     * </p>
+     *
+     * @return
+     * A {@code Currency} instance. In some cases, null
+     * is returned.
+     *
+     * @since 1.4
+     *
+     * @see Currency#getInstance(Locale)
+     */
+    public Currency getCurrency() {
+        try {
+            return Currency.getInstance(toLocale());
+        } catch (IllegalArgumentException e) {
+            // Currency.getInstance(Locale) throws IllegalArgumentException
+            // when the given ISO 3166 code is not supported.
+            return null;
+        }
+    }
+
+    /**
+     * Code assignment state in <a href="http://en.wikipedia.org/wiki/ISO_3166-1"
+     * >ISO 3166-1</a>.
+     *
+     * @see <a href="http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Decoding_table"
+     * >Decoding table of ISO 3166-1 alpha-2 codes</a>
+     */
+    public enum Assignment {
+        /**
+         * <a href="http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements"
+         * >Officially assigned</a>.
+         *
+         * Assigned to a country, territory, or area of geographical interest.
+         */
+        OFFICIALLY_ASSIGNED,
+
+        /**
+         * <a href="http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#User-assigned_code_elements"
+         * >User assigned</a>.
+         *
+         * Free for assignment at the disposal of users.
+         */
+        USER_ASSIGNED,
+
+        /**
+         * <a href="http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Exceptional_reservations"
+         * >Exceptionally reserved</a>.
+         *
+         * Reserved on request for restricted use.
+         */
+        EXCEPTIONALLY_RESERVED,
+
+        /**
+         * <a href="http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Transitional_reservations"
+         * >Transitionally reserved</a>.
+         *
+         * Deleted from ISO 3166-1 but reserved transitionally.
+         */
+        TRANSITIONALLY_RESERVED,
+
+        /**
+         * <a href="http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Indeterminate_reservations"
+         * >Indeterminately reserved</a>.
+         *
+         * Used in coding systems associated with ISO 3166-1.
+         */
+        INDETERMINATELY_RESERVED,
+
+        /**
+         * <a href="http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Codes_currently_agreed_not_to_use"
+         * >Not used</a>.
+         *
+         * Not used in ISO 3166-1 in deference to international property
+         * organization names.
+         */
+        NOT_USED
     }
 }

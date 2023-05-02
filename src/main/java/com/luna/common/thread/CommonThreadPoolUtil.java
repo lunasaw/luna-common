@@ -24,33 +24,27 @@ import lombok.Data;
 @Data
 public class CommonThreadPoolUtil {
 
-    private static final long KEEP_ALIVE_TIME = 0L;
+    private static final long KEEP_ALIVE_TIME       = 0L;
+    private static final Logger                log         = LoggerFactory.getLogger(CommonThreadPoolUtil.class);
     /** 核心线程数(默认初始化为10) */
-    private static int cacheCorePoolSize     = 10;
-
+    private static int        cacheCorePoolSize     = 10;
     /** 核心线程控制的最大数目 */
-    private static int maxCorePoolSize       = 160;
-
+    private static int        maxCorePoolSize       = 160;
     /** 队列等待线程数阈值 */
-    private static int blockingQueueWaitSize = 16;
-
+    private static int        blockingQueueWaitSize = 16;
     /** 核心线程数自动调整的增量幅度 */
-    private static int incrementCorePoolSize = 4;
+    private static int        incrementCorePoolSize = 4;
+    /** 初始化线程池 */
+    private static MyselfThreadPoolExecutor    threadPool  =
+        new MyselfThreadPoolExecutor(cacheCorePoolSize, cacheCorePoolSize, KEEP_ALIVE_TIME,
+            TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
+    /** 初始化线程对象ThreadLocal,重写initialValue()，保证ThreadLocal首次执行get方法时不会null异常 */
+    private final ThreadLocal<List<Future<?>>> threadLocal = ThreadLocal.withInitial(ArrayList::new);
 
     public static void refresh() {
         threadPool = new MyselfThreadPoolExecutor(cacheCorePoolSize, cacheCorePoolSize, KEEP_ALIVE_TIME,
             TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
     }
-
-    /** 初始化线程对象ThreadLocal,重写initialValue()，保证ThreadLocal首次执行get方法时不会null异常 */
-    private final ThreadLocal<List<Future<?>>> threadLocal = ThreadLocal.withInitial(ArrayList::new);
-
-    private static final Logger                log         = LoggerFactory.getLogger(CommonThreadPoolUtil.class);
-
-    /** 初始化线程池 */
-    private static MyselfThreadPoolExecutor    threadPool  =
-        new MyselfThreadPoolExecutor(cacheCorePoolSize, cacheCorePoolSize, KEEP_ALIVE_TIME,
-            TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
 
     /**
      *
@@ -181,6 +175,6 @@ public class CommonThreadPoolUtil {
 
         threadPool.setCorePoolSize(cacheCorePoolSize);
         threadPool.setMaximumPoolSize(cacheCorePoolSize);
-        this.cacheCorePoolSize = cacheCorePoolSize;
+        CommonThreadPoolUtil.cacheCorePoolSize = cacheCorePoolSize;
     }
 }

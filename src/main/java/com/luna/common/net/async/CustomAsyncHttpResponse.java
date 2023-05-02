@@ -101,10 +101,6 @@ public final class CustomAsyncHttpResponse extends BasicClassicHttpResponse {
         return create(code, content, ContentType.TEXT_PLAIN);
     }
 
-    public void setBody(final CustomResponseBody body) {
-        this.body = body;
-    }
-
     public void setBody(final byte[] bodyBytes, final ContentType contentType) {
         this.body = CustomResponseBody.create(bodyBytes, contentType);
     }
@@ -115,6 +111,10 @@ public final class CustomAsyncHttpResponse extends BasicClassicHttpResponse {
 
     public CustomResponseBody getBody() {
         return body;
+    }
+
+    public void setBody(final CustomResponseBody body) {
+        this.body = body;
     }
 
     public ContentType getContentType() {

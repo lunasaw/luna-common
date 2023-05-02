@@ -1,11 +1,11 @@
 package com.luna.common.os;
 
 /**
- *  @author luna
+ * @author luna
  */
 public class OSinfo {
 
-    private static final String OS        = System.getProperty("os.name").toLowerCase();
+    private static final String OS       = System.getProperty("os.name").toLowerCase();
 
     private static final OSinfo INSTANCE = new OSinfo();
 

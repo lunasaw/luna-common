@@ -27,13 +27,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CustomSseAsyncConsumer extends AbstractCharResponseConsumer<SseResponse> {
 
-    private SseResponse                                          response;
-
     private final BlockingQueue<Event>                           events;
-
     private final AbstactEventFutureCallback<SseResponse, Event> callback;
-
     private final Integer                                        timeWait;
+    private SseResponse                                          response;
 
     public CustomSseAsyncConsumer(AbstactEventFutureCallback<SseResponse, Event> callback) {
         this(100, callback, 1000);

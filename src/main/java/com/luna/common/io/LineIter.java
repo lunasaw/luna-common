@@ -1,11 +1,11 @@
 package com.luna.common.io;
 
-import com.luna.common.check.Assert;
-
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+
+import com.luna.common.check.Assert;
 
 /**
  * 将Reader包装为一个按照行读取的Iterator<br>
@@ -111,7 +111,7 @@ public class LineIter implements Iterator<String>, Iterable<String>, Closeable, 
      * @throws NoSuchElementException 没有更多行
      */
     public String nextLine() throws NoSuchElementException {
-        if (false == hasNext()) {
+        if (!hasNext()) {
             throw new NoSuchElementException("No more lines");
         }
         String currentLine = this.cachedLine;

@@ -1,4 +1,5 @@
 package com.luna.common.os.hardware.dto;
+
 import java.lang.management.ManagementFactory;
 
 /**
@@ -37,7 +38,6 @@ public class JvmDTO {
     /** 开始时间 */
     private String startTime;
 
-
     public String getTotal() {
         return total;
     }
@@ -66,12 +66,12 @@ public class JvmDTO {
         return runTime;
     }
 
-    public String getStartTime() {
-        return startTime;
-    }
-
     public void setRunTime(String runTime) {
         this.runTime = runTime;
+    }
+
+    public String getStartTime() {
+        return startTime;
     }
 
     public void setStartTime(String startTime) {
@@ -100,7 +100,6 @@ public class JvmDTO {
     public void setHome(String home) {
         this.home = home;
     }
-
 
     @Override
     public String toString() {

@@ -1,4 +1,5 @@
 package com.luna.common.os.hardware;
+
 import java.util.List;
 import java.util.Set;
 
@@ -44,21 +45,20 @@ public class OshiHardware {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("OshiHardwareDTO{");
-        sb.append("hostName='").append(hostName).append('\'');
-        sb.append(", manufacturer='").append(manufacturer).append('\'');
-        sb.append(", model='").append(model).append('\'');
-        sb.append(", serialNumber='").append(serialNumber).append('\'');
-        sb.append(", firmwareDTO=").append(firmwareDTO);
-        sb.append(", motherboardDTO=").append(motherboardDTO);
-        sb.append(", macAddressSet=").append(macAddressSet);
-        sb.append(", processor=").append(processor);
-        sb.append(", memory=").append(memory);
-        sb.append(", jvm=").append(jvm);
-        sb.append(", sysFiles=").append(sysFiles);
-        sb.append(", systemInfoDTO=").append(systemInfoDTO);
-        sb.append('}');
-        return sb.toString();
+        String sb = "OshiHardwareDTO{" + "hostName='" + hostName + '\'' +
+                ", manufacturer='" + manufacturer + '\'' +
+                ", model='" + model + '\'' +
+                ", serialNumber='" + serialNumber + '\'' +
+                ", firmwareDTO=" + firmwareDTO +
+                ", motherboardDTO=" + motherboardDTO +
+                ", macAddressSet=" + macAddressSet +
+                ", processor=" + processor +
+                ", memory=" + memory +
+                ", jvm=" + jvm +
+                ", sysFiles=" + sysFiles +
+                ", systemInfoDTO=" + systemInfoDTO +
+                '}';
+        return sb;
     }
 
     public String getHostName() {

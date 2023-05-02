@@ -3,15 +3,16 @@ package com.luna.common.os.hardware;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Sets;
 import com.luna.common.date.DateUnit;
 import com.luna.common.date.DateUtils;
+import com.luna.common.math.NumberUtil;
 import com.luna.common.os.SystemInfoUtil;
 import com.luna.common.os.hardware.dto.*;
 import com.luna.common.text.Calculator;
-import com.luna.common.math.NumberUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.google.common.collect.Sets;
 
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
@@ -34,7 +35,7 @@ public class OshiUtils {
 
     public static void main(String[] args) {
         OshiHardware oshiHardware = new OshiHardware();
-        refresh(oshiHardware,new SystemInfo());
+        refresh(oshiHardware, new SystemInfo());
         System.out.println(oshiHardware);
     }
 

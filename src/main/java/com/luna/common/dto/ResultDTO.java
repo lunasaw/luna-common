@@ -1,8 +1,8 @@
 package com.luna.common.dto;
 
-import com.luna.common.dto.constant.ResultCode;
-
 import java.io.Serializable;
+
+import com.luna.common.dto.constant.ResultCode;
 
 /**
  * 返回值
@@ -16,7 +16,7 @@ public class ResultDTO<T> implements Serializable {
     /** 是否调用以及过参数校验 */
     private Boolean success = false;
     /** 业务code，见{@link ResultCode} */
-    private Integer     code = 0;
+    private Integer code    = 0;
     /** 业务消息，见{@link ResultCode} */
     private String  message;
     /** 返回值 */
@@ -72,10 +72,10 @@ public class ResultDTO<T> implements Serializable {
     @Override
     public String toString() {
         return "ResultDTO{" +
-                "success=" + success +
-                ", code=" + code +
-                ", message='" + message + '\'' +
-                ", data=" + data +
-                '}';
+            "success=" + success +
+            ", code=" + code +
+            ", message='" + message + '\'' +
+            ", data=" + data +
+            '}';
     }
 }

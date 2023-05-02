@@ -49,6 +49,36 @@ public abstract class CalendaristBase {
 
     protected int[]           fields                = new int[25];
 
+    protected static void validate(int year, int month, int day, int hour, int minute, int second, int millis) {
+        if (year < 1900 || year > 2100) {
+            throw new IllegalArgumentException("the argument 'year' must between 1900 and 2100");
+        }
+
+        if (month < 1 || month > 12) {
+            throw new IllegalArgumentException("the argument 'month' must between 1 and 12");
+        }
+
+        if (day < 1 || day > 31) {
+            throw new IllegalArgumentException("the argument 'day' must between 1 and 31");
+        }
+
+        if (hour < 0 || hour > 23) {
+            throw new IllegalArgumentException("the argument 'hour' must between 0 and 23");
+        }
+
+        if (minute < 0 || minute > 59) {
+            throw new IllegalArgumentException("the argument 'minute' must between 0 and 59");
+        }
+
+        if (second < 0 || second > 59) {
+            throw new IllegalArgumentException("the argument 'second' must between 0 and 59");
+        }
+
+        if (millis < 0 || millis > 999) {
+            throw new IllegalArgumentException("the argument 'millis' must between 0 and 999");
+        }
+    }
+
     public void set(int field, int value) {
         validateSet(field, value);
 
@@ -109,36 +139,6 @@ public abstract class CalendaristBase {
             if (value < 0 || value > 999) {
                 throw new IllegalArgumentException("the argument 'millis' must between 0 and 999");
             }
-        }
-    }
-
-    protected static void validate(int year, int month, int day, int hour, int minute, int second, int millis) {
-        if (year < 1900 || year > 2100) {
-            throw new IllegalArgumentException("the argument 'year' must between 1900 and 2100");
-        }
-
-        if (month < 1 || month > 12) {
-            throw new IllegalArgumentException("the argument 'month' must between 1 and 12");
-        }
-
-        if (day < 1 || day > 31) {
-            throw new IllegalArgumentException("the argument 'day' must between 1 and 31");
-        }
-
-        if (hour < 0 || hour > 23) {
-            throw new IllegalArgumentException("the argument 'hour' must between 0 and 23");
-        }
-
-        if (minute < 0 || minute > 59) {
-            throw new IllegalArgumentException("the argument 'minute' must between 0 and 59");
-        }
-
-        if (second < 0 || second > 59) {
-            throw new IllegalArgumentException("the argument 'second' must between 0 and 59");
-        }
-
-        if (millis < 0 || millis > 999) {
-            throw new IllegalArgumentException("the argument 'millis' must between 0 and 999");
         }
     }
 }

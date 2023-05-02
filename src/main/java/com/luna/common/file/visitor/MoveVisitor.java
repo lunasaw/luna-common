@@ -1,10 +1,10 @@
 package com.luna.common.file.visitor;
 
-import com.luna.common.file.PathUtil;
-
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+
+import com.luna.common.file.PathUtil;
 
 /**
  * 文件移动操作的FileVisitor实现，用于递归遍历移动目录和文件，此类非线程安全<br>
@@ -17,8 +17,8 @@ public class MoveVisitor extends SimpleFileVisitor<Path> {
 
     private final Path         source;
     private final Path         target;
-    private boolean            isTargetCreated;
     private final CopyOption[] copyOptions;
+    private boolean            isTargetCreated;
 
     /**
      * 构造
@@ -28,7 +28,7 @@ public class MoveVisitor extends SimpleFileVisitor<Path> {
      * @param copyOptions 拷贝（移动）选项
      */
     public MoveVisitor(Path source, Path target, CopyOption... copyOptions) {
-        if (PathUtil.exists(target, false) && false == PathUtil.isDirectory(target)) {
+        if (PathUtil.exists(target, false) && !PathUtil.isDirectory(target)) {
             throw new IllegalArgumentException("Target must be a directory");
         }
         this.source = source;
@@ -42,9 +42,9 @@ public class MoveVisitor extends SimpleFileVisitor<Path> {
         initTarget();
         // 将当前目录相对于源路径转换为相对于目标路径
         final Path targetDir = target.resolve(source.relativize(dir));
-        if (false == Files.exists(targetDir)) {
+        if (!Files.exists(targetDir)) {
             Files.createDirectories(targetDir);
-        } else if (false == Files.isDirectory(targetDir)) {
+        } else if (!Files.isDirectory(targetDir)) {
             throw new FileAlreadyExistsException(targetDir.toString());
         }
         return FileVisitResult.CONTINUE;
@@ -62,7 +62,7 @@ public class MoveVisitor extends SimpleFileVisitor<Path> {
      * 初始化目标文件或目录
      */
     private void initTarget() {
-        if (false == this.isTargetCreated) {
+        if (!this.isTargetCreated) {
             PathUtil.mkdir(this.target);
             this.isTargetCreated = true;
         }

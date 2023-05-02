@@ -10,6 +10,10 @@ package com.luna.common.io;
 public class FastByteBuffer {
 
     /**
+     * 一个缓冲区的最小字节数
+     */
+    private final int minChunkLen;
+    /**
      * 缓冲集
      */
     private byte[][]  buffers            = new byte[16][];
@@ -33,11 +37,6 @@ public class FastByteBuffer {
      * 缓冲字节数
      */
     private int       size;
-
-    /**
-     * 一个缓冲区的最小字节数
-     */
-    private final int minChunkLen;
 
     public FastByteBuffer() {
         this.minChunkLen = 1024;

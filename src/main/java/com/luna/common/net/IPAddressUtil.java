@@ -60,7 +60,7 @@ public class IPAddressUtil {
                     }
 
                     var2 *= 10L;
-                    var2 += (long)var9;
+                    var2 += var9;
                     var5 = false;
                 }
             }

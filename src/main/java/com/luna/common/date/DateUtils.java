@@ -1,14 +1,15 @@
 package com.luna.common.date;
 
-import com.luna.common.constant.StrPoolConstant;
-import com.luna.common.utils.ObjectUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.lang.management.ManagementFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.commons.lang3.tuple.Pair;
+
+import com.luna.common.constant.StrPoolConstant;
+import com.luna.common.utils.ObjectUtils;
 
 public class DateUtils {
 
@@ -136,8 +137,7 @@ public class DateUtils {
     /**
      * 日期路径 即年/月/日 如2018/08/08
      */
-    public static String datePath()
-    {
+    public static String datePath() {
         Date now = new Date();
         return DateFormatUtils.format(now, "yyyy/MM/dd");
     }
@@ -450,7 +450,7 @@ public class DateUtils {
      * 获取凌晨00:00:00
      *
      * @param date 任意时间
-     * @return    Date
+     * @return Date
      */
     public static Date getMorning(Date date) {
         Calendar dateCalendar = Calendar.getInstance();
@@ -502,6 +502,7 @@ public class DateUtils {
 
     /**
      * 取得日期是某年的第几周
+     * 
      * @param date 任意时间
      * @return int
      */

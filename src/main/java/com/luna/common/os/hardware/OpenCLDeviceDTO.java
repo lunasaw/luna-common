@@ -133,31 +133,30 @@ public class OpenCLDeviceDTO {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("OpenCLDeviceDO [clPlatformICDSuffixKHR=");
-        builder.append(clPlatformICDSuffixKHR);
-        builder.append(", id=");
-        builder.append(id);
-        builder.append(", clDeviceType=");
-        builder.append(clDeviceType);
-        builder.append(", clDeviceName=");
-        builder.append(clDeviceName);
-        builder.append(", clDeviceBoardNameAMD=");
-        builder.append(clDeviceBoardNameAMD);
-        builder.append(", clDeviceVendor=");
-        builder.append(clDeviceVendor);
-        builder.append(", clDeviceVendorId=");
-        builder.append(clDeviceVendorId);
-        builder.append(", clDeviceVersion=");
-        builder.append(clDeviceVersion);
-        builder.append(", clDeviceOpenCLCVersion=");
-        builder.append(clDeviceOpenCLCVersion);
-        builder.append(", clDriverVersion=");
-        builder.append(clDriverVersion);
-        builder.append(", clDeviceGlobalMemSize=");
-        builder.append(clDeviceGlobalMemSize);
-        builder.append("]");
-        return builder.toString();
+        String builder = "OpenCLDeviceDO [clPlatformICDSuffixKHR=" +
+                clPlatformICDSuffixKHR +
+                ", id=" +
+                id +
+                ", clDeviceType=" +
+                clDeviceType +
+                ", clDeviceName=" +
+                clDeviceName +
+                ", clDeviceBoardNameAMD=" +
+                clDeviceBoardNameAMD +
+                ", clDeviceVendor=" +
+                clDeviceVendor +
+                ", clDeviceVendorId=" +
+                clDeviceVendorId +
+                ", clDeviceVersion=" +
+                clDeviceVersion +
+                ", clDeviceOpenCLCVersion=" +
+                clDeviceOpenCLCVersion +
+                ", clDriverVersion=" +
+                clDriverVersion +
+                ", clDeviceGlobalMemSize=" +
+                clDeviceGlobalMemSize +
+                "]";
+        return builder;
     }
 
 }

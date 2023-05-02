@@ -1,16 +1,18 @@
 package com.luna.common.os;
 
-import com.luna.common.dto.constant.ResultCode;
-import com.luna.common.exception.BaseException;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
-import oshi.SystemInfo;
-import oshi.software.os.OSProcess;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
+
+import com.luna.common.dto.constant.ResultCode;
+import com.luna.common.exception.BaseException;
+
+import oshi.SystemInfo;
+import oshi.software.os.OSProcess;
 
 /**
  *
@@ -41,8 +43,8 @@ public class ProcessUtils {
         List<OSProcess> osProcessList = getProcesses();
 
         List<OSProcess> result = osProcessList.stream()
-                .filter(osProcess -> StringUtils.equals(removeExtension(osProcess.getName()), fileNameWithoutExtension))
-                .collect(Collectors.toList());
+            .filter(osProcess -> StringUtils.equals(removeExtension(osProcess.getName()), fileNameWithoutExtension))
+            .collect(Collectors.toList());
 
         return result;
     }
@@ -51,8 +53,8 @@ public class ProcessUtils {
         List<OSProcess> osProcessList = getProcesses();
 
         List<OSProcess> result = osProcessList.stream()
-                .filter(osProcess -> formatPath(osProcess.getPath()).startsWith(formatPath(path)))
-                .collect(Collectors.toList());
+            .filter(osProcess -> formatPath(osProcess.getPath()).startsWith(formatPath(path)))
+            .collect(Collectors.toList());
 
         return result;
     }

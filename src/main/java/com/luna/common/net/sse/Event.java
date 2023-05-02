@@ -5,7 +5,7 @@ public class Event {
     private final String id;
     private final String event;
     private final String data;
-    private final int retry;
+    private final int    retry;
 
     public Event(String id, String event, String data, int retry) {
         this.id = id;

@@ -1,9 +1,10 @@
 package com.luna.common.math;
 
-import com.luna.common.constant.Constant;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+
+import com.luna.common.constant.Constant;
 
 /**
  * @author Luna
@@ -199,6 +200,6 @@ public class MathUtils {
             return null;
         }
         int scale = 4;
-        return b1.multiply(b2).divide(HUNDRED_B, scale, BigDecimal.ROUND_HALF_UP);
+        return b1.multiply(b2).divide(HUNDRED_B, scale, RoundingMode.HALF_UP);
     }
 }
