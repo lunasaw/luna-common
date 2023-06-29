@@ -44,10 +44,10 @@ public class FirmwareDTO {
     @Override
     public String toString() {
         return "FirmwareDTO{" +
-                "manufacturer='" + manufacturer + '\'' +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", version='" + version + '\'' +
-                '}';
+            "manufacturer='" + manufacturer + '\'' +
+            ", name='" + name + '\'' +
+            ", description='" + description + '\'' +
+            ", version='" + version + '\'' +
+            '}';
     }
 }

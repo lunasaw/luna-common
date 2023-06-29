@@ -1,6 +1,5 @@
 package com.luna.common.escape;
 
-
 import com.luna.common.replacer.LookupReplacer;
 import com.luna.common.replacer.ReplacerChain;
 
@@ -20,20 +19,19 @@ import com.luna.common.replacer.ReplacerChain;
  * @since 5.7.2
  */
 public class XmlEscape extends ReplacerChain {
-	private static final long serialVersionUID = 1L;
+    protected static final String[][] BASIC_ESCAPE     = {   //
+        // {"'", "&apos;"}, // " - single-quote
+        {"\"", "&quot;"},                                    // " - double-quote
+        {"&", "&amp;"},                                      // & - ampersand
+        {"<", "&lt;"},                                       // < - less-than
+        {">", "&gt;"},                                       // > - greater-than
+    };
+    private static final long         serialVersionUID = 1L;
 
-	protected static final String[][] BASIC_ESCAPE = { //
-//			{"'", "&apos;"}, // " - single-quote
-			{"\"", "&quot;"}, // " - double-quote
-			{"&", "&amp;"}, // & - ampersand
-			{"<", "&lt;"}, // < - less-than
-			{">", "&gt;"}, // > - greater-than
-	};
-
-	/**
-	 * 构造
-	 */
-	public XmlEscape() {
-		addChain(new LookupReplacer(BASIC_ESCAPE));
-	}
+    /**
+     * 构造
+     */
+    public XmlEscape() {
+        addChain(new LookupReplacer(BASIC_ESCAPE));
+    }
 }

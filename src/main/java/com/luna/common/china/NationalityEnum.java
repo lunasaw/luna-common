@@ -66,8 +66,8 @@ public enum NationalityEnum {
     OTHER("57", "其他"),
     FOREIGN_COUNTRY("58", "外国血统中国籍人士");
 
-    private String code;
-    private String desc;
+    private final String code;
+    private final String desc;
 
     NationalityEnum(String code, String desc) {
         this.code = code;

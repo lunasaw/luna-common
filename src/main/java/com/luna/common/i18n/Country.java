@@ -280,7 +280,7 @@ public enum Country {
     private String code;
 
     /** 构造方法 */
-    private Country(String name, String code) {
+    Country(String name, String code) {
         this.name = name;
         this.code = code;
     }

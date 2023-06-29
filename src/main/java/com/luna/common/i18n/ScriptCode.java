@@ -884,29 +884,9 @@ public enum ScriptCode {
     /**
      * Constructor.
      */
-    private ScriptCode(int numeric, String name) {
+    ScriptCode(int numeric, String name) {
         this.numeric = numeric;
         this.name = name;
-    }
-
-    /**
-     * Get the numeric code of this script code.
-     *
-     * @return
-     * Numeric code.
-     */
-    public int getNumeric() {
-        return numeric;
-    }
-
-    /**
-     * Get English name of this script code.
-     *
-     * @return
-     * English name.
-     */
-    public String getName() {
-        return name;
     }
 
     /**
@@ -1028,7 +1008,7 @@ public enum ScriptCode {
 
             // The first letter.
             if (i == 0) {
-                if (Character.isUpperCase(ch) == false) {
+                if (!Character.isUpperCase(ch)) {
                     // Modification is needed.
                     sb = new StringBuilder();
                     sb.append(Character.toUpperCase(ch));
@@ -1037,12 +1017,12 @@ public enum ScriptCode {
             // The second and subsequent letters.
             else {
                 if (sb == null) {
-                    if (Character.isLowerCase(ch) == false) {
+                    if (!Character.isLowerCase(ch)) {
                         // Modification is needed.
                         sb = new StringBuilder();
 
                         // Copy all the previous letters so far.
-                        sb.append(code.substring(0, i));
+                        sb.append(code, 0, i);
 
                         // Lower the current letter.
                         sb.append(Character.toLowerCase(ch));
@@ -1145,5 +1125,25 @@ public enum ScriptCode {
         }
 
         return list;
+    }
+
+    /**
+     * Get the numeric code of this script code.
+     *
+     * @return
+     * Numeric code.
+     */
+    public int getNumeric() {
+        return numeric;
+    }
+
+    /**
+     * Get English name of this script code.
+     *
+     * @return
+     * English name.
+     */
+    public String getName() {
+        return name;
     }
 }

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Objects;
-import java.util.Optional;
 
 import com.luna.common.text.CharsetUtil;
 

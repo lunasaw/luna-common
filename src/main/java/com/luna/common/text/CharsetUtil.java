@@ -1,14 +1,15 @@
 package com.luna.common.text;
 
-import com.luna.common.anno.Filter;
-import com.luna.common.constant.CharPoolConstant;
-import com.luna.common.file.FileTools;
-import com.luna.common.os.OSinfo;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
+
+import com.luna.common.anno.Filter;
+import com.luna.common.constant.CharPoolConstant;
+import com.luna.common.file.FileTools;
+import com.luna.common.os.OSinfo;
 
 /**
  * 字符集工具类
@@ -280,9 +281,9 @@ public class CharsetUtil {
         } else if (obj instanceof byte[]) {
             return str((byte[])obj, charset);
         } else if (obj instanceof Byte[]) {
-            return str((Byte[])obj, charset);
+            return str(obj, charset);
         } else if (obj instanceof ByteBuffer) {
-            return str((ByteBuffer)obj, charset);
+            return str(obj, charset);
         } else if (null != obj && obj.getClass().isArray()) {
             return StringTools.toString(obj);
         }
@@ -328,7 +329,6 @@ public class CharsetUtil {
             || c == '\u202a'
             || c == '\u0000');
     }
-
 
     /**
      * 是否为ASCII字符，ASCII字符位于0~127之间
@@ -472,6 +472,7 @@ public class CharsetUtil {
 
     /**
      * 是否为16进制规范的字符，判断是否为如下字符
+     * 
      * <pre>
      * 1. 0~9
      * 2. a~f
@@ -544,7 +545,7 @@ public class CharsetUtil {
      * @return true表示为字符类
      */
     public static boolean isChar(Object value) {
-        //noinspection ConstantConditions
+        // noinspection ConstantConditions
         return value instanceof Character || value.getClass() == char.class;
     }
 
@@ -559,7 +560,7 @@ public class CharsetUtil {
      * @since 4.0.10
      */
     public static boolean isBlankChar(char c) {
-        return isBlankChar((int) c);
+        return isBlankChar((int)c);
     }
 
     /**
@@ -574,16 +575,16 @@ public class CharsetUtil {
      */
     public static boolean isBlankChar(int c) {
         return Character.isWhitespace(c)
-                || Character.isSpaceChar(c)
-                || c == '\ufeff'
-                || c == '\u202a'
-                || c == '\u0000'
-                // issue#I5UGSQ，Hangul Filler
-                || c == '\u3164'
-                // Braille Pattern Blank
-                || c == '\u2800'
-                // MONGOLIAN VOWEL SEPARATOR
-                || c == '\u180e';
+            || Character.isSpaceChar(c)
+            || c == '\ufeff'
+            || c == '\u202a'
+            || c == '\u0000'
+            // issue#I5UGSQ，Hangul Filler
+            || c == '\u3164'
+            // Braille Pattern Blank
+            || c == '\u2800'
+            // MONGOLIAN VOWEL SEPARATOR
+            || c == '\u180e';
     }
 
     /**
@@ -594,8 +595,8 @@ public class CharsetUtil {
      * @since 4.0.8
      */
     public static boolean isEmoji(char c) {
-        //noinspection ConstantConditions
-        return false == ((c == 0x0) || //
+        // noinspection ConstantConditions
+        return !((c == 0x0) || //
                 (c == 0x9) || //
                 (c == 0xA) || //
                 (c == 0xD) || //
@@ -619,8 +620,8 @@ public class CharsetUtil {
     /**
      * 比较两个字符是否相同
      *
-     * @param c1              字符1
-     * @param c2              字符2
+     * @param c1 字符1
+     * @param c2 字符2
      * @param caseInsensitive 是否忽略大小写
      * @return 是否相同
      * @since 4.0.3
@@ -656,6 +657,7 @@ public class CharsetUtil {
 
     /**
      * 将字母、数字转换为带圈的字符：
+     * 
      * <pre>
      *     '1' -》 '①'
      *     'A' -》 'Ⓐ'
@@ -679,23 +681,27 @@ public class CharsetUtil {
         } else if (c >= 'a' && c <= 'z') {
             result = 'ⓐ' + c - 'a';
         }
-        return (char) result;
+        return (char)result;
     }
 
     /**
      * 将[1-20]数字转换为带圈的字符：
+     * 
      * <pre>
      *     1 -》 '①'
      *     12 -》 '⑫'
      *     20 -》 '⑳'
      * </pre>
+     * 
      * 也称作：封闭式字符，英文：Enclosed Alphanumerics
      *
      * @param number 被转换的数字
      * @return 转换后的字符
      * @author dazer
-     * @see <a href="https://en.wikipedia.org/wiki/List_of_Unicode_characters#Unicode_symbols">维基百科wikipedia-Unicode_symbols</a>
-     * @see <a href="https://zh.wikipedia.org/wiki/Unicode%E5%AD%97%E7%AC%A6%E5%88%97%E8%A1%A8">维基百科wikipedia-Unicode字符列表</a>
+     * @see <a href=
+     * "https://en.wikipedia.org/wiki/List_of_Unicode_characters#Unicode_symbols">维基百科wikipedia-Unicode_symbols</a>
+     * @see <a href=
+     * "https://zh.wikipedia.org/wiki/Unicode%E5%AD%97%E7%AC%A6%E5%88%97%E8%A1%A8">维基百科wikipedia-Unicode字符列表</a>
      * @see <a href="https://coolsymbol.com/">coolsymbol</a>
      * @see <a href="https://baike.baidu.com/item/%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6/112715?fr=aladdin">百度百科 特殊字符</a>
      * @since 5.6.2
@@ -704,6 +710,6 @@ public class CharsetUtil {
         if (number > 20) {
             throw new IllegalArgumentException("Number must be [1-20]");
         }
-        return (char) ('①' + number - 1);
+        return (char)('①' + number - 1);
     }
 }

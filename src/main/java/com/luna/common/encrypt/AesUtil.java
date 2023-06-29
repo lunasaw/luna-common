@@ -1,25 +1,27 @@
 package com.luna.common.encrypt;
 
-import org.apache.commons.codec.binary.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.security.Key;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.Key;
+
+import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AesUtil {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AesUtil.class);
+    public static final String  CHARSET            = "UTF-8";
+    public static final String  KEY_ALGIROTHM      = "AesUtil";
+    public static final String  CIPHER_ALGIROTHM   = "AesUtil/CBC/PKCS5Padding";
+    public static final String  DEFAULT_SECRET_KEY = "uBdUx82vPHkDKb284d7NkjFoNcKWBuka";
+    private static final Logger LOG                = LoggerFactory.getLogger(AesUtil.class);
 
-    public static final String CHARSET = "UTF-8";
-    public static final String KEY_ALGIROTHM = "AesUtil";
-    public static final String CIPHER_ALGIROTHM = "AesUtil/CBC/PKCS5Padding";
-    public static final String DEFAULT_SECRET_KEY = "uBdUx82vPHkDKb284d7NkjFoNcKWBuka";
     /**
      * 加密(UTF8)
-     * @param key     密码
+     * 
+     * @param key 密码
      * @param content 待加密内容
      * @return base64处理后的密文
      */
@@ -40,7 +42,8 @@ public class AesUtil {
 
     /**
      * 解密(UTF8)
-     * @param key       密码
+     * 
+     * @param key 密码
      * @param encrypted 密文
      * @return 原文
      */

@@ -81,10 +81,6 @@ public class OshiHardwareDTO {
         this.sysFiles = sysFiles;
     }
 
-    public void setProcessorDTO(ProcessorDTO processorDTO) {
-        this.processorDTO = processorDTO;
-    }
-
     public String getHostName() {
         return hostName;
     }
@@ -137,12 +133,16 @@ public class OshiHardwareDTO {
         return macAddressSet;
     }
 
+    public void setMacAddressSet(Set<String> macAddressSet) {
+        this.macAddressSet = macAddressSet;
+    }
+
     public ProcessorDTO getProcessorDTO() {
         return processorDTO;
     }
 
-    public void setMacAddressSet(Set<String> macAddressSet) {
-        this.macAddressSet = macAddressSet;
+    public void setProcessorDTO(ProcessorDTO processorDTO) {
+        this.processorDTO = processorDTO;
     }
 
     public JvmDTO getJvmDTO() {

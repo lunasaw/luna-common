@@ -1,23 +1,18 @@
 package com.luna.common.encrypt;
 
-import com.luna.common.reflect.ConvertUtil;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
+import com.luna.common.reflect.ConvertUtil;
+
 public class SignUtil {
     public static final String MD5        = "MD5";
     public static final String FIELD_SIGN = "sign";
-
-    public static enum SignType {
-        MD5,
-        HMACSHA256;
-
-        private SignType() {}
-    }
 
     /**
      * 生成带有 sign 的 XML 格式字符串
@@ -146,13 +141,20 @@ public class SignUtil {
      */
     public static String hmacsha256(String data, String key) throws Exception {
         Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
-        SecretKeySpec secret_key = new SecretKeySpec(key.getBytes("UTF-8"), "HmacSHA256");
+        SecretKeySpec secret_key = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
         sha256_HMAC.init(secret_key);
-        byte[] array = sha256_HMAC.doFinal(data.getBytes("UTF-8"));
+        byte[] array = sha256_HMAC.doFinal(data.getBytes(StandardCharsets.UTF_8));
         StringBuilder sb = new StringBuilder();
         for (byte item : array) {
-            sb.append(Integer.toHexString((item & 0xFF) | 0x100).substring(1, 3));
+            sb.append(Integer.toHexString((item & 0xFF) | 0x100), 1, 3);
         }
         return sb.toString().toUpperCase();
+    }
+
+    public enum SignType {
+        MD5,
+        HMACSHA256;
+
+        SignType() {}
     }
 }

@@ -79,9 +79,8 @@ import lombok.SneakyThrows;
  */
 public class AsyncHttpUtils {
 
-    private static CloseableHttpAsyncClient     asyncClient;
-
     private static final HttpAsyncClientBuilder HTTP_ASYNC_CLIENT_BUILDER = HttpAsyncClients.custom();
+    private static CloseableHttpAsyncClient     asyncClient;
 
     static {
         init();

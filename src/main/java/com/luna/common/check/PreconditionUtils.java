@@ -1,4 +1,4 @@
-package com.luna.common.utils;
+package com.luna.common.check;
 
 import com.luna.common.dto.constant.ResultCode;
 import com.luna.common.exception.BaseException;

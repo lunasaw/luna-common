@@ -1,6 +1,5 @@
 package com.luna.common.text;
 
-
 /**
  * @author luna
  */

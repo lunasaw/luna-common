@@ -20,13 +20,13 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import com.luna.common.text.CharsetUtil;
-import com.luna.common.xml.XmlUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import com.luna.common.xml.XmlUtil;
 
 /**
  * 类型转换器
@@ -701,7 +701,7 @@ public class ConvertUtil {
             return new BigDecimal((Long)value);
         }
         if (value instanceof Double) {
-            return new BigDecimal((Double)value);
+            return BigDecimal.valueOf((Double) value);
         }
         if (value instanceof Integer) {
             return new BigDecimal((Integer)value);
@@ -768,7 +768,7 @@ public class ConvertUtil {
         if (obj instanceof String) {
             return (String)obj;
         } else if (obj instanceof byte[] || obj instanceof Byte[]) {
-            return str((Byte[])obj, charset);
+            return str(obj, charset);
         } else if (obj instanceof ByteBuffer) {
             return str((ByteBuffer)obj, charset);
         }
@@ -853,7 +853,7 @@ public class ConvertUtil {
      * @return 全角字符串.
      */
     public static String toSBC(String input, Set<Character> notConvertSet) {
-        char c[] = input.toCharArray();
+        char[] c = input.toCharArray();
         for (int i = 0; i < c.length; i++) {
             if (null != notConvertSet && notConvertSet.contains(c[i])) {
                 // 跳过不替换的字符
@@ -888,7 +888,7 @@ public class ConvertUtil {
      * @return 替换后的字符
      */
     public static String toDBC(String text, Set<Character> notConvertSet) {
-        char c[] = text.toCharArray();
+        char[] c = text.toCharArray();
         for (int i = 0; i < c.length; i++) {
             if (null != notConvertSet && notConvertSet.contains(c[i])) {
                 // 跳过不替换的字符

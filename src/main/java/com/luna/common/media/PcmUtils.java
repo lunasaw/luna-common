@@ -9,8 +9,7 @@ import java.io.IOException;
  * @author luna
  */
 public class PcmUtils {
-    public PcmUtils() {
-    }
+    public PcmUtils() {}
 
     public static void convert2Wav(String inPcmFilePath, String outWavFilePath, int sampleRate, int channels, int bitNum) {
         convert2Wav(new File(inPcmFilePath), new File(outWavFilePath), sampleRate, channels, bitNum);
@@ -22,7 +21,7 @@ public class PcmUtils {
         byte[] data = new byte[1024];
 
         try {
-            long byteRate = (long)(sampleRate * channels * bitNum / 8);
+            long byteRate = (long) sampleRate * channels * bitNum / 8;
             in = new FileInputStream(inPcmFile);
             out = new FileOutputStream(outWavFile, false);
             long totalAudioLen = in.getChannel().size();
@@ -31,7 +30,7 @@ public class PcmUtils {
             boolean var14 = false;
 
             int length;
-            while((length = in.read(data)) > 0) {
+            while ((length = in.read(data)) > 0) {
                 out.write(data, 0, length);
             }
         } catch (Exception var27) {
@@ -63,15 +62,16 @@ public class PcmUtils {
 
     public static void pcm2Wav(byte[] pcm, byte[] wav, int sampleRate, int channels, int bitNum) {
         byte[] header = new byte[44];
-        long byteRate = (long)(sampleRate * channels * bitNum / 8);
-        long totalAudioLen = (long)pcm.length;
+        long byteRate = (long) sampleRate * channels * bitNum / 8;
+        long totalAudioLen = pcm.length;
         long totalDataLen = totalAudioLen + 36L;
         writeWaveBytesHeader(header, totalAudioLen, totalDataLen, sampleRate, channels, byteRate);
         System.arraycopy(header, 0, wav, 0, header.length);
         System.arraycopy(pcm, 0, wav, header.length, pcm.length);
     }
 
-    private static void writeWaveFileHeader(FileOutputStream out, long totalAudioLen, long totalDataLen, int sampleRate, int channels, long byteRate) throws IOException {
+    private static void writeWaveFileHeader(FileOutputStream out, long totalAudioLen, long totalDataLen, int sampleRate, int channels, long byteRate)
+        throws IOException {
         byte[] header = new byte[44];
         writeWaveBytesHeader(header, totalAudioLen, totalDataLen, sampleRate, channels, byteRate);
         out.write(header, 0, 44);

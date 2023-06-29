@@ -31,10 +31,8 @@ public class HttpBaseUtils {
      * 读取时间超时
      */
     private static final Integer              READ_TIME_OUT       = 5000;
-
-    private static volatile HttpURLConnection conn                = null;
-
     private static final int                  DEFAULT_BUFFER_SIZE = 4096;
+    private static volatile HttpURLConnection conn                = null;
 
     public static HttpURLConnection getConn(String url) {
         try {

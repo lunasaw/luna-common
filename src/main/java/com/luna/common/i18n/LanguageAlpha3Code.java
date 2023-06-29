@@ -5418,139 +5418,13 @@ public enum LanguageAlpha3Code {
      */
     zza("Zaza");
 
-    /**
-     * The usage of this language code.
-     *
-     * @since 1.1
-     */
-    public enum Usage {
         /**
-         * Code for terminology applications (ISO 639-2/T).
-         */
-        TERMINOLOGY,
-
-        /**
-         * Code for bibliographic applications (ISO 639-2/B).
-         */
-        BIBLIOGRAPHY,
-
-        /**
-         * For all applications including both terminology and
-         * bibliographic applications.
-         */
-        COMMON
-    };
-
-    /**
      * Language name.
      */
     private final String name;
 
-    private LanguageAlpha3Code(String name) {
+    LanguageAlpha3Code(String name) {
         this.name = name;
-    }
-
-    /**
-     * Get the language name.
-     *
-     * @return
-     * The language name.
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Get <a href="http://en.wikipedia.org/wiki/ISO_639-1">ISO 639-1</a>
-     * language code.
-     *
-     * @return
-     * <a href="http://en.wikipedia.org/wiki/ISO_639-1">ISO 639-1</a>
-     * language code. This method may return {@code null}.
-     */
-    public LanguageCode getAlpha2() {
-        return null;
-    }
-
-    /**
-     * Get the usage of this language code.
-     *
-     * <p>
-     * Most language codes return {@link Usage#COMMON Usage.COMMON}.
-     * </p>
-     *
-     * @return
-     * The usage of this language code.
-     */
-    public Usage getUsage() {
-        return Usage.COMMON;
-    }
-
-    /**
-     * Get the synonym of this code.
-     *
-     * <p>
-     * In most cases, this method simply returns <code>this</code> object. On
-     * the other hand, language codes that have two alpha-3 codes, namely, ISO
-     * 639-2/T code ("terminological" code) and ISO 639-2/B code
-     * ("bibliographic" code), return their counterparts. For example,
-     * {@link #deu LanguageAlpha3Code.deu}{@code .getSynonym()} returns
-     * {@link #ger LanguageAlpha3Code.ger}.
-     * </p>
-     *
-     * @return
-     * <a href="http://en.wikipedia.org/wiki/ISO_639-2">ISO 639-2</a>
-     * language code.
-     */
-    public LanguageAlpha3Code getSynonym() {
-        return this;
-    }
-
-    /**
-     * Get the bibliographic code of this language.
-     *
-     * <p>
-     * Most languages have just one <a
-     * href="http://en.wikipedia.org/wiki/ISO_639-2">ISO 639-2</a> code and they
-     * simply return <code>this</code> object. Only ISO 639-2/T codes
-     * ("terminological" codes) return counterpart objects. For example,
-     * {@link LanguageAlpha3Code#fra LanguageAlpha3Code.fra}{@code .getAlpha3B()}
-     * returns {@link LanguageAlpha3Code#fre LanguageAlpha3Code.fre}.
-     * </p>
-     *
-     * @return
-     * The bibliographic code of this language.
-     */
-    public LanguageAlpha3Code getAlpha3B() {
-        if (getUsage() == Usage.BIBLIOGRAPHY) {
-            return this;
-        } else {
-            return getSynonym();
-        }
-    }
-
-    /**
-     * Get the terminological code of this language.
-     *
-     * <p>
-     * Most languages have just one <a
-     * href="http://en.wikipedia.org/wiki/ISO_639-2">ISO 639-2</a> code and they
-     * simply return <code>this</code> object. Only ISO 639-2/B codes
-     * ("bibliographic" codes) return counterpart objects. For example,
-     * {@link LanguageAlpha3Code#fre LanguageAlpha3Code.fre}{@code .getAlpha3T()}
-     * returns {@link LanguageAlpha3Code#fra LanguageAlpha3Code.fra}.
-     *
-     * </p>
-     *
-     * @return
-     * The terminological code of this language.
-     */
-    public LanguageAlpha3Code getAlpha3T() {
-        if (getUsage() == Usage.TERMINOLOGY) {
-            return this;
-        } else {
-            return getSynonym();
-        }
     }
 
     /**
@@ -5699,7 +5573,7 @@ public enum LanguageAlpha3Code {
             return null;
         }
 
-        if (caseSensitive == false) {
+        if (!caseSensitive) {
             code = code.toLowerCase();
         }
 
@@ -5800,5 +5674,131 @@ public enum LanguageAlpha3Code {
         }
 
         return list;
+    }
+
+    /**
+     * Get the language name.
+     *
+     * @return
+     * The language name.
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Get <a href="http://en.wikipedia.org/wiki/ISO_639-1">ISO 639-1</a>
+     * language code.
+     *
+     * @return
+     * <a href="http://en.wikipedia.org/wiki/ISO_639-1">ISO 639-1</a>
+     * language code. This method may return {@code null}.
+     */
+    public LanguageCode getAlpha2() {
+        return null;
+    }
+
+    /**
+     * Get the usage of this language code.
+     *
+     * <p>
+     * Most language codes return {@link Usage#COMMON Usage.COMMON}.
+     * </p>
+     *
+     * @return
+     * The usage of this language code.
+     */
+    public Usage getUsage() {
+        return Usage.COMMON;
+    }
+
+    /**
+     * Get the synonym of this code.
+     *
+     * <p>
+     * In most cases, this method simply returns <code>this</code> object. On
+     * the other hand, language codes that have two alpha-3 codes, namely, ISO
+     * 639-2/T code ("terminological" code) and ISO 639-2/B code
+     * ("bibliographic" code), return their counterparts. For example,
+     * {@link #deu LanguageAlpha3Code.deu}{@code .getSynonym()} returns
+     * {@link #ger LanguageAlpha3Code.ger}.
+     * </p>
+     *
+     * @return
+     * <a href="http://en.wikipedia.org/wiki/ISO_639-2">ISO 639-2</a>
+     * language code.
+     */
+    public LanguageAlpha3Code getSynonym() {
+        return this;
+    }
+
+    /**
+     * Get the bibliographic code of this language.
+     *
+     * <p>
+     * Most languages have just one <a
+     * href="http://en.wikipedia.org/wiki/ISO_639-2">ISO 639-2</a> code and they
+     * simply return <code>this</code> object. Only ISO 639-2/T codes
+     * ("terminological" codes) return counterpart objects. For example,
+     * {@link LanguageAlpha3Code#fra LanguageAlpha3Code.fra}{@code .getAlpha3B()}
+     * returns {@link LanguageAlpha3Code#fre LanguageAlpha3Code.fre}.
+     * </p>
+     *
+     * @return
+     * The bibliographic code of this language.
+     */
+    public LanguageAlpha3Code getAlpha3B() {
+        if (getUsage() == Usage.BIBLIOGRAPHY) {
+            return this;
+        } else {
+            return getSynonym();
+        }
+    }
+
+    /**
+     * Get the terminological code of this language.
+     *
+     * <p>
+     * Most languages have just one <a
+     * href="http://en.wikipedia.org/wiki/ISO_639-2">ISO 639-2</a> code and they
+     * simply return <code>this</code> object. Only ISO 639-2/B codes
+     * ("bibliographic" codes) return counterpart objects. For example,
+     * {@link LanguageAlpha3Code#fre LanguageAlpha3Code.fre}{@code .getAlpha3T()}
+     * returns {@link LanguageAlpha3Code#fra LanguageAlpha3Code.fra}.
+     *
+     * </p>
+     *
+     * @return
+     * The terminological code of this language.
+     */
+    public LanguageAlpha3Code getAlpha3T() {
+        if (getUsage() == Usage.TERMINOLOGY) {
+            return this;
+        } else {
+            return getSynonym();
+        }
+    }
+
+/**
+     * The usage of this language code.
+     *
+     * @since 1.1
+     */
+    public enum Usage {
+        /**
+         * Code for terminology applications (ISO 639-2/T).
+         */
+        TERMINOLOGY,
+
+        /**
+         * Code for bibliographic applications (ISO 639-2/B).
+         */
+        BIBLIOGRAPHY,
+
+        /**
+         * For all applications including both terminology and
+         * bibliographic applications.
+         */
+        COMMON
     }
 }

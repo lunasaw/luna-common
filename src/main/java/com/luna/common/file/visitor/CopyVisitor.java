@@ -1,10 +1,10 @@
 package com.luna.common.file.visitor;
 
-import com.luna.common.file.PathUtil;
-
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+
+import com.luna.common.file.PathUtil;
 
 /**
  * 文件拷贝的FileVisitor实现，用于递归遍历拷贝目录，此类非线程安全<br>
@@ -17,8 +17,8 @@ public class CopyVisitor extends SimpleFileVisitor<Path> {
 
     private final Path         source;
     private final Path         target;
-    private boolean            isTargetCreated;
     private final CopyOption[] copyOptions;
+    private boolean            isTargetCreated;
 
     /**
      * 构造

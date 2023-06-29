@@ -1,8 +1,8 @@
 package com.luna.common.dto;
 
-import com.luna.common.dto.constant.ResultCode;
-
 import java.util.Objects;
+
+import com.luna.common.dto.constant.ResultCode;
 
 /**
  * @author Luna

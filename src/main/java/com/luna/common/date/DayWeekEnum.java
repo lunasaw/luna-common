@@ -1,4 +1,5 @@
 package com.luna.common.date;
+
 /**
  * @author Luna
  * @since 2020/1/14
@@ -16,7 +17,7 @@ public enum DayWeekEnum {
     private int    code;
     private String name;
 
-    private DayWeekEnum(int code, String name) {
+    DayWeekEnum(int code, String name) {
         this.code = code;
         this.name = name;
     }

@@ -35,9 +35,9 @@ public enum CalendaristTermsType {
     XIAOHAN(23, "小寒"),
     DAHAN(24, "大寒");
 
-    private Integer typeId;
+    private final Integer typeId;
 
-    private String  typeName;
+    private final String  typeName;
 
     CalendaristTermsType(Integer typeId, String typeName) {
         this.typeId = typeId;

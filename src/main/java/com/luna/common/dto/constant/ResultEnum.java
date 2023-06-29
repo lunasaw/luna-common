@@ -13,15 +13,11 @@ public enum ResultEnum {
 
     PARAMETER_INVALID(ResultCode.PARAMETER_INVALID, ResultCode.MSG_PARAMETER_INVALID),
 
-    INTERFACE_OFFLINE(ResultCode.INTERFACE_OFFLINE, ResultCode.MSG_INTERFACE_OFFLINE)
-    ;
+    INTERFACE_OFFLINE(ResultCode.INTERFACE_OFFLINE, ResultCode.MSG_INTERFACE_OFFLINE);
 
-    private int errorCode;
+    private final int    errorCode;
 
-    private String errorMsg;
-
-
-
+    private final String errorMsg;
 
     ResultEnum(Integer code, String msg) {
         this.errorCode = code;

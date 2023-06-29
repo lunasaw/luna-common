@@ -1,13 +1,15 @@
 package com.luna.common.check;
 
-import com.luna.common.exception.BaseException;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+
+import com.luna.common.exception.BaseException;
 
 /**
  * @author luna
@@ -15,12 +17,11 @@ import java.util.stream.Collectors;
 public class ValidDataUtil {
 
     private static final ValidatorFactory DEFAULT_VALIDATOR_FACTORY = Validation.buildDefaultValidatorFactory();
-    ;
 
     /**
      * 校验器
      *
-     * @param t   参数
+     * @param t 参数
      * @param <T> 参数类型
      * @return
      */

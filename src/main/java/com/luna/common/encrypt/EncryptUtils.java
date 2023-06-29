@@ -1,13 +1,16 @@
 package com.luna.common.encrypt;
 
-import org.apache.commons.codec.digest.DigestUtils;
-
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
+import org.apache.commons.codec.digest.DigestUtils;
 
 /**
  * @author luna@mac
@@ -18,7 +21,6 @@ public class EncryptUtils {
     /** 首先初始化一个字符数组，用来存放每个16进制字符 */
     private static final char[] hexDigits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd',
         'e', 'f'};
-
 
     /**
      * 根据内容生成一串校验和
@@ -37,7 +39,7 @@ public class EncryptUtils {
             byte[] checksum = md5.digest(md5Unid.getBytes());
 
             return Integer.toHexString(checksum[0] & 0xff) +
-                    Integer.toHexString(checksum[1] & 0xff);
+                Integer.toHexString(checksum[1] & 0xff);
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }

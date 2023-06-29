@@ -971,7 +971,7 @@ public enum LocaleCode {
     private final CountryCode   country;
     private final String        string;
 
-    private LocaleCode(LanguageCode language, CountryCode country) {
+    LocaleCode(LanguageCode language, CountryCode country) {
         this.language = language;
         this.country = country;
 
@@ -979,137 +979,6 @@ public enum LocaleCode {
             string = language.name();
         } else {
             string = language.name() + "-" + country.name();
-        }
-    }
-
-    /**
-     * Get the language code.
-     *
-     * @return
-     * The language code. This method always returns a non-null value.
-     */
-    public LanguageCode getLanguage() {
-        return language;
-    }
-
-    /**
-     * Get the country code.
-     *
-     * @return
-     * The country code. This method may return null.
-     * For example, {@link #en LocaleCode.en}.getCountry() returns null.
-     */
-    public CountryCode getCountry() {
-        return country;
-    }
-
-    /**
-     * Get the string representation of this locale code. Its format is
-     * either of the following:
-     *
-     * <ul>
-     * <li><i>language</i></li>
-     * <li><i>language</i><code>-</code><i>country</i>
-     * </ul>
-     *
-     * <p>
-     * where <i>language</i> is an <a
-     * href="http://en.wikipedia.org/wiki/ISO_639-1">ISO 639-1</a> code
-     * and <i>country</i> is an <a
-     * href="http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2">ISO 3166-1
-     * alpha-2</a> code.
-     * </p>
-     *
-     * @return
-     * The string representation of this locale code.
-     */
-    @Override
-    public String toString() {
-        return string;
-    }
-
-    /**
-     * Convert this {@code LocaleCode} instance to a {@link Locale} instance.
-     *
-     * <p>
-     * In most cases, this method creates a new {@code Locale} instance
-     * every time it is called, but some {@code LocaleCode} instances
-     * return their corresponding entries in {@code Locale} class.
-     * For example, {@link #it LocaleCode.it} always returns
-     * {@link Locale#ITALIAN}.
-     * </p>
-     *
-     * <p>
-     * The table below lists {@code LocaleCode} entries whose {@code toLocale()}
-     * does not create a new {@code Locale} instance but returns an entry in
-     * {@code Locale} class.
-     * </p>
-     *
-     * <table border="1" style="border-collapse: collapse;" cellpadding="5">
-     * <tr bgcolor="#FF8C00">
-     * <th>LocaleCode</th>
-     * <th>Locale</th>
-     * </tr>
-     * <tr>
-     * <td>{@link LocaleCode#de LocaleCode.de}</td>
-     * <td>{@link Locale#GERMAN}</td>
-     * </tr>
-     * <tr>
-     * <td>{@link LocaleCode#en LocaleCode.en}</td>
-     * <td>{@link Locale#ENGLISH}</td>
-     * </tr>
-     * <tr>
-     * <td>{@link LocaleCode#fr LocaleCode.fr}</td>
-     * <td>{@link Locale#FRENCH}</td>
-     * </tr>
-     * <tr>
-     * <td>{@link LocaleCode#fr_CA LocaleCode.fr_CA}</td>
-     * <td>{@link Locale#CANADA_FRENCH}</td>
-     * </tr>
-     * <tr>
-     * <td>{@link LocaleCode#it LocaleCode.it}</td>
-     * <td>{@link Locale#ITALIAN}</td>
-     * </tr>
-     * <tr>
-     * <td>{@link LocaleCode#ja LocaleCode.ja}</td>
-     * <td>{@link Locale#JAPANESE}</td>
-     * </tr>
-     * <tr>
-     * <td>{@link LocaleCode#ko LocaleCode.ko}</td>
-     * <td>{@link Locale#KOREAN}</td>
-     * </tr>
-     * <tr>
-     * <td>{@link LocaleCode#zh LocaleCode.zh}</td>
-     * <td>{@link Locale#CHINESE}</td>
-     * </tr>
-     * <tr>
-     * <td>{@link LocaleCode#zh_CN LocaleCode.zh_CN}</td>
-     * <td>{@link Locale#SIMPLIFIED_CHINESE}</td>
-     * </tr>
-     * <tr>
-     * <td>{@link LocaleCode#zh_TW LocaleCode.zh_TW}</td>
-     * <td>{@link Locale#TRADITIONAL_CHINESE}</td>
-     * </tr>
-     * </table>
-     *
-     * <p>
-     * In addition, {@code toLocale()} of {@link LocaleCode#undefined
-     * LocaleCode.undefined} behaves a bit differently. It returns
-     * {@link Locale#ROOT Locale.ROOT} when it is available (i.e. when
-     * the version of Java SE is 1.6 or higher). Otherwise, it returns
-     * a {@code Locale} instance whose language and country are empty
-     * strings. Even in the latter case, the same instance is returned
-     * on every call.
-     * </p>
-     *
-     * @return
-     * A {@code Locale} instance that matches this {@code LocaleCode}.
-     */
-    public Locale toLocale() {
-        if (country != null) {
-            return new Locale(language.name(), country.name());
-        } else {
-            return new Locale(language.name());
         }
     }
 
@@ -1616,6 +1485,137 @@ public enum LocaleCode {
         } catch (Exception e) {
             // Simulate Locale.ROOT.
             return new Locale("", "");
+        }
+    }
+
+    /**
+     * Get the language code.
+     *
+     * @return
+     * The language code. This method always returns a non-null value.
+     */
+    public LanguageCode getLanguage() {
+        return language;
+    }
+
+    /**
+     * Get the country code.
+     *
+     * @return
+     * The country code. This method may return null.
+     * For example, {@link #en LocaleCode.en}.getCountry() returns null.
+     */
+    public CountryCode getCountry() {
+        return country;
+    }
+
+    /**
+     * Get the string representation of this locale code. Its format is
+     * either of the following:
+     *
+     * <ul>
+     * <li><i>language</i></li>
+     * <li><i>language</i><code>-</code><i>country</i>
+     * </ul>
+     *
+     * <p>
+     * where <i>language</i> is an <a
+     * href="http://en.wikipedia.org/wiki/ISO_639-1">ISO 639-1</a> code
+     * and <i>country</i> is an <a
+     * href="http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2">ISO 3166-1
+     * alpha-2</a> code.
+     * </p>
+     *
+     * @return
+     * The string representation of this locale code.
+     */
+    @Override
+    public String toString() {
+        return string;
+    }
+
+    /**
+     * Convert this {@code LocaleCode} instance to a {@link Locale} instance.
+     *
+     * <p>
+     * In most cases, this method creates a new {@code Locale} instance
+     * every time it is called, but some {@code LocaleCode} instances
+     * return their corresponding entries in {@code Locale} class.
+     * For example, {@link #it LocaleCode.it} always returns
+     * {@link Locale#ITALIAN}.
+     * </p>
+     *
+     * <p>
+     * The table below lists {@code LocaleCode} entries whose {@code toLocale()}
+     * does not create a new {@code Locale} instance but returns an entry in
+     * {@code Locale} class.
+     * </p>
+     *
+     * <table border="1" style="border-collapse: collapse;" cellpadding="5">
+     * <tr bgcolor="#FF8C00">
+     * <th>LocaleCode</th>
+     * <th>Locale</th>
+     * </tr>
+     * <tr>
+     * <td>{@link LocaleCode#de LocaleCode.de}</td>
+     * <td>{@link Locale#GERMAN}</td>
+     * </tr>
+     * <tr>
+     * <td>{@link LocaleCode#en LocaleCode.en}</td>
+     * <td>{@link Locale#ENGLISH}</td>
+     * </tr>
+     * <tr>
+     * <td>{@link LocaleCode#fr LocaleCode.fr}</td>
+     * <td>{@link Locale#FRENCH}</td>
+     * </tr>
+     * <tr>
+     * <td>{@link LocaleCode#fr_CA LocaleCode.fr_CA}</td>
+     * <td>{@link Locale#CANADA_FRENCH}</td>
+     * </tr>
+     * <tr>
+     * <td>{@link LocaleCode#it LocaleCode.it}</td>
+     * <td>{@link Locale#ITALIAN}</td>
+     * </tr>
+     * <tr>
+     * <td>{@link LocaleCode#ja LocaleCode.ja}</td>
+     * <td>{@link Locale#JAPANESE}</td>
+     * </tr>
+     * <tr>
+     * <td>{@link LocaleCode#ko LocaleCode.ko}</td>
+     * <td>{@link Locale#KOREAN}</td>
+     * </tr>
+     * <tr>
+     * <td>{@link LocaleCode#zh LocaleCode.zh}</td>
+     * <td>{@link Locale#CHINESE}</td>
+     * </tr>
+     * <tr>
+     * <td>{@link LocaleCode#zh_CN LocaleCode.zh_CN}</td>
+     * <td>{@link Locale#SIMPLIFIED_CHINESE}</td>
+     * </tr>
+     * <tr>
+     * <td>{@link LocaleCode#zh_TW LocaleCode.zh_TW}</td>
+     * <td>{@link Locale#TRADITIONAL_CHINESE}</td>
+     * </tr>
+     * </table>
+     *
+     * <p>
+     * In addition, {@code toLocale()} of {@link LocaleCode#undefined
+     * LocaleCode.undefined} behaves a bit differently. It returns
+     * {@link Locale#ROOT Locale.ROOT} when it is available (i.e. when
+     * the version of Java SE is 1.6 or higher). Otherwise, it returns
+     * a {@code Locale} instance whose language and country are empty
+     * strings. Even in the latter case, the same instance is returned
+     * on every call.
+     * </p>
+     *
+     * @return
+     * A {@code Locale} instance that matches this {@code LocaleCode}.
+     */
+    public Locale toLocale() {
+        if (country != null) {
+            return new Locale(language.name(), country.name());
+        } else {
+            return new Locale(language.name());
         }
     }
 }

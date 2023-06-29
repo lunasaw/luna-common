@@ -8,11 +8,11 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
+import com.luna.common.check.Assert;
 import com.luna.common.file.visitor.CopyVisitor;
 import com.luna.common.file.visitor.DelVisitor;
 import com.luna.common.file.visitor.MoveVisitor;
 import com.luna.common.io.IoUtil;
-import com.luna.common.utils.Assert;
 import com.luna.common.text.CharsetUtil;
 
 /**
@@ -574,7 +574,7 @@ public class PathUtil {
      * @since 5.5.7
      */
     public static Path mkdir(Path dir) {
-        if (null != dir && false == exists(dir, false)) {
+        if (null != dir && !exists(dir, false)) {
             try {
                 Files.createDirectories(dir);
             } catch (IOException e) {
@@ -607,7 +607,7 @@ public class PathUtil {
             Files.delete(path);
         } catch (AccessDeniedException e) {
             // 可能遇到只读文件，无法删除.使用 file 方法删除
-            if (false == path.toFile().delete()) {
+            if (!path.toFile().delete()) {
                 throw e;
             }
         }

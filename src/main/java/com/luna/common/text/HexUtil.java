@@ -1,11 +1,11 @@
 package com.luna.common.text;
 
-import com.luna.common.constant.CharPoolConstant;
-import com.luna.common.exception.UtilException;
-
 import java.awt.*;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
+
+import com.luna.common.constant.CharPoolConstant;
+import com.luna.common.exception.UtilException;
 
 /**
  * 十六进制（简写为hex或下标16）在数学中是一种逢16进1的进位制，一般用数字0到9和字母A到F表示（其中:A~F即10~15）。<br>

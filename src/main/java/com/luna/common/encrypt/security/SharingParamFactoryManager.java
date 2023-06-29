@@ -1,4 +1,5 @@
 package com.luna.common.encrypt.security;
+
 /**
  * @author luna
  */

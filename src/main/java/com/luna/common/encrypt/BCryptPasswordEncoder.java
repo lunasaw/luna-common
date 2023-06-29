@@ -15,12 +15,11 @@
  */
 package com.luna.common.encrypt;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.security.SecureRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Implementation of PasswordEncoder that uses the BCrypt strong hashing function. Clients
@@ -32,13 +31,11 @@ import java.util.regex.Pattern;
  */
 @Slf4j
 public class BCryptPasswordEncoder {
-    private Pattern             BCRYPT_PATTERN = Pattern
-        .compile("\\A\\$2(a|y|b)?\\$(\\d\\d)\\$[./0-9A-Za-z]{53}");
-
     private final int           strength;
     private final BCryptVersion version;
-
     private final SecureRandom  random;
+    private final Pattern             BCRYPT_PATTERN = Pattern
+        .compile("\\A\\$2(a|y|b)?\\$(\\d\\d)\\$[./0-9A-Za-z]{53}");
 
     public BCryptPasswordEncoder() {
         this(-1);
@@ -94,6 +91,17 @@ public class BCryptPasswordEncoder {
         this.version = version;
         this.strength = strength == -1 ? 10 : strength;
         this.random = random;
+    }
+
+    public static void main(String[] args) {
+        String password = "czy1024";
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        String encode = bCryptPasswordEncoder.encode(password);
+        String encode2 = bCryptPasswordEncoder.encode(password);
+        System.out.println(encode);
+        System.out.println(encode2);
+        boolean matches = bCryptPasswordEncoder.matches(password, encode2);
+        System.out.println(matches);
     }
 
     public String encode(CharSequence rawPassword) {
@@ -154,16 +162,5 @@ public class BCryptPasswordEncoder {
         public String getVersion() {
             return this.version;
         }
-    }
-
-    public static void main(String[] args) {
-        String password = "czy1024";
-        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        String encode = bCryptPasswordEncoder.encode(password);
-        String encode2 = bCryptPasswordEncoder.encode(password);
-        System.out.println(encode);
-        System.out.println(encode2);
-        boolean matches = bCryptPasswordEncoder.matches(password, encode2);
-        System.out.println(matches);
     }
 }

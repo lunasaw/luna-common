@@ -1,10 +1,10 @@
 package com.luna.common.calendarist.utils;
 
-import com.luna.common.calendarist.constants.CalendaristConstants;
-import com.luna.common.calendarist.pojo.SolarDate;
-
 import java.util.Calendar;
 import java.util.Date;
+
+import com.luna.common.calendarist.constants.CalendaristConstants;
+import com.luna.common.calendarist.pojo.SolarDate;
 
 public class CalendaristUtils {
 
@@ -126,7 +126,7 @@ public class CalendaristUtils {
     public static long solarToInt(int y, int m, int d) {
         m = (m + 9) % 12;
         y = y - m / 10;
-        return 365 * y + y / 4 - y / 100 + y / 400 + (m * 306 + 5) / 10 + (d - 1);
+        return 365L * y + y / 4 - y / 100 + y / 400 + (m * 306 + 5) / 10 + (d - 1);
     }
 
     public static SolarDate solarFromInt(long g) {
@@ -157,7 +157,7 @@ public class CalendaristUtils {
      */
     public static int getFirstTerm(int solarYear, int solarMonth) {
         long times = 31556925974L * (solarYear - 1900)
-            + CalendaristConstants.SOLAR_TERM_INFO[(solarMonth - 1) * 2] * 60000L + ((long)0.7 * (solarYear - 1900));
+            + CalendaristConstants.SOLAR_TERM_INFO[(solarMonth - 1) * 2] * 60000L + (0L);
         Date offDate = new Date(times - 2208549300000L);
         // 1、取得本地时间：
         Calendar cal = CalendaristUtils.getCalendarInstance();

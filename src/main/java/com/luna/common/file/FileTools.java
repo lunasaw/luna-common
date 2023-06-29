@@ -1,5 +1,8 @@
 package com.luna.common.file;
 
+import static com.luna.common.file.PathUtil.del;
+import static java.nio.file.Files.isDirectory;
+
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -8,25 +11,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.collect.Lists;
+import com.luna.common.check.Assert;
 import com.luna.common.constant.Constant;
 import com.luna.common.exception.BaseException;
 import com.luna.common.file.visitor.MoveVisitor;
 import com.luna.common.io.IoUtil;
-import com.luna.common.utils.Assert;
 import com.luna.common.text.CharsetUtil;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import oshi.util.FileUtil;
-
-import static com.luna.common.file.PathUtil.del;
-import static java.nio.file.Files.isDirectory;
 
 /**
  * @author Luna
  */
 public class FileTools {
-
 
     /**
      * 获取临时文件路径（绝对路径）
@@ -45,7 +44,7 @@ public class FileTools {
      * @since 4.0.6
      */
     public static File getTmpDir() {
-        return  new File(getTmpDirPath());
+        return new File(getTmpDirPath());
     }
 
     /**
@@ -135,7 +134,7 @@ public class FileTools {
     /**
      * 将流的内容写入文件
      *
-     * @param in        输入流，不关闭
+     * @param in 输入流，不关闭
      * @param isCloseIn 是否关闭输入流
      * @return dest
      * @throws IOException IO异常
@@ -160,7 +159,7 @@ public class FileTools {
     /**
      * 将流的内容写入文件
      *
-     * @param in        输入流，不关闭
+     * @param in 输入流，不关闭
      * @param isCloseIn 是否关闭输入流
      * @return dest
      * @throws IOException IO异常
@@ -600,7 +599,7 @@ public class FileTools {
         if (!file.exists()) {
             Files.createFile(file.toPath());
             try {
-                //noinspection ResultOfMethodCallIgnored
+                // noinspection ResultOfMethodCallIgnored
                 file.createNewFile();
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -617,7 +616,7 @@ public class FileTools {
      * @return 文件，若路径为null，返回null
      * @throws IORuntimeException IO异常
      */
-    public static File touch(String path){
+    public static File touch(String path) {
         if (path == null) {
             return null;
         }
@@ -648,11 +647,9 @@ public class FileTools {
      * @return 输入流
      * @throws IOException 文件未找到
      */
-    public static BufferedInputStream getInputStream(File file)  {
+    public static BufferedInputStream getInputStream(File file) {
         return IoUtil.toBuffered(IoUtil.toStream(file));
     }
-
-
 
     /**
      * 获得一个带缓存的写入对象
@@ -672,7 +669,7 @@ public class FileTools {
     /**
      * 获得一个文件读取器
      *
-     * @param file    文件
+     * @param file 文件
      * @param charset 字符集
      * @return BufferedReader对象
      * @throws IORuntimeException IO异常

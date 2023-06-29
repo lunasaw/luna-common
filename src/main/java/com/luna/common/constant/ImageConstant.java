@@ -32,6 +32,16 @@ public enum ImageConstant {
 
     private Integer imageType;
 
+    ImageConstant(String imageStr, Integer imageType) {
+        this.imageStr = imageStr;
+        this.imageType = imageType;
+    }
+
+    public static String getTypeStr(Integer orderType) {
+        return Arrays.stream(ImageConstant.values()).filter(type -> Objects.equals(type.getImageType(), orderType))
+            .findFirst().orElse(IMAGE).getImageStr();
+    }
+
     public String getImageStr() {
         return imageStr;
     }
@@ -46,15 +56,5 @@ public enum ImageConstant {
 
     public void setImageType(Integer imageType) {
         this.imageType = imageType;
-    }
-
-    ImageConstant(String imageStr, Integer imageType) {
-        this.imageStr = imageStr;
-        this.imageType = imageType;
-    }
-
-    public static String getTypeStr(Integer orderType) {
-        return Arrays.stream(ImageConstant.values()).filter(type -> Objects.equals(type.getImageType(), orderType))
-            .findFirst().orElse(IMAGE).getImageStr();
     }
 }

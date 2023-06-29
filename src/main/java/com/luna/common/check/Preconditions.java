@@ -2,6 +2,7 @@ package com.luna.common.check;
 
 import com.luna.common.dto.constant.ResultEnum;
 import com.luna.common.exception.BaseException;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -32,7 +33,7 @@ public class Preconditions {
     public static void checkExpression(boolean expression, ResultEnum resultEnum) {
 
         if (!expression) {
-            throw new BaseException(resultEnum.getErrorCode(),resultEnum.getErrorMsg());
+            throw new BaseException(resultEnum.getErrorCode(), resultEnum.getErrorMsg());
         }
 
     }
@@ -46,7 +47,6 @@ public class Preconditions {
         return reference;
     }
 
-
     public static <T> T checkNotNull(T reference, ResultEnum bizErrorEnum) {
 
         if (reference == null) {
@@ -55,7 +55,6 @@ public class Preconditions {
 
         return reference;
     }
-
 
     public static <T> T checkParamNotNull(T reference) {
 

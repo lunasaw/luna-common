@@ -341,6 +341,11 @@ public enum HashMode {
         this.speed = speed;
     }
 
+    public static HashMode get(Integer type) {
+        return Arrays.stream(HashMode.values()).filter(hashMode -> hashMode.name().equals("MODE_" + type)).findFirst()
+            .orElse(null);
+    }
+
     public Integer getMode() {
         return Integer.parseInt(this.name().substring(5));
     }
@@ -363,15 +368,10 @@ public enum HashMode {
 
     /**
      * 即5分钟的计算量
-     * 
+     *
      * @return
      */
     public Long getLinesPerTask() {
         return speed * 60 * 5;
-    }
-
-    public static HashMode get(Integer type) {
-        return Arrays.stream(HashMode.values()).filter(hashMode -> hashMode.name().equals("MODE_" + type)).findFirst()
-            .orElse(null);
     }
 }

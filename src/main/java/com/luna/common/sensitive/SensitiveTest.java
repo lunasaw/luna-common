@@ -1,12 +1,8 @@
 package com.luna.common.sensitive;
 
+import java.util.*;
 
 import com.alibaba.fastjson2.JSON;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author chenzhangyue
@@ -44,7 +40,7 @@ public class SensitiveTest {
         lisi.setPassword("HAHAHAHAHA");
         lisi.setAddress("上海市嘉定区南翔镇");
         // 李四是张三的朋友
-        zhangsan.setFriends(Arrays.asList(lisi));
+        zhangsan.setFriends(Collections.singletonList(lisi));
         // 对张三进行脱敏
         // 脱敏配置
         Map<FieldType, FieldConfig> config = new HashMap<>();
@@ -63,17 +59,16 @@ public class SensitiveTest {
     public static class Person {
 
         @Sensitive(FieldType.CHINESE_NAME)
-        private String name;
+        private String              name;
         @Sensitive(FieldType.MOBILE)
-        private String mobile;
+        private String              mobile;
         @Sensitive(FieldType.ADDRESS)
-        private String address;
+        private String              address;
         @Sensitive(FieldType.PASSWORD)
-        private String password;
+        private String              password;
 
-        private List<Person> friends;
+        private List<Person>        friends;
         private Map<String, Object> params;
-
 
         public String getName() {
             return name;

@@ -5,8 +5,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.common.base.Objects;
+import com.luna.common.check.Assert;
 import com.luna.common.date.DateUtils;
-import com.luna.common.utils.Assert;
 import com.luna.common.text.RandomIDCardUtil;
 import com.luna.common.text.StringTools;
 
@@ -122,7 +122,7 @@ public class Validator {
      * @since 4.4.5
      */
     public static boolean isFalse(boolean value) {
-        return false == value;
+        return !value;
     }
 
     /**
@@ -294,7 +294,7 @@ public class Validator {
      * @throws ValidateException 验证异常
      */
     public static Object validateEqual(Object t1, Object t2, String errorMsg) throws ValidateException {
-        if (false == equal(t1, t2)) {
+        if (!equal(t1, t2)) {
             throw new ValidateException(errorMsg);
         }
         return t1;
@@ -357,7 +357,7 @@ public class Validator {
      */
     public static <T extends CharSequence> T validateMatchRegex(String regex, T value, String errorMsg)
         throws ValidateException {
-        if (false == isMatchRegex(regex, value)) {
+        if (!isMatchRegex(regex, value)) {
             throw new ValidateException(errorMsg);
         }
         return value;
@@ -405,7 +405,7 @@ public class Validator {
      * @throws ValidateException 验证异常
      */
     public static <T extends CharSequence> T validateGeneral(T value, String errorMsg) throws ValidateException {
-        if (false == isGeneral(value)) {
+        if (!isGeneral(value)) {
             throw new ValidateException(errorMsg);
         }
         return value;
@@ -617,7 +617,7 @@ public class Validator {
      * @since 4.1.8
      */
     public static <T extends CharSequence> T validateWord(T value, String errorMsg) throws ValidateException {
-        if (false == isWord(value)) {
+        if (!isWord(value)) {
             throw new ValidateException(errorMsg);
         }
         return value;
@@ -696,7 +696,7 @@ public class Validator {
      * @throws ValidateException 验证异常
      */
     public static <T extends CharSequence> T validateEmail(T value, String errorMsg) throws ValidateException {
-        if (false == isEmail(value)) {
+        if (!isEmail(value)) {
             throw new ValidateException(errorMsg);
         }
         return value;
@@ -722,7 +722,7 @@ public class Validator {
      * @throws ValidateException 验证异常
      */
     public static <T extends CharSequence> T validateMobile(T value, String errorMsg) throws ValidateException {
-        if (false == isMobile(value)) {
+        if (!isMobile(value)) {
             throw new ValidateException(errorMsg);
         }
         return value;
@@ -749,7 +749,7 @@ public class Validator {
      */
     public static <T extends CharSequence> T validateCitizenIdNumber(T value, String errorMsg)
         throws ValidateException {
-        if (false == isCitizenId(value)) {
+        if (!isCitizenId(value)) {
             throw new ValidateException(errorMsg);
         }
         return value;
@@ -825,7 +825,7 @@ public class Validator {
      * @throws ValidateException 验证异常
      */
     public static <T extends CharSequence> T validateBirthday(T value, String errorMsg) throws ValidateException {
-        if (false == isBirthday(value)) {
+        if (!isBirthday(value)) {
             throw new ValidateException(errorMsg);
         }
         return value;
@@ -851,7 +851,7 @@ public class Validator {
      * @throws ValidateException 验证异常
      */
     public static <T extends CharSequence> T validateIpv4(T value, String errorMsg) throws ValidateException {
-        if (false == isIpv4(value)) {
+        if (!isIpv4(value)) {
             throw new ValidateException(errorMsg);
         }
         return value;
@@ -877,7 +877,7 @@ public class Validator {
      * @throws ValidateException 验证异常
      */
     public static <T extends CharSequence> T validateIpv6(T value, String errorMsg) throws ValidateException {
-        if (false == isIpv6(value)) {
+        if (!isIpv6(value)) {
             throw new ValidateException(errorMsg);
         }
         return value;
@@ -905,7 +905,7 @@ public class Validator {
      * @since 4.1.3
      */
     public static <T extends CharSequence> T validateMac(T value, String errorMsg) throws ValidateException {
-        if (false == isMac(value)) {
+        if (!isMac(value)) {
             throw new ValidateException(errorMsg);
         }
         return value;
@@ -933,7 +933,7 @@ public class Validator {
      * @since 3.0.6
      */
     public static <T extends CharSequence> T validatePlateNumber(T value, String errorMsg) throws ValidateException {
-        if (false == isPlateNumber(value)) {
+        if (!isPlateNumber(value)) {
             throw new ValidateException(errorMsg);
         }
         return value;
@@ -967,7 +967,7 @@ public class Validator {
      * @throws ValidateException 验证异常
      */
     public static <T extends CharSequence> T validateUrl(T value, String errorMsg) throws ValidateException {
-        if (false == isUrl(value)) {
+        if (!isUrl(value)) {
             throw new ValidateException(errorMsg);
         }
         return value;
@@ -1004,7 +1004,7 @@ public class Validator {
      * @throws ValidateException 验证异常
      */
     public static <T extends CharSequence> T validateChinese(T value, String errorMsg) throws ValidateException {
-        if (false == isChinese(value)) {
+        if (!isChinese(value)) {
             throw new ValidateException(errorMsg);
         }
         return value;
@@ -1031,7 +1031,7 @@ public class Validator {
      */
     public static <T extends CharSequence> T validateGeneralWithChinese(T value, String errorMsg)
         throws ValidateException {
-        if (false == isGeneralWithChinese(value)) {
+        if (!isGeneralWithChinese(value)) {
             throw new ValidateException(errorMsg);
         }
         return value;
@@ -1059,7 +1059,7 @@ public class Validator {
      * @throws ValidateException 验证异常
      */
     public static <T extends CharSequence> T validateUUID(T value, String errorMsg) throws ValidateException {
-        if (false == isUUID(value)) {
+        if (!isUUID(value)) {
             throw new ValidateException(errorMsg);
         }
         return value;
@@ -1087,7 +1087,7 @@ public class Validator {
      * @since 4.3.3
      */
     public static <T extends CharSequence> T validateHex(T value, String errorMsg) throws ValidateException {
-        if (false == isHex(value)) {
+        if (!isHex(value)) {
             throw new ValidateException(errorMsg);
         }
         return value;
@@ -1121,7 +1121,7 @@ public class Validator {
      * @since 4.1.10
      */
     public static void validateBetween(Number value, Number min, Number max, String errorMsg) throws ValidateException {
-        if (false == isBetween(value, min, max)) {
+        if (!isBetween(value, min, max)) {
             throw new ValidateException(errorMsg);
         }
     }
@@ -1171,7 +1171,7 @@ public class Validator {
      * @since 5.6.3
      */
     public static <T extends CharSequence> T validateCarVin(T value, String errorMsg) throws ValidateException {
-        if (false == isCarVin(value)) {
+        if (!isCarVin(value)) {
             throw new ValidateException(errorMsg);
         }
         return value;
@@ -1205,7 +1205,7 @@ public class Validator {
      */
     public static <T extends CharSequence> T validateCarDrivingLicence(T value, String errorMsg)
         throws ValidateException {
-        if (false == isCarDrivingLicence(value)) {
+        if (!isCarDrivingLicence(value)) {
             throw new ValidateException(errorMsg);
         }
         return value;

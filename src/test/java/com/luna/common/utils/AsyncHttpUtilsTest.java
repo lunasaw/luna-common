@@ -1,49 +1,30 @@
 package com.luna.common.utils;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
+import org.apache.hc.client5.http.async.methods.SimpleRequestBuilder;
+import org.apache.hc.core5.http.HttpHeaders;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.Method;
+import org.apache.hc.core5.http.nio.AsyncRequestProducer;
+import org.apache.hc.core5.http.nio.entity.StringAsyncEntityProducer;
+import org.junit.Test;
+
 import com.alibaba.fastjson2.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import com.luna.common.net.HttpUtils;
 import com.luna.common.net.HttpUtilsConstant;
 import com.luna.common.net.async.CustomAbstacktFutureCallback;
 import com.luna.common.net.async.CustomAsyncHttpResponse;
-import com.luna.common.net.async.CustomResponseConsumer;
 import com.luna.common.net.async.CustomSseAsyncConsumer;
 import com.luna.common.net.hander.AsyncValidatingResponseHandler;
-import com.luna.common.net.hander.LoggingEventSourceListener;
 import com.luna.common.net.high.AsyncHttpUtils;
-import com.luna.common.net.method.SseRequest;
-import com.luna.common.net.sse.Event;
-import com.luna.common.net.sse.SseEntity;
 import com.luna.common.net.sse.SseResponse;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.hc.client5.http.async.methods.*;
-import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
-import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
-import org.apache.hc.client5.http.impl.auth.CredentialsProviderBuilder;
-import org.apache.hc.core5.concurrent.FutureCallback;
-import org.apache.hc.core5.http.*;
-import org.apache.hc.core5.http.io.entity.EntityUtils;
-import org.apache.hc.core5.http.message.BasicClassicHttpResponse;
-import org.apache.hc.core5.http.message.StatusLine;
-import org.apache.hc.core5.http.nio.AsyncRequestProducer;
-import org.apache.hc.core5.http.nio.AsyncResponseConsumer;
-import org.apache.hc.core5.http.nio.entity.StringAsyncEntityProducer;
-import org.apache.hc.core5.http.nio.support.AbstractAsyncResponseConsumer;
-import org.apache.hc.core5.http.protocol.HttpContext;
-import org.apache.hc.core5.io.CloseMode;
-import org.junit.Assert;
-import org.junit.Test;
 
-import java.io.IOException;
-import java.net.URI;
-import java.nio.CharBuffer;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author luna
@@ -52,6 +33,10 @@ import java.util.concurrent.Future;
  */
 @Slf4j
 public class AsyncHttpUtilsTest {
+
+    public static void main(final String[] args) throws Exception {
+
+    }
 
     @Test
     public void async_test() throws Exception {
@@ -71,7 +56,7 @@ public class AsyncHttpUtilsTest {
                 AsyncHttpUtils.doGet("http://httpbin.org", requestUri, null, null, new AsyncValidatingResponseHandler<String>() {
                     @Override
                     public <R extends HttpResponse> void handleResponse(R response) {
-                        CustomAsyncHttpResponse response1 = (CustomAsyncHttpResponse) response;
+                        CustomAsyncHttpResponse response1 = (CustomAsyncHttpResponse)response;
                         System.out.println(response1.getBodyText());
                     }
                 });
@@ -99,13 +84,14 @@ public class AsyncHttpUtilsTest {
         header.put(HttpHeaders.AUTHORIZATION, "Bearer sk-xxxx");
         header.put(HttpHeaders.CONTENT_TYPE, HttpUtilsConstant.JSON);
 
-        StringAsyncEntityProducer stringAsyncEntityProducer = new StringAsyncEntityProducer("{\"temperature\":0,\"model\":\"text-davinci-003\",\"prompt\":\"Say this is a test\",\"stream\":true,\"max_tokens\":7}");
-        AsyncRequestProducer producer = AsyncHttpUtils.getProducer("https://api.openai.com", "/v1/completions", header, new HashMap<>(), stringAsyncEntityProducer, Method.POST.toString());
+        StringAsyncEntityProducer stringAsyncEntityProducer = new StringAsyncEntityProducer(
+            "{\"temperature\":0,\"model\":\"text-davinci-003\",\"prompt\":\"Say this is a test\",\"stream\":true,\"max_tokens\":7}");
+        AsyncRequestProducer producer = AsyncHttpUtils.getProducer("https://api.openai.com", "/v1/completions", header, new HashMap<>(),
+            stringAsyncEntityProducer, Method.POST.toString());
 
         CustomSseAsyncConsumer customSseAsyncConsumer = new CustomSseAsyncConsumer();
 
-
-        AsyncHttpUtils.doAsyncRequest(producer, customSseAsyncConsumer, new CustomAbstacktFutureCallback<SseResponse>(){});
+        AsyncHttpUtils.doAsyncRequest(producer, customSseAsyncConsumer, new CustomAbstacktFutureCallback<SseResponse>() {});
     }
 
     @Test
@@ -113,7 +99,8 @@ public class AsyncHttpUtilsTest {
         CustomSseAsyncConsumer customSseAsyncConsumer = new CustomSseAsyncConsumer();
 
         ImmutableMap<String, String> map = ImmutableMap.of();
-        AsyncRequestProducer producer = AsyncHttpUtils.getProducer("http://localhost:6060", "/stream-sse-mvc", map, new HashMap<>(), Method.GET.toString());
+        AsyncRequestProducer producer =
+            AsyncHttpUtils.getProducer("http://localhost:6060", "/stream-sse-mvc", map, new HashMap<>(), Method.GET.toString());
 
         SseResponse sseResponse = AsyncHttpUtils.doAsyncRequest(producer, customSseAsyncConsumer, new CustomAbstacktFutureCallback<SseResponse>() {
             @Override
@@ -122,10 +109,6 @@ public class AsyncHttpUtilsTest {
             }
         });
         System.out.println(JSON.toJSONString(sseResponse));
-    }
-
-    public static void main(final String[] args) throws Exception {
-
     }
 
 }

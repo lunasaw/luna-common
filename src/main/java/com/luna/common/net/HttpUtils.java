@@ -75,12 +75,8 @@ import com.luna.common.text.CharsetUtil;
 public class HttpUtils {
 
     public static final HttpClientContext  CLIENT_CONTEXT      = HttpClientContext.create();
-    private static CloseableHttpClient     httpClient;
-
-    private static final HttpClientBuilder HTTP_CLIENT_BUILDER = HttpClients.custom();
-
     public static final BasicCookieStore   COOKIE_STORE        = new BasicCookieStore();
-
+    private static final HttpClientBuilder HTTP_CLIENT_BUILDER = HttpClients.custom();
     public static int                      MAX_REDIRECTS       = 10;
     /**
      * 最大连接数
@@ -90,12 +86,10 @@ public class HttpUtils {
      * 设置连接建立的超时时间为10s
      */
     public static int                      CONNECT_TIMEOUT     = 10;
-
     public static int                      RESPONSE_TIMEOUT    = 30;
-
     public static int                      MAX_ROUTE           = 200;
-
     public static int                      SOCKET_TIME_OUT     = 10;
+    private static CloseableHttpClient     httpClient;
 
     static {
         init();
@@ -163,16 +157,6 @@ public class HttpUtils {
     public static void refresh() {
         HTTP_CLIENT_BUILDER.setDefaultCookieStore(COOKIE_STORE);
         httpClient = HTTP_CLIENT_BUILDER.build();
-    }
-
-    public void addRequestInterceptorFirst(HttpRequestInterceptor httpRequestInterceptor) {
-        HTTP_CLIENT_BUILDER.addRequestInterceptorFirst(httpRequestInterceptor);
-        refresh();
-    }
-
-    public void addExecInterceptorAfter(final String existing, final String name, final ExecChainHandler interceptor) {
-        HTTP_CLIENT_BUILDER.addExecInterceptorAfter(existing, name, interceptor);
-        refresh();
     }
 
     public static void basicAuth(String userName, String password, String host) {
@@ -726,5 +710,15 @@ public class HttpUtils {
 
     public static String checkResponseAndGetResult(HttpResponse httpResponse, Boolean isEnsure) {
         return checkResponseAndGetResultV2((ClassicHttpResponse)httpResponse, isEnsure);
+    }
+
+    public void addRequestInterceptorFirst(HttpRequestInterceptor httpRequestInterceptor) {
+        HTTP_CLIENT_BUILDER.addRequestInterceptorFirst(httpRequestInterceptor);
+        refresh();
+    }
+
+    public void addExecInterceptorAfter(final String existing, final String name, final ExecChainHandler interceptor) {
+        HTTP_CLIENT_BUILDER.addExecInterceptorAfter(existing, name, interceptor);
+        refresh();
     }
 }

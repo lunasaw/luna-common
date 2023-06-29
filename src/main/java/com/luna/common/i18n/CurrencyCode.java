@@ -15,13 +15,7 @@
  */
 package com.luna.common.i18n;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Currency;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -2684,129 +2678,11 @@ public enum CurrencyCode {
     private final int               minorUnit;
     private final List<CountryCode> countryList;
 
-    private CurrencyCode(String name, int numeric, int minorUnit, CountryCode... countries) {
+    CurrencyCode(String name, int numeric, int minorUnit, CountryCode... countries) {
         this.name = name;
         this.numeric = numeric;
         this.minorUnit = minorUnit;
         this.countryList = Collections.unmodifiableList(Arrays.asList(countries));
-    }
-
-    /**
-     * Get the currency name.
-     *
-     * @return
-     * The currency name.
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Get the <a href="http://en.wikipedia.org/wiki/ISO_4217"
-     * >ISO 4217</a> numeric code.
-     *
-     * @return
-     * The <a href="http://en.wikipedia.org/wiki/ISO_4217">ISO 4217</a>
-     * numeric code.
-     */
-    public int getNumeric() {
-        return numeric;
-    }
-
-    /**
-     * Get the minor unit.
-     *
-     * @return
-     * The minor unit. {@code -1} means N.A.
-     */
-    public int getMinorUnit() {
-        return minorUnit;
-    }
-
-    /**
-     * Get the list of countries using this currency.
-     *
-     * @return
-     * The list of countries using this currency.
-     */
-    public List<CountryCode> getCountryList() {
-        return countryList;
-    }
-
-    /**
-     * Check if this currency code represents a fund.
-     *
-     * <p>
-     * {@code CurrencyCode} instances listed below return {@code true}.
-     * </p>
-     *
-     * <ul>
-     * <li>{@link #BOV} Mvdol
-     * <li>{@link #CHE} WIR EUro
-     * <li>{@link #CHW} WIR Franc
-     * <li>{@link #CLF} Unidad de Fomento
-     * <li>{@link #COU} Unidad de Valor Real
-     * <li>{@link #MXV} Mexican Unidad de Inversion (UDI)
-     * <li>{@link #USN} US Dollar (Next day)
-     * <li>{@link #USS} US Dollar (Same day)
-     * <li>{@link #UYI} Uruguay Peso en Unidades
-     * </ul>
-     *
-     * @return
-     * True if this currency code represents a fund.
-     */
-    public boolean isFund() {
-        return false;
-    }
-
-    /**
-     * Check if this currency code represents a precious metal.
-     *
-     * <p>
-     * {@code CurrencyCode} instances listed below return {@code true}.
-     * </p>
-     *
-     * <ul>
-     * <li>{@link #XAG} Silver
-     * <li>{@link #XAU} Gold
-     * <li>{@link #XPD} Palladium
-     * <li>{@link #XPT} Platinum
-     * </ul>
-     *
-     * @return
-     * True if this currency code represents a precious metal.
-     */
-    public boolean isPreciousMetal() {
-        return false;
-    }
-
-    /**
-     * Get the {@link Currency} instance that corresponds to
-     * this currency code.
-     *
-     * <p>
-     * This method is an alias of {@link Currency}{@code .}{@link
-     * Currency#getInstance(String) getInstance}{@code (this.name())}.
-     * The only difference is that this method returns {@code null}
-     * when {@code Currency.getInstance(String)} throws {@code
-     * IllegalArgumentException}.
-     * </p>
-     *
-     * @return
-     * A {@link Currency} instance, or {@code null} if this
-     * ISO 4217 code is not supported by the implementation
-     * of {@link Currency#getInstance(String)}.
-     *
-     * @see Currency#getInstance(String)
-     */
-    public Currency getCurrency() {
-        try {
-            return Currency.getInstance(this.name());
-        } catch (IllegalArgumentException e) {
-            // Currency.getInstance(String) throws IllegalArgumentException
-            // when the given ISO 4217 code is not supported.
-            return null;
-        }
     }
 
     /**
@@ -3117,5 +2993,123 @@ public enum CurrencyCode {
         }
 
         return list;
+    }
+
+    /**
+     * Get the currency name.
+     *
+     * @return
+     * The currency name.
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Get the <a href="http://en.wikipedia.org/wiki/ISO_4217"
+     * >ISO 4217</a> numeric code.
+     *
+     * @return
+     * The <a href="http://en.wikipedia.org/wiki/ISO_4217">ISO 4217</a>
+     * numeric code.
+     */
+    public int getNumeric() {
+        return numeric;
+    }
+
+    /**
+     * Get the minor unit.
+     *
+     * @return
+     * The minor unit. {@code -1} means N.A.
+     */
+    public int getMinorUnit() {
+        return minorUnit;
+    }
+
+    /**
+     * Get the list of countries using this currency.
+     *
+     * @return
+     * The list of countries using this currency.
+     */
+    public List<CountryCode> getCountryList() {
+        return countryList;
+    }
+
+    /**
+     * Check if this currency code represents a fund.
+     *
+     * <p>
+     * {@code CurrencyCode} instances listed below return {@code true}.
+     * </p>
+     *
+     * <ul>
+     * <li>{@link #BOV} Mvdol
+     * <li>{@link #CHE} WIR EUro
+     * <li>{@link #CHW} WIR Franc
+     * <li>{@link #CLF} Unidad de Fomento
+     * <li>{@link #COU} Unidad de Valor Real
+     * <li>{@link #MXV} Mexican Unidad de Inversion (UDI)
+     * <li>{@link #USN} US Dollar (Next day)
+     * <li>{@link #USS} US Dollar (Same day)
+     * <li>{@link #UYI} Uruguay Peso en Unidades
+     * </ul>
+     *
+     * @return
+     * True if this currency code represents a fund.
+     */
+    public boolean isFund() {
+        return false;
+    }
+
+    /**
+     * Check if this currency code represents a precious metal.
+     *
+     * <p>
+     * {@code CurrencyCode} instances listed below return {@code true}.
+     * </p>
+     *
+     * <ul>
+     * <li>{@link #XAG} Silver
+     * <li>{@link #XAU} Gold
+     * <li>{@link #XPD} Palladium
+     * <li>{@link #XPT} Platinum
+     * </ul>
+     *
+     * @return
+     * True if this currency code represents a precious metal.
+     */
+    public boolean isPreciousMetal() {
+        return false;
+    }
+
+    /**
+     * Get the {@link Currency} instance that corresponds to
+     * this currency code.
+     *
+     * <p>
+     * This method is an alias of {@link Currency}{@code .}{@link
+     * Currency#getInstance(String) getInstance}{@code (this.name())}.
+     * The only difference is that this method returns {@code null}
+     * when {@code Currency.getInstance(String)} throws {@code
+     * IllegalArgumentException}.
+     * </p>
+     *
+     * @return
+     * A {@link Currency} instance, or {@code null} if this
+     * ISO 4217 code is not supported by the implementation
+     * of {@link Currency#getInstance(String)}.
+     *
+     * @see Currency#getInstance(String)
+     */
+    public Currency getCurrency() {
+        try {
+            return Currency.getInstance(this.name());
+        } catch (IllegalArgumentException e) {
+            // Currency.getInstance(String) throws IllegalArgumentException
+            // when the given ISO 4217 code is not supported.
+            return null;
+        }
     }
 }

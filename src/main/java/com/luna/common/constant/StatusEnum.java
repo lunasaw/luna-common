@@ -29,14 +29,6 @@ public enum StatusEnum {
         this.label = label;
     }
 
-    public String getLabel() {
-        return label;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
     /**
      * 根据匹配value的值获取Label
      *
@@ -71,5 +63,13 @@ public enum StatusEnum {
             }
         }
         return null;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public String getValue() {
+        return value;
     }
 }

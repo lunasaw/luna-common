@@ -22,59 +22,58 @@ import com.luna.common.text.StringTools;
  */
 public class FileNameUtil {
 
-
     /**
      * 针对ClassPath路径的伪协议前缀（兼容Spring）: "classpath:"
      */
-    public static final String CLASSPATH_URL_PREFIX = "classpath:";
+    public static final String   CLASSPATH_URL_PREFIX          = "classpath:";
     /**
      * URL 前缀表示文件: "file:"
      */
-    public static final String FILE_URL_PREFIX = "file:";
+    public static final String   FILE_URL_PREFIX               = "file:";
     /**
      * URL 前缀表示jar: "jar:"
      */
-    public static final String JAR_URL_PREFIX = "jar:";
+    public static final String   JAR_URL_PREFIX                = "jar:";
     /**
      * URL 前缀表示war: "war:"
      */
-    public static final String WAR_URL_PREFIX = "war:";
+    public static final String   WAR_URL_PREFIX                = "war:";
     /**
      * URL 协议表示文件: "file"
      */
-    public static final String URL_PROTOCOL_FILE = "file";
+    public static final String   URL_PROTOCOL_FILE             = "file";
     /**
      * URL 协议表示Jar文件: "jar"
      */
-    public static final String URL_PROTOCOL_JAR = "jar";
+    public static final String   URL_PROTOCOL_JAR              = "jar";
     /**
      * URL 协议表示zip文件: "zip"
      */
-    public static final String URL_PROTOCOL_ZIP = "zip";
+    public static final String   URL_PROTOCOL_ZIP              = "zip";
     /**
      * URL 协议表示WebSphere文件: "wsjar"
      */
-    public static final String URL_PROTOCOL_WSJAR = "wsjar";
+    public static final String   URL_PROTOCOL_WSJAR            = "wsjar";
     /**
      * URL 协议表示JBoss zip文件: "vfszip"
      */
-    public static final String URL_PROTOCOL_VFSZIP = "vfszip";
+    public static final String   URL_PROTOCOL_VFSZIP           = "vfszip";
     /**
      * URL 协议表示JBoss文件: "vfsfile"
      */
-    public static final String URL_PROTOCOL_VFSFILE = "vfsfile";
+    public static final String   URL_PROTOCOL_VFSFILE          = "vfsfile";
     /**
      * URL 协议表示JBoss VFS资源: "vfs"
      */
-    public static final String URL_PROTOCOL_VFS = "vfs";
+    public static final String   URL_PROTOCOL_VFS              = "vfs";
     /**
      * Jar路径以及内部文件路径的分界符: "!/"
      */
-    public static final String JAR_URL_SEPARATOR = "!/";
+    public static final String   JAR_URL_SEPARATOR             = "!/";
     /**
      * WAR路径及内部文件路径分界符
      */
-    public static final String WAR_URL_SEPARATOR = "*/";
+    public static final String   WAR_URL_SEPARATOR             = "*/";
 
     /**
      * .java文件扩展名
@@ -106,8 +105,7 @@ public class FileNameUtil {
     /**
      * 绝对路径判断正则
      */
-    private static final Pattern PATTERN_PATH_ABSOLUTE = Pattern.compile("^[a-zA-Z]:([/\\\\].*)?");
-
+    private static final Pattern PATTERN_PATH_ABSOLUTE         = Pattern.compile("^[a-zA-Z]:([/\\\\].*)?");
 
     // -------------------------------------------------------------------------------------------- name start
 
@@ -314,7 +312,7 @@ public class FileNameUtil {
      * @since 3.3.1
      */
     public static boolean containsInvalid(String fileName) {
-        return (false == StringTools.isBlank(fileName)) && ReUtil.contains(FILE_NAME_INVALID_PATTERN_WIN, fileName);
+        return (!StringTools.isBlank(fileName)) && ReUtil.contains(FILE_NAME_INVALID_PATTERN_WIN, fileName);
     }
 
     /**
@@ -340,7 +338,7 @@ public class FileNameUtil {
      * dirPath: d:/Aaa/bbb    filePath: d:/aaa/bbb/     =》    ""
      * </pre>
      *
-     * @param dirPath  父路径
+     * @param dirPath 父路径
      * @param filePath 文件路径
      * @return 相对子路径
      */
@@ -367,7 +365,7 @@ public class FileNameUtil {
      * </pre>
      *
      * @param rootDir 绝对父路径
-     * @param file    文件
+     * @param file 文件
      * @return 相对子路径
      */
     public static String subPath(String rootDir, File file) {
@@ -430,7 +428,7 @@ public class FileNameUtil {
         pathToUse = pathToUse.replaceAll("[/\\\\]+", StrPoolConstant.SLASH);
         // 去除开头空白符，末尾空白符合法，不去除
         pathToUse = StringTools.trimLeadingWhitespace(pathToUse);
-        //兼容Windows下的共享目录路径（原始路径如果以\\开头，则保留这种路径）
+        // 兼容Windows下的共享目录路径（原始路径如果以\\开头，则保留这种路径）
         if (path.startsWith("\\\\")) {
             pathToUse = "\\" + pathToUse;
         }
@@ -444,7 +442,7 @@ public class FileNameUtil {
                 // 去除类似于/C:这类路径开头的斜杠
                 prefix = prefix.substring(1);
             }
-            if (false == prefix.contains(StrPoolConstant.SLASH)) {
+            if (!prefix.contains(StrPoolConstant.SLASH)) {
                 pathToUse = pathToUse.substring(prefixIndex + 1);
             } else {
                 // 如果前缀中包含/,说明非Windows风格path
@@ -464,7 +462,7 @@ public class FileNameUtil {
         for (int i = pathList.size() - 1; i >= 0; i--) {
             element = pathList.get(i);
             // 只处理非.的目录，即只处理非当前目录
-            if (false == StrPoolConstant.DOT.equals(element)) {
+            if (!StrPoolConstant.DOT.equals(element)) {
                 if (StrPoolConstant.DOUBLE_DOT.equals(element)) {
                     tops++;
                 } else {
@@ -483,7 +481,7 @@ public class FileNameUtil {
         if (tops > 0 && StringTools.isEmpty(prefix)) {
             // 只有相对路径补充开头的..，绝对路径直接忽略之
             while (tops-- > 0) {
-                //遍历完节点发现还有上级标注（即开头有一个或多个..），补充之
+                // 遍历完节点发现还有上级标注（即开头有一个或多个..），补充之
                 // Normal path element found.
                 pathElements.add(0, StrPoolConstant.DOUBLE_DOT);
             }
@@ -497,9 +495,9 @@ public class FileNameUtil {
      * 此方法并没有针对路径做标准化，建议先执行{@link #normalize(String)}方法标准化路径后判断<br>
      * 绝对路径判断条件是：
      * <ul>
-     *     <li>以/开头的路径</li>
-     *     <li>满足类似于 c:/xxxxx，其中祖母随意，不区分大小写</li>
-     *     <li>满足类似于 d:\xxxxx，其中祖母随意，不区分大小写</li>
+     * <li>以/开头的路径</li>
+     * <li>满足类似于 c:/xxxxx，其中祖母随意，不区分大小写</li>
+     * <li>满足类似于 d:\xxxxx，其中祖母随意，不区分大小写</li>
      * </ul>
      *
      * @param path 需要检查的Path

@@ -7,10 +7,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang3.ObjectUtils;
+
 import com.luna.common.constant.StrPoolConstant;
 import com.luna.common.io.FastByteArrayOutputStream;
 import com.luna.common.text.StringTools;
-import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * 异常工具类
@@ -354,7 +356,7 @@ public class ExceptionUtil {
      */
     public static List<Throwable> getThrowableList(Throwable throwable) {
         final List<Throwable> list = new ArrayList<>();
-        while (throwable != null && false == list.contains(throwable)) {
+        while (throwable != null && !list.contains(throwable)) {
             list.add(throwable);
             throwable = throwable.getCause();
         }

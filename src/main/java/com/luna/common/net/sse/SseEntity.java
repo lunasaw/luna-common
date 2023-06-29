@@ -1,10 +1,5 @@
 package com.luna.common.net.sse;
 
-import com.google.common.base.Splitter;
-import com.luna.common.io.IoUtil;
-import com.luna.common.text.CharsetUtil;
-import org.apache.hc.core5.http.ContentType;
-import org.apache.hc.core5.http.io.entity.AbstractHttpEntity;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -15,25 +10,27 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.stream.Collectors;
 
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.AbstractHttpEntity;
+
+import com.google.common.base.Splitter;
+import com.luna.common.io.IoUtil;
+import com.luna.common.text.CharsetUtil;
+
 public class SseEntity extends AbstractHttpEntity {
 
+    private final StringBuilder  allEvent     = new StringBuilder();
     private BlockingQueue<Event> events       = new ArrayBlockingQueue<>(100);
     private StringBuilder        currentEvent = new StringBuilder();
-
-    private final StringBuilder  allEvent     = new StringBuilder();
     private int                  newLineCount = 0;
     private String               lastEventId;
 
-    public StringBuilder getAllEvent() {
-        return allEvent;
-    }
-
-    public void setEvents(BlockingQueue<Event> events) {
-        this.events = events;
-    }
-
     public SseEntity(ContentType contentType) {
         super(contentType, CharsetUtil.defaultCharsetName());
+    }
+
+    public StringBuilder getAllEvent() {
+        return allEvent;
     }
 
     public void pushBuffer(CharBuffer buf, boolean endOfStream) {
@@ -90,6 +87,10 @@ public class SseEntity extends AbstractHttpEntity {
 
     public BlockingQueue<Event> getEvents() {
         return events;
+    }
+
+    public void setEvents(BlockingQueue<Event> events) {
+        this.events = events;
     }
 
     public boolean hasMoreEvents() {

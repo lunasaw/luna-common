@@ -1,9 +1,10 @@
 package com.luna.common.text;
 
-import com.alibaba.fastjson2.JSONObject;
+import java.util.Optional;
+
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Optional;
+import com.alibaba.fastjson2.JSONObject;
 
 /**
  * @description 扩展字段工具类
@@ -50,6 +51,18 @@ public class ExtendUtils {
         return value == null ? null : value.toString();
     }
 
+    public static Boolean getBoolean(String flag, Boolean defaultValue) {
+        return Optional.ofNullable(flag).filter(StringTools::isNotBlank).map(Boolean::valueOf).orElse(defaultValue);
+    }
+
+    public static String getString(String flag, String defaultValue) {
+        return Optional.ofNullable(flag).filter(StringTools::isNotBlank).orElse(defaultValue);
+    }
+
+    public static Integer getInteger(String flag, Integer defaultValue) {
+        return Optional.ofNullable(flag).filter(StringTools::isNotBlank).map(Integer::parseInt).orElse(defaultValue);
+    }
+
     public Object getFeaturesSubValue(String extend, String key, String subKey) {
         if (StringUtils.isBlank(extend)) {
             return null;
@@ -57,7 +70,7 @@ public class ExtendUtils {
         JSONObject featuresObj = JSONObject.parseObject(extend);
         Object object = featuresObj.get(key);
         if (object != null) {
-            return ((JSONObject) object).get(subKey);
+            return ((JSONObject)object).get(subKey);
         }
         return object;
     }
@@ -86,17 +99,5 @@ public class ExtendUtils {
         object.remove(subKey);
         extendObj.put(key, object);
         return extendObj.toString();
-    }
-
-    public static Boolean getBoolean(String flag, Boolean defaultValue) {
-        return Optional.ofNullable(flag).filter(StringTools::isNotBlank).map(Boolean::valueOf).orElse(defaultValue);
-    }
-
-    public static String getString(String flag, String defaultValue) {
-        return Optional.ofNullable(flag).filter(StringTools::isNotBlank).orElse(defaultValue);
-    }
-
-    public static Integer getInteger(String flag, Integer defaultValue) {
-        return Optional.ofNullable(flag).filter(StringTools::isNotBlank).map(Integer::parseInt).orElse(defaultValue);
     }
 }
