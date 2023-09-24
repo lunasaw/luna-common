@@ -7,9 +7,15 @@
 
 [www.isluna.ml](http://www.isluna.ml) 
 
+
 个人使用开发工具基础包,借鉴Hutool,Apache Commons等优秀开源项目，提供一些常用的工具类，方便开发。
 
 另外提供异步工作流，比如任务队列处理，责任链基类等常用工具。
+
+更新日志
+
+- 2023-09-24 断点续传
+
 
 # Contributor
 
