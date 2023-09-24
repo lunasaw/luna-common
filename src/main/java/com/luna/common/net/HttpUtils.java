@@ -1,8 +1,6 @@
 package com.luna.common.net;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
@@ -31,8 +29,10 @@ import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.cookie.BasicCookieStore;
 import org.apache.hc.client5.http.cookie.Cookie;
 import org.apache.hc.client5.http.cookie.StandardCookieSpec;
+import org.apache.hc.client5.http.entity.mime.FileBody;
 import org.apache.hc.client5.http.entity.mime.HttpMultipartMode;
 import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.client5.http.entity.mime.StringBody;
 import org.apache.hc.client5.http.impl.DefaultSchemePortResolver;
 import org.apache.hc.client5.http.impl.auth.BasicAuthCache;
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
@@ -49,6 +49,7 @@ import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
 import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
 import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.*;
 import org.apache.hc.core5.http.config.Registry;
 import org.apache.hc.core5.http.config.RegistryBuilder;
@@ -58,6 +59,7 @@ import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.http.message.BasicClassicHttpRequest;
+import org.apache.hc.core5.http.message.BasicClassicHttpResponse;
 import org.apache.hc.core5.http.nio.support.AsyncRequestBuilder;
 import org.apache.hc.core5.pool.PoolConcurrencyPolicy;
 import org.apache.hc.core5.pool.PoolReusePolicy;
@@ -66,6 +68,7 @@ import org.apache.hc.core5.util.TimeValue;
 
 import com.google.common.collect.ImmutableList;
 import com.luna.common.constant.StrPoolConstant;
+import com.luna.common.file.FileTools;
 import com.luna.common.net.method.HttpDelete;
 import com.luna.common.text.CharsetUtil;
 
@@ -418,6 +421,114 @@ public class HttpUtils {
         }
         HttpEntity reqEntity = builder.build();
         return doPost(host, path, headers, queries, reqEntity, responseHandler);
+    }
+
+    private static void close(Closeable... closeables) {
+        if (closeables == null) {
+            return;
+        }
+        for (Closeable closeable : closeables) {
+            if (closeable == null) {
+                continue;
+            }
+            try {
+                closeable.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public static <T> void doPost(String host, String path, Map<String, String> headers,
+                               Map<String, String> queries, Map<String, String> bodies, HttpClientResponseHandler<T> responseHandler, FutureCallback<Object> futureCallback) {
+
+        if (MapUtils.isNotEmpty(bodies)) {
+            bodies.forEach((k, v) -> {
+                boolean notExists = FileTools.notExists(v);
+                if (notExists) {
+                    return;
+                }
+                File file = new File(v);
+                // 添加文件
+                breakingPointUpload(host, path, headers, queries, k, file, futureCallback);
+            });
+        }
+
+        try {
+            responseHandler.handleResponse(new BasicClassicHttpResponse(HttpStatus.SC_OK));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <T> void breakingPointUpload(String host, String path, Map<String, String> headers,
+                               Map<String, String> queries, String key, File file, FutureCallback<Object> futureCallback) {
+
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+        // 设置浏览器兼容模式
+        builder.setMode(HttpMultipartMode.LEGACY);
+        // 设置请求的编码格式
+        builder.setCharset(CharsetUtil.defaultCharset());
+        builder.setContentType(ContentType.MULTIPART_FORM_DATA);
+
+        RandomAccessFile rw = null;
+        FileOutputStream fos = null;
+        try {
+            long length = file.length();
+            //每次请求发送文件的大小
+            int size = 10485760;
+            //根据文件大小计算请求次数
+            int round = (int) Math.ceil((double) length / size);
+            rw = new RandomAccessFile(file, "rw");
+            //文件上传起始位置
+            long start = 0L;
+            for (int i = 0; i < round; i++) {
+                Date startDate = new Date();
+                //一次请求的结束位置
+                long end = start + size;
+                //判断此次请求结束是否大于文件的总大小，如果大于就用文件总大小减去起始位置，得到最后一次请求的结束位置
+                if (end > length) {
+                    size = (int) (length - start);
+                    end = start + size;
+                }
+                //设置此次请求的数据范围
+                headers.put("Range", "bytes=" + start + "-" + end);
+                //读取源文件时跳到此次请求的起始位置
+                rw.seek(start);
+                byte[] bytes = new byte[size];
+                //读取源文件，从起始位置到本次请求的结束位置
+                int read = rw.read(bytes);
+                //创建临时文件，请求时放入请求体上传临时文件
+                File tmpFile = new File(System.getProperty("java.io.tmpdir"));
+                fos = new FileOutputStream(tmpFile);
+                fos.write(bytes, 0, read);
+                fos.flush();
+                fos.close();
+                // 把文件转换成流对象FileBody
+                FileBody bin = new FileBody(tmpFile);
+                builder.addPart(key, bin);
+
+                HttpEntity reqEntity = builder.build();
+
+                HttpEntity httpEntity = doPost(host, path, headers, queries, reqEntity, HttpEntityContainer::getEntity);
+                EntityUtils.consume(httpEntity);
+
+                headers.remove("Range");
+                tmpFile.delete();
+                //将本次请求的结束位置，替换成下次请求的开始位置
+                start = start + size;
+                Date endDate = new Date();
+                long time = endDate.getTime() - startDate.getTime();
+                System.out.println("用时====" + time);
+            }
+
+            futureCallback.completed(new BasicClassicHttpResponse(HttpStatus.SC_OK));
+        } catch (IOException e) {
+            futureCallback.cancelled();
+            futureCallback.failed(e);
+        } finally {
+            close(fos, rw);
+        }
     }
 
     public static ClassicHttpResponse doPost(String host, String path, Map<String, String> headers,

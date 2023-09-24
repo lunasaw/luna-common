@@ -1,74 +1,85 @@
 package com.luna.common.encrypt;
 
-import java.security.Key;
+import java.security.NoSuchAlgorithmException;
 
 import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.commons.codec.binary.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class AesUtil {
 
     public static final String  CHARSET            = "UTF-8";
-    public static final String  KEY_ALGIROTHM      = "AesUtil";
     public static final String  CIPHER_ALGIROTHM   = "AesUtil/CBC/PKCS5Padding";
-    public static final String  DEFAULT_SECRET_KEY = "uBdUx82vPHkDKb284d7NkjFoNcKWBuka";
-    private static final Logger LOG                = LoggerFactory.getLogger(AesUtil.class);
+
+    private static final String ALGORITHM        = "AES";
+    private static final int    KEY_SIZE         = 128;
+
+    public static String generateKey() {
+        try {
+            KeyGenerator keyGenerator = KeyGenerator.getInstance(ALGORITHM);
+            keyGenerator.init(KEY_SIZE);
+            SecretKey secretKey = keyGenerator.generateKey();
+            // 将密钥转换为字符串
+            String key = Base64Util.encodeBase64(secretKey.getEncoded());
+            return key;
+        } catch (NoSuchAlgorithmException e) {
+            log.error("generateKey:: ", e);
+            return null;
+        }
+    }
 
     /**
      * 加密(UTF8)
      * 
      * @param key 密码
-     * @param content 待加密内容
+     * @param data 待加密内容
      * @return base64处理后的密文
      */
-    public static String encrypt(String key, String content) {
+    public static String encrypt(String data, String key) {
         try {
-            Key keySpec = new SecretKeySpec(key.getBytes(CHARSET), KEY_ALGIROTHM);
+            SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(CHARSET), ALGORITHM);
             Cipher cipher = Cipher.getInstance(CIPHER_ALGIROTHM);
-            byte[] iv = new byte[cipher.getBlockSize()];
-            IvParameterSpec ivParams = new IvParameterSpec(iv);
-            cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivParams);
-            byte[] encryptByte = cipher.doFinal(content.getBytes(CHARSET));
-            return Base64.encodeBase64String(encryptByte);
+            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+            byte[] encryptedBytes = cipher.doFinal(data.getBytes(CHARSET));
+            return Base64Util.encodeBase64(encryptedBytes);
         } catch (Exception e) {
-            LOG.error("加密失败.", e);
+            log.error("encrypt::data = {}, key = {} ", data, key, e);
+            return null;
         }
-        return null;
     }
 
     /**
      * 解密(UTF8)
      * 
      * @param key 密码
-     * @param encrypted 密文
+     * @param encryptedData 密文
      * @return 原文
      */
-    public static String decrypt(String key, String encrypted) {
-        byte[] encryptBytes = Base64.decodeBase64(encrypted);
+    public static String decrypt(String encryptedData, String key) {
         try {
-            Key keySpec = new SecretKeySpec(key.getBytes(CHARSET), KEY_ALGIROTHM);
+            SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(CHARSET), ALGORITHM);
             Cipher cipher = Cipher.getInstance(CIPHER_ALGIROTHM);
-            byte[] ivByte = new byte[cipher.getBlockSize()];
-            IvParameterSpec ivParamsSpec = new IvParameterSpec(ivByte);
-            cipher.init(Cipher.DECRYPT_MODE, keySpec, ivParamsSpec);
-            byte[] content = cipher.doFinal(encryptBytes);
-            return new String(content, CHARSET);
+            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
+            byte[] encryptedBytes = Base64Util.decodeBase64(encryptedData);
+            byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
+            return new String(decryptedBytes, CHARSET);
         } catch (Exception e) {
-            LOG.error("解密失败.", e);
+            log.error("decrypt::encryptedData = {}, key = {} ", encryptedData, key, e);
+            return null;
         }
-        return null;
     }
 
     public static void main(String[] args) {
+        String key = generateKey();
         String dbPassword = "10090909091";
-        String encryptDbPwd = AesUtil.encrypt(DEFAULT_SECRET_KEY, dbPassword);
+        String encryptDbPwd = AesUtil.encrypt(key, dbPassword);
         System.out.println("encrypt: " + encryptDbPwd);
         System.out.println("encrypt length: " + encryptDbPwd.length());
-        String decrypt = AesUtil.decrypt(DEFAULT_SECRET_KEY, encryptDbPwd);
+        String decrypt = AesUtil.decrypt(key, encryptDbPwd);
         System.out.println("decrypt:" + decrypt);
     }
 }
