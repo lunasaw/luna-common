@@ -278,4 +278,16 @@ public class AsyncHttpUtils {
         }
     }
 
+    public static Future<CustomAsyncHttpResponse> doAsyncRequestFuture(AsyncRequestProducer producer, FutureCallback<CustomAsyncHttpResponse> callback) {
+        return doAsyncRequestFuture(producer, CustomResponseConsumer.create(), callback);
+    }
+
+    public static <T> Future<T> doAsyncRequestFuture(AsyncRequestProducer producer, AsyncResponseConsumer<T> consumer, FutureCallback<T> callback) {
+        try {
+            return asyncClient.execute(producer, consumer, HttpUtils.CLIENT_CONTEXT, callback);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
