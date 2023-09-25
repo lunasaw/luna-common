@@ -2,6 +2,7 @@ package com.luna.common.net;
 
 import java.io.*;
 import java.net.InetAddress;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
@@ -20,10 +21,7 @@ import org.apache.hc.client5.http.auth.AuthScope;
 import org.apache.hc.client5.http.auth.StandardAuthScheme;
 import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
 import org.apache.hc.client5.http.classic.ExecChainHandler;
-import org.apache.hc.client5.http.classic.methods.HttpGet;
-import org.apache.hc.client5.http.classic.methods.HttpPost;
-import org.apache.hc.client5.http.classic.methods.HttpPut;
-import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.classic.methods.*;
 import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.cookie.BasicCookieStore;
@@ -32,16 +30,12 @@ import org.apache.hc.client5.http.cookie.StandardCookieSpec;
 import org.apache.hc.client5.http.entity.mime.FileBody;
 import org.apache.hc.client5.http.entity.mime.HttpMultipartMode;
 import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
-import org.apache.hc.client5.http.entity.mime.StringBody;
 import org.apache.hc.client5.http.impl.DefaultSchemePortResolver;
 import org.apache.hc.client5.http.impl.auth.BasicAuthCache;
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import org.apache.hc.client5.http.impl.auth.BasicScheme;
 import org.apache.hc.client5.http.impl.auth.DigestScheme;
-import org.apache.hc.client5.http.impl.classic.BasicHttpClientResponseHandler;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.classic.*;
 import org.apache.hc.client5.http.impl.io.ManagedHttpClientConnectionFactory;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.client5.http.impl.routing.DefaultProxyRoutePlanner;
@@ -61,6 +55,7 @@ import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.http.message.BasicClassicHttpRequest;
 import org.apache.hc.core5.http.message.BasicClassicHttpResponse;
 import org.apache.hc.core5.http.nio.support.AsyncRequestBuilder;
+import org.apache.hc.core5.net.URIBuilder;
 import org.apache.hc.core5.pool.PoolConcurrencyPolicy;
 import org.apache.hc.core5.pool.PoolReusePolicy;
 import org.apache.hc.core5.ssl.SSLContextBuilder;
@@ -91,7 +86,7 @@ public class HttpUtils {
     public static int                      CONNECT_TIMEOUT     = 10;
     public static int                      RESPONSE_TIMEOUT    = 30;
     public static int                      MAX_ROUTE           = 200;
-    public static int                      SOCKET_TIME_OUT     = 10;
+    public static int                      SOCKET_TIME_OUT     = 100;
     private static CloseableHttpClient     httpClient;
 
     static {
@@ -282,6 +277,18 @@ public class HttpUtils {
         }
     }
 
+    public static HttpResponse doHead(String url) {
+        HttpHead request = new HttpHead(url);
+        CloseableHttpResponse response = doRequest(null, request);
+        return response;
+    }
+
+    public static HttpResponse doGet(String url, Map<String, String> headers) {
+        HttpGet request = new HttpGet(buildUrl(url, StringUtils.EMPTY, new HashMap<>(0)));
+        builderHeader(headers, request);
+        return doRequest(null, request);
+    }
+
     /**
      * 发送 get 请求
      *
@@ -459,6 +466,11 @@ public class HttpUtils {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static <T> void breakingPointDownload(String host, String path, Map<String, String> headers,
+                                                 Map<String, String> queries, FutureCallback<Object> futureCallback) {
+
     }
 
     public static <T> void breakingPointUpload(String host, String path, Map<String, String> headers,
@@ -673,6 +685,27 @@ public class HttpUtils {
             sbUrl.append(StrPoolConstant.QUESTION).append(sbQuery);
         }
         return sbUrl.toString();
+    }
+
+    /**
+     * 拼接URL用户名和密码
+     *
+     * @param url
+     * @param username 用户名
+     * @param password
+     * @return
+     */
+    public static String getUserInfo(String url, String username, String password) {
+        try {
+            if (username == null && password == null) {
+                return url;
+            } else {
+                URIBuilder uriBuilder = (new URIBuilder(url)).setUserInfo(username + ':' + password);
+                return uriBuilder.toString();
+            }
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

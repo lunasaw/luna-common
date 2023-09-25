@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.apache.hc.client5.http.async.methods.SimpleRequestBuilder;
+import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.HttpResponse;
@@ -91,7 +92,22 @@ public class AsyncHttpUtilsTest {
 
         CustomSseAsyncConsumer customSseAsyncConsumer = new CustomSseAsyncConsumer();
 
-        AsyncHttpUtils.doAsyncRequest(producer, customSseAsyncConsumer, new CustomAbstacktFutureCallback<SseResponse>() {});
+        AsyncHttpUtils.doAsyncRequest(producer, customSseAsyncConsumer, new FutureCallback<SseResponse>() {
+            @Override
+            public void completed(SseResponse result) {
+
+            }
+
+            @Override
+            public void failed(Exception ex) {
+
+            }
+
+            @Override
+            public void cancelled() {
+
+            }
+        });
     }
 
     @Test
