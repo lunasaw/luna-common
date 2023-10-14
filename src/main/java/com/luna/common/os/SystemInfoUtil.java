@@ -1,16 +1,17 @@
 package com.luna.common.os;
 
-import java.net.*;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Properties;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomUtils;
 
-import com.google.common.collect.Lists;
-
+import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import oshi.SystemInfo;
 import oshi.software.os.OSProcess;
 
@@ -45,12 +46,51 @@ public class SystemInfoUtil {
     }
 
     /**
-     * 本地IP
+     * 本地IP 有可能拿到回环网卡
      *
      * @return IP地址
      */
+    @Deprecated
     public static String getIP() {
         return getLocalHost().getHostAddress();
+    }
+
+    /**
+     * 本级ip 过滤 回环地址、链路本地地址或多播地址
+     * 
+     * @return
+     */
+    public static String getNoLoopbackIP() {
+        return getAddress().getHostAddress();
+    }
+
+    public static List<String> getAllIpAddress() {
+        try {
+            return getInetAddress(false).stream().map(InetAddress::getHostAddress).collect(Collectors.toList());
+        } catch (SocketException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * 获取非回环网卡IP
+     * 
+     * @return
+     */
+    public static InetAddress getAddress() {
+        try {
+            return getInetAddress(true).stream().findFirst().orElse(getLocalHost());
+        } catch (SocketException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void main(String[] args) throws SocketException {
+        System.out.println(getNoLoopbackIP());
+        System.out.println(getInetAddress(false));
+        System.out.println(getMacList());
+        System.out.println(getAllIpAddress());
+        System.out.println(getAddress());
     }
 
     /**
@@ -73,7 +113,7 @@ public class SystemInfoUtil {
             byte[] hardwareAddress = byInetAddress.getHardwareAddress();
             return getMacFromBytes(hardwareAddress);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            return null;
         }
     }
 
@@ -88,23 +128,16 @@ public class SystemInfoUtil {
      */
     public static List<String> getMacList() {
         try {
-            ArrayList<String> list = Lists.newArrayList();
-            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-            while (networkInterfaces.hasMoreElements()) {
-                NetworkInterface iface = networkInterfaces.nextElement();
-                List<InterfaceAddress> addrs = iface.getInterfaceAddresses();
-                List<String> collect = addrs.stream().filter(interfaceAddress -> {
-                    try {
-                        return NetworkInterface.getByInetAddress(interfaceAddress.getAddress())
-                            .getHardwareAddress() != null;
-                    } catch (SocketException e) {
-                        return false;
-                    }
-                }).map(address -> getMac(address.getAddress()))
-                    .distinct().collect(Collectors.toList());
-                list.addAll(collect);
+            ArrayList<String> macList = Lists.newArrayList();
+            List<InetAddress> inetAddress = getInetAddress(false);
+
+            for (InetAddress address : inetAddress) {
+                String mac = getMac(address);
+                if (StringUtils.isNotBlank(mac)) {
+                    macList.add(mac);
+                }
             }
-            return list.stream().distinct().collect(Collectors.toList());
+            return macList;
         } catch (SocketException e) {
             throw new RuntimeException(e);
         }
@@ -118,6 +151,31 @@ public class SystemInfoUtil {
     public static String getRandomMac() {
         List<String> macList = getMacList();
         return macList.get(RandomUtils.nextInt(0, macList.size() - 1));
+    }
+
+    public static List<InetAddress> getInetAddress(Boolean filterLoopback) throws SocketException {
+        List<InetAddress> ipList = new ArrayList<>();
+        Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+        while (interfaces.hasMoreElements()) {
+            NetworkInterface networkInterface = interfaces.nextElement();
+            if (networkInterface.isLoopback() || !networkInterface.isUp()) {
+                continue;
+            }
+            Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
+            while (addresses.hasMoreElements()) {
+                InetAddress address = addresses.nextElement();
+
+                if (filterLoopback) {
+                    if (address.isLinkLocalAddress() || address.isLoopbackAddress() || address.isMulticastAddress()) {
+                        continue;
+                    }
+                }
+
+                ipList.add(address);
+            }
+        }
+
+        return ipList;
     }
 
     /**

@@ -3,6 +3,9 @@ package com.luna.common.date;
 import java.lang.management.ManagementFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.*;
 
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -12,6 +15,18 @@ import com.luna.common.constant.StrPoolConstant;
 import com.luna.common.utils.ObjectUtils;
 
 public class DateUtils {
+
+    /**
+     * 兼容不规范的iso8601时间格式
+     */
+    public static final String                          ISO8601_COMPATIBLE_PATTERN = "yyyy-M-d'T'H:m:s";
+
+    /**
+     * 用以输出标准的iso8601时间格式
+     */
+    public static final String                          ISO8601_PATTERN            = "yyyy-MM-dd'T'HH:mm:ss";
+
+    public static final String                          ZONE_STR                   = "Asia/Shanghai";
 
     public static final String                         FORMAT_YYYY_MM_DD          = "yyyy-MM-dd";
 
@@ -37,11 +52,23 @@ public class DateUtils {
 
     public static final String                         END_TIME                   = "23:59:59";
 
+    public static final DateTimeFormatter               ISO8601_COMPATIBLE_FORMAT  =
+        DateTimeFormatter.ofPattern(ISO8601_COMPATIBLE_PATTERN, Locale.getDefault()).withZone(ZoneId.of(ZONE_STR));
+
+    public static final DateTimeFormatter               ISO8601_PATTERN_FORMAT     =
+        DateTimeFormatter.ofPattern(ISO8601_PATTERN, Locale.getDefault()).withZone(ZoneId.of(ZONE_STR));
+
+    public static final DateTimeFormatter               DATETIME                   =
+        DateTimeFormatter.ofPattern(FORMAT_YYYY_MM_DD_HH_MM_SS, Locale.getDefault()).withZone(ZoneId.of(ZONE_STR));
+
+    public static final DateTimeFormatter               DATE                       =
+        DateTimeFormatter.ofPattern(FORMAT_YYYY_MM_DD, Locale.getDefault()).withZone(ZoneId.of(ZONE_STR));
+
     private static final SimpleDateFormat              SDF_DATE                   =
         new SimpleDateFormat(FORMAT_YYYY_MM_DD);
     private static final SimpleDateFormat              PURE_DATE_FORMAT           =
         new SimpleDateFormat(FORMAT_YYYYMMDD);
-    private static final SimpleDateFormat              SDF_DATETIME               =
+    private static final SimpleDateFormat               SDF_DATETIME               =
         new SimpleDateFormat(FORMAT_YYYY_MM_DD_HH_MM_SS);
     private static final SimpleDateFormat              SDF_SHORTDATETIME          =
         new SimpleDateFormat(FORMAT_YYYY_MM_DD_HH_MM);
@@ -52,16 +79,28 @@ public class DateUtils {
     private static final Map<String, SimpleDateFormat> SIMPLE_DATE_FORMATERS      =
         new HashMap<String, SimpleDateFormat>();
 
+    private static final Map<String, DateTimeFormatter> DATE_FORMATERS             =
+        new HashMap<String, DateTimeFormatter>();
+
     static {
         SIMPLE_DATE_FORMATERS.put(FORMAT_YYYY_MM_DD, SDF_DATE);
         SIMPLE_DATE_FORMATERS.put(FORMAT_YYYY_MM_DD_HH_MM_SS, SDF_DATETIME);
         SIMPLE_DATE_FORMATERS.put(FORMAT_YYYY_MM_DD_HH_MM, SDF_SHORTDATETIME);
         SIMPLE_DATE_FORMATERS.put(FORMAT_HH_MM_SS, SDF_TIME);
         SIMPLE_DATE_FORMATERS.put(FORMAT_YYYYMMDD, SDF_SIMPLEDATETIME);
+
+        DATE_FORMATERS.put(ISO8601_COMPATIBLE_PATTERN, ISO8601_COMPATIBLE_FORMAT);
+        DATE_FORMATERS.put(ISO8601_PATTERN, ISO8601_PATTERN_FORMAT);
+        DATE_FORMATERS.put(FORMAT_YYYY_MM_DD_HH_MM_SS, DATETIME);
+
     }
 
     private static SimpleDateFormat getCachedDateFormat(String aMask) {
         return SIMPLE_DATE_FORMATERS.get(aMask);
+    }
+
+    private static DateTimeFormatter getCachedDateTimeFormat(String aMask) {
+        return DATE_FORMATERS.get(aMask);
     }
 
     /**
@@ -152,6 +191,32 @@ public class DateUtils {
             SimpleDateFormat sd = getCachedDateFormat(aMask);
             if (sd == null) {
                 sd = new SimpleDateFormat(aMask);
+                return sd.format(aDate);
+            }
+            synchronized (sd) {
+                return sd.format(aDate);
+            }
+        }
+    }
+
+    /**
+     * 返回自定义格式字符串
+     */
+    public static String formatTime(String aMask, Date date) {
+        return formatTime(aMask, date.toInstant());
+    }
+
+    /**
+     * 返回自定义格式字符串
+     */
+    public static String formatTime(String aMask, TemporalAccessor aDate) {
+        if (aDate == null) {
+            return null;
+        } else {
+            DateTimeFormatter sd = getCachedDateTimeFormat(aMask);
+
+            if (sd == null) {
+                sd = DateTimeFormatter.ofPattern(aMask, Locale.getDefault()).withZone(ZoneId.of(ZONE_STR));
                 return sd.format(aDate);
             }
             synchronized (sd) {
