@@ -7,11 +7,12 @@ import java.net.UnknownHostException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.Lists;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.RandomUtils;
-
 import org.apache.commons.lang3.StringUtils;
-import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.google.common.collect.Lists;
+
 import oshi.SystemInfo;
 import oshi.software.os.OSProcess;
 
@@ -55,9 +56,25 @@ public class SystemInfoUtil {
         return getLocalHost().getHostAddress();
     }
 
+    public static String getIpv4() {
+        return Objects.requireNonNull(getAllIpv4()).stream().findFirst().orElse(null);
+    }
+
     /**
      * 本级ip 过滤 回环地址、链路本地地址或多播地址
      * 
+     * @return
+     */
+    public static List<String> getAllIpv4() {
+        List<String> allIpAddress = getAllIpAddress();
+        if (CollectionUtils.isEmpty(allIpAddress)) {
+            return new ArrayList<>();
+        }
+        return allIpAddress.stream().filter(e -> !e.contains(":")).collect(Collectors.toList());
+    }
+
+    /**
+     * 本级ip 过滤 回环地址、链路本地地址或多播地址
      * @return
      */
     public static String getNoLoopbackIP() {
@@ -74,7 +91,6 @@ public class SystemInfoUtil {
 
     /**
      * 获取非回环网卡IP
-     * 
      * @return
      */
     public static InetAddress getAddress() {
