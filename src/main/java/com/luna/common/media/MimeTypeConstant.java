@@ -3,7 +3,7 @@ package com.luna.common.media;
 /**
  * 媒体类型工具类
  * 
- * @author ruoyi
+ * @author luna
  */
 public class MimeTypeConstant {
     public static final String   IMAGE_PNG                 = "image/png";
