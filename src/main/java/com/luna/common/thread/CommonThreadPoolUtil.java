@@ -2,11 +2,9 @@ package com.luna.common.thread;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,22 +25,22 @@ public class CommonThreadPoolUtil {
     private static final long KEEP_ALIVE_TIME       = 0L;
     private static final Logger                log         = LoggerFactory.getLogger(CommonThreadPoolUtil.class);
     /** 核心线程数(默认初始化为10) */
-    private static int        cacheCorePoolSize     = 10;
+    private static volatile int                cacheCorePoolSize     = 5;
     /** 核心线程控制的最大数目 */
-    private static int        maxCorePoolSize       = 160;
+    private static volatile int                maxCorePoolSize       = 50;
     /** 队列等待线程数阈值 */
-    private static int        blockingQueueWaitSize = 16;
+    private static volatile int                blockingQueueWaitSize = 2000;
     /** 核心线程数自动调整的增量幅度 */
-    private static int        incrementCorePoolSize = 4;
+    private static volatile int                incrementCorePoolSize = 4;
     /** 初始化线程池 */
-    private static MyselfThreadPoolExecutor    threadPool  =
-        new MyselfThreadPoolExecutor(cacheCorePoolSize, cacheCorePoolSize, KEEP_ALIVE_TIME,
+    private static ThreadPoolExecutor          threadPool            =
+        new ThreadPoolExecutor(cacheCorePoolSize, cacheCorePoolSize, KEEP_ALIVE_TIME,
             TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
     /** 初始化线程对象ThreadLocal,重写initialValue()，保证ThreadLocal首次执行get方法时不会null异常 */
     private final ThreadLocal<List<Future<?>>> threadLocal = ThreadLocal.withInitial(ArrayList::new);
 
-    public static void refresh() {
-        threadPool = new MyselfThreadPoolExecutor(cacheCorePoolSize, cacheCorePoolSize, KEEP_ALIVE_TIME,
+    public synchronized static void refresh() {
+        threadPool = new ThreadPoolExecutor(cacheCorePoolSize, maxCorePoolSize, KEEP_ALIVE_TIME,
             TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
     }
 
@@ -69,7 +67,7 @@ public class CommonThreadPoolUtil {
             // 设置最新的threadLocal变量到当前主进程
             threadLocal.set(threadLocalResult);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("dealTask::callable = {} ", callable, e);
             return ResultDTOUtils.failure(ResultCode.ERROR_SYSTEM_EXCEPTION, "线程池发生异常-Future");
         }
         return ResultDTOUtils.success();
@@ -93,7 +91,7 @@ public class CommonThreadPoolUtil {
             // 执行线程业务逻辑
             threadPool.execute(runnable);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("dealTask::runnable = {} ", runnable, e);
             return ResultDTOUtils.failure(ResultCode.ERROR_SYSTEM_EXCEPTION, "线程池发生异常");
         }
         return ResultDTOUtils.success();
@@ -113,7 +111,7 @@ public class CommonThreadPoolUtil {
         try {
             // 获取当前进程变量
             threadLocalResult = threadLocal.get();
-            if (threadLocalResult == null || threadLocalResult.size() == 0) {
+            if (CollectionUtils.isEmpty(threadLocalResult)) {
                 return ResultDTOUtils.failure(ResultCode.PARAMETER_INVALID, "获取线程池执行结果为空", null);
             }
             return ResultDTOUtils.success(threadLocalResult);
@@ -136,7 +134,7 @@ public class CommonThreadPoolUtil {
     private void dynamicTuningPoolSize() {
 
         // 队列等待任务数（此为近似值，故采用>=判断）
-        int queueSize = threadPool.getQueueSize();
+        int queueSize = threadPool.getQueue().size();
         // 动态更改核心线程数大小
         if (queueSize >= blockingQueueWaitSize) {
             // 核心线程数小于设定的最大线程数才会自动扩展线程数
@@ -176,5 +174,18 @@ public class CommonThreadPoolUtil {
         threadPool.setCorePoolSize(cacheCorePoolSize);
         threadPool.setMaximumPoolSize(cacheCorePoolSize);
         CommonThreadPoolUtil.cacheCorePoolSize = cacheCorePoolSize;
+    }
+
+    public static void main(String[] args) {
+        CommonThreadPoolUtil commonThreadPoolUtil = new CommonThreadPoolUtil();
+        commonThreadPoolUtil.setCacheCorePoolSize(20);
+        for (int i = 0; i < 100; i++) {
+            commonThreadPoolUtil.dealTask((Callable<String>)() -> {
+                System.out.println("线程池执行任务");
+                return "线程池执行任务";
+            });
+        }
+        ResultDTO<Object> objectResultDTO = commonThreadPoolUtil.obtainTaskFuture();
+        System.out.println(objectResultDTO);
     }
 }

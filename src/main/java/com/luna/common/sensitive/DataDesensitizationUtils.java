@@ -1,4 +1,6 @@
-package com.luna.common.text;
+package com.luna.common.sensitive;
+
+import com.luna.common.text.StringTools;
 
 /**
  * @author luna
