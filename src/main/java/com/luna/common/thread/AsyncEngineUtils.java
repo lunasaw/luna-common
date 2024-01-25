@@ -1,8 +1,11 @@
 package com.luna.common.thread;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +18,7 @@ public class AsyncEngineUtils {
 
     private static final Logger          log            = LoggerFactory.getLogger(AsyncEngineUtils.class);
 
-    private static final int             CORE_POOL_SIZE = 10;
+    private static final int             CORE_POOL_SIZE = 100;
 
     private static final int             MAX_POOL_SIZE  = 200;
 
@@ -43,6 +46,21 @@ public class AsyncEngineUtils {
             return Lists.newArrayList();
         }
         return concurrentExecute(-1, null, tasks);
+    }
+
+    /**
+     * 并发执行具有同样返回值的任务
+     *
+     * @param tasks 任务
+     * @return T 任务返回值
+     */
+    public static <T> List<T> concurrentExecute(List<Callable<T>> tasks) {
+
+        if (CollectionUtils.isEmpty(tasks)) {
+            return Lists.newArrayList();
+        }
+
+        return concurrentExecute(tasks.toArray(new Callable[tasks.size()]));
     }
 
     /**
@@ -93,7 +111,15 @@ public class AsyncEngineUtils {
         executor.submit(task);
     }
 
-    public static ExecutorService getExecutor() {
-        return executor;
+    public static void main(String[] args) {
+        List<Callable<Void>> list = Lists.newArrayList();
+        for (int i = 0; i < 3; i++) {
+            list.add(() -> {
+                System.out.println("hello");
+                return null;
+            });
+        }
+        List<Void> voids = concurrentExecute(list);
+        System.out.println(voids);
     }
 }

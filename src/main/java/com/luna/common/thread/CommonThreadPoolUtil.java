@@ -2,10 +2,7 @@ package com.luna.common.thread;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,14 +32,14 @@ public class CommonThreadPoolUtil {
     /** 核心线程数自动调整的增量幅度 */
     private static int        incrementCorePoolSize = 4;
     /** 初始化线程池 */
-    private static MyselfThreadPoolExecutor    threadPool  =
-        new MyselfThreadPoolExecutor(cacheCorePoolSize, cacheCorePoolSize, KEEP_ALIVE_TIME,
+    private static ThreadPoolExecutor          threadPool            =
+        new ThreadPoolExecutor(cacheCorePoolSize, cacheCorePoolSize, KEEP_ALIVE_TIME,
             TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
     /** 初始化线程对象ThreadLocal,重写initialValue()，保证ThreadLocal首次执行get方法时不会null异常 */
     private final ThreadLocal<List<Future<?>>> threadLocal = ThreadLocal.withInitial(ArrayList::new);
 
     public static void refresh() {
-        threadPool = new MyselfThreadPoolExecutor(cacheCorePoolSize, cacheCorePoolSize, KEEP_ALIVE_TIME,
+        threadPool = new ThreadPoolExecutor(cacheCorePoolSize, cacheCorePoolSize, KEEP_ALIVE_TIME,
             TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
     }
 
@@ -136,7 +133,7 @@ public class CommonThreadPoolUtil {
     private void dynamicTuningPoolSize() {
 
         // 队列等待任务数（此为近似值，故采用>=判断）
-        int queueSize = threadPool.getQueueSize();
+        int queueSize = threadPool.getQueue().size();
         // 动态更改核心线程数大小
         if (queueSize >= blockingQueueWaitSize) {
             // 核心线程数小于设定的最大线程数才会自动扩展线程数

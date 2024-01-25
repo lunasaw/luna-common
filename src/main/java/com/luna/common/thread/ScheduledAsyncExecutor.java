@@ -1,23 +1,20 @@
 package com.luna.common.thread;
 
-import java.util.concurrent.*;
+import lombok.SneakyThrows;
+
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.function.*;
 
 /**
  * @author luna
  */
-public class AsyncExecuter {
-
-    private static final Executor                    executor                    =
-        new ThreadPoolExecutor(2, 50, 500, TimeUnit.SECONDS, new LinkedBlockingDeque<>(),
-            runnable -> new Thread(runnable, "AsyncExecuter-" + Thread.currentThread().getName()));
+public class ScheduledAsyncExecutor {
 
     private static final ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(5,
-        runnable -> new Thread(runnable, "AsyncExecuter-" + Thread.currentThread().getName()));
 
-    public static void submit(final Runnable runnable) {
-        executor.execute(runnable);
-    }
+        runnable -> new Thread(runnable, "ScheduledAsyncExecute-" + Thread.currentThread().getName()));
 
     /**
      * 无入参，无返回值的异步执行方法 , void noStaticFoo()
@@ -51,7 +48,7 @@ public class AsyncExecuter {
      * @param <P2> 第二个入参类型
      * @return Future对象，用以判断是否执行结束
      */
-    public static <P1, P2> Future async(BiConsumer<P1, P2> method, P1 param1, P2 param2) {
+    public static <P1, P2> Future submit(BiConsumer<P1, P2> method, P1 param1, P2 param2) {
         return scheduledThreadPoolExecutor.submit(() -> method.accept(param1, param2));
     }
 
@@ -62,8 +59,12 @@ public class AsyncExecuter {
      * @param <R> 返回值类型,如 Entity
      * @return Future对象，用以判断是否执行结束、获取返回结果
      */
-    public static <R> Future<R> async(Supplier<R> method) {
+    public static <R> Future<R> submit(Supplier<R> method) {
         return scheduledThreadPoolExecutor.submit(method::get);
+    }
+
+    public static <T> Future<T> submit(Runnable task, T result) {
+        return scheduledThreadPoolExecutor.submit(task, result);
     }
 
     /**
@@ -75,7 +76,7 @@ public class AsyncExecuter {
      * @param <R> 返回值类型,如 Entity
      * @return Future对象，用以判断是否执行结束、获取返回结果
      */
-    public static <P, R> Future<R> async(Function<P, R> method, P param) {
+    public static <P, R> Future<R> submit(Function<P, R> method, P param) {
         return scheduledThreadPoolExecutor.submit(() -> method.apply(param));
     }
 
@@ -92,5 +93,29 @@ public class AsyncExecuter {
      */
     public static <P1, P2, R> Future<R> async(BiFunction<P1, P2, R> method, P1 param1, P2 param2) {
         return scheduledThreadPoolExecutor.submit(() -> method.apply(param1, param2));
+    }
+
+    /**
+     * 延迟执行
+     * 
+     * @param method
+     * @param initialDelay
+     * @param delay
+     * @param unit
+     */
+    public static <P> void scheduleWithFixedDelay(Consumer<P> method, P param1, long initialDelay, long delay, TimeUnit unit) {
+        scheduledThreadPoolExecutor.scheduleWithFixedDelay(() -> method.accept(param1), initialDelay, delay, unit);
+    }
+
+    public static <P> void scheduleWithFixedDelay(Runnable runnable, long initialDelay, long delay, TimeUnit unit) {
+        scheduledThreadPoolExecutor.scheduleWithFixedDelay(runnable, initialDelay, delay, unit);
+    }
+
+    @SneakyThrows
+    public static void main(String[] args) {
+        scheduleWithFixedDelay(() -> System.out.println("hello"), 1, 1, TimeUnit.SECONDS);
+        Future hello = submit(() -> "helloFuture");
+        Object o = hello.get();
+        System.out.println(o);
     }
 }
