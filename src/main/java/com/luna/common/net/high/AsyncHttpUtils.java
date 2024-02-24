@@ -33,9 +33,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Map;
 import java.util.concurrent.Future;
-
-import javax.annotation.PreDestroy;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.client5.http.auth.CredentialsProvider;
 import org.apache.hc.client5.http.auth.StandardAuthScheme;
@@ -180,7 +177,6 @@ public class AsyncHttpUtils {
         refresh();
     }
 
-    @PreDestroy
     public static void destroy() {
         asyncClient.close(CloseMode.GRACEFUL);
     }
