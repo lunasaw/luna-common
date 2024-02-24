@@ -11,6 +11,7 @@ com.luna.common.check
 com.luna.common.china
 com.luna.common.command
 com.luna.common.constant
+com.luna.common.cron
 com.luna.common.date
 com.luna.common.dto
 com.luna.common.dto.constant
