@@ -1,11 +1,9 @@
 package com.luna.common.thread;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,11 +14,17 @@ import com.google.common.collect.Lists;
  */
 public class AsyncEngineUtils {
 
-    private static final Logger          log            = LoggerFactory.getLogger(AsyncEngineUtils.class);
+    private static final Logger          log             = LoggerFactory.getLogger(AsyncEngineUtils.class);
 
-    private static final int             CORE_POOL_SIZE = 100;
+    private static final int             CORE_POOL_SIZE  = 200;
 
-    private static final int             MAX_POOL_SIZE  = 200;
+    private static final int             MAX_POOL_SIZE   = 200;
+
+    private static final int             KEEP_ALIVE_TIME = 60 * 5;
+
+    private static final int             QUEUE_CAPACITY  = 1000;
+
+    private static final long            TIME_OUT        = 300;
 
     private static final ExecutorService executor;
 
@@ -28,9 +32,9 @@ public class AsyncEngineUtils {
         executor = new ThreadPoolExecutor(
             CORE_POOL_SIZE,
             MAX_POOL_SIZE,
-            60 * 5L,
+            KEEP_ALIVE_TIME,
             TimeUnit.SECONDS,
-            new SynchronousQueue<>(),
+            new LinkedBlockingDeque<>(QUEUE_CAPACITY),
             Executors.defaultThreadFactory(),
             new ThreadPoolExecutor.CallerRunsPolicy());
     }
@@ -83,11 +87,13 @@ public class AsyncEngineUtils {
             for (Future<T> future : futures) {
                 T t = null;
                 try {
-                    t = future.get();
+                    t = future.get(TIME_OUT, TimeUnit.MILLISECONDS);
                 } catch (CancellationException e) {
                     if (timeout > 0) {
                         log.error("concurrentExecute some task timeout!");
                     }
+                } catch (TimeoutException tt) {
+                    log.error("future.get() TimeoutException ", tt);
                 } catch (Throwable tt) {
                     log.error("future.get() Exception ", tt);
                 }
