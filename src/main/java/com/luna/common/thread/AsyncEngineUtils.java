@@ -1,5 +1,6 @@
 package com.luna.common.thread;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -45,11 +46,12 @@ public class AsyncEngineUtils {
      * @param tasks 任务
      * @return T 任务返回值
      */
+    @SafeVarargs
     public static <T> List<T> concurrentExecute(Callable<T>... tasks) {
         if (tasks == null || tasks.length == 0) {
             return Lists.newArrayList();
         }
-        return concurrentExecute(-1, null, tasks);
+        return concurrentExecute(-1, null, Lists.newArrayList(tasks));
     }
 
     /**
@@ -59,12 +61,11 @@ public class AsyncEngineUtils {
      * @return T 任务返回值
      */
     public static <T> List<T> concurrentExecute(List<Callable<T>> tasks) {
-
         if (CollectionUtils.isEmpty(tasks)) {
             return Lists.newArrayList();
         }
 
-        return concurrentExecute(tasks.toArray(new Callable[tasks.size()]));
+        return concurrentExecute(-1, null, tasks);
     }
 
     /**
@@ -75,15 +76,15 @@ public class AsyncEngineUtils {
      * @param tasks 任务
      * @return T 任务返回值
      */
-    public static <T> List<T> concurrentExecute(long timeout, TimeUnit unit, Callable<T>... tasks) {
-        if (tasks == null || tasks.length == 0) {
+    public static <T> List<T> concurrentExecute(long timeout, TimeUnit unit, List<Callable<T>> tasks) {
+        if (CollectionUtils.isEmpty(tasks)) {
             return Lists.newArrayList();
         }
 
         List<T> result = Lists.newArrayList();
         try {
-            List<Future<T>> futures = timeout > 0 ? executor.invokeAll(Lists.newArrayList(tasks), timeout, unit)
-                : executor.invokeAll(Lists.newArrayList(tasks));
+            List<Future<T>> futures = timeout > 0 ? executor.invokeAll(tasks, timeout, unit)
+                : executor.invokeAll(tasks);
             for (Future<T> future : futures) {
                 T t = null;
                 try {
