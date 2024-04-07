@@ -156,7 +156,7 @@ public class AsyncEngineUtils {
         System.out.println(voids);
     }
 
-    public void destroy() {
+    public static void destroy() {
         log.warn("start to stop thread pool");
         EXECUTOR.shutdown();
         log.warn("finish to stop thread pool");
