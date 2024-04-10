@@ -10,7 +10,7 @@ import java.util.UUID;
  */
 public class SessionGenerator {
 
-	private static Map<String, UUID> cache = new HashMap<String, UUID>();
+    private static final Map<String, UUID> cache       = new HashMap<String, UUID>();
 	private final static String DEFAULT_KEY = "DEFAULT"; 
 	
 	private static UUID getDefaultUUID() {

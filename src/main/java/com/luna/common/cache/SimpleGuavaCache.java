@@ -5,9 +5,10 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.google.common.cache.*;
 import com.google.common.collect.ImmutableMap;
 
@@ -66,7 +67,8 @@ public class SimpleGuavaCache<K, V> {
         cache.put(key, value);
     }
 
-    public void invalidate(K... key) {
+    @SafeVarargs
+    public final void invalidate(K... key) {
         Arrays.stream(key).forEach(cache::invalidate);
     }
 
@@ -102,7 +104,8 @@ public class SimpleGuavaCache<K, V> {
         cache.refresh(key);
     }
 
-    public ImmutableMap<K, V> getAllPresent(K... keys) {
+    @SafeVarargs
+    public final ImmutableMap<K, V> getAllPresent(K... keys) {
         return cache.getAllPresent(Arrays.stream(keys).distinct().collect(Collectors.toList()));
     }
 

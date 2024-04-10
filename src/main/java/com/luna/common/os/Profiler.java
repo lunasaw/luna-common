@@ -433,9 +433,9 @@ public final class Profiler {
 
             Object[] params = new Object[] {
                     message, // {0} - entry信息
-                    new Long(startTime), // {1} - 起始时间
-                    new Long(duration), // {2} - 持续总时间
-                    new Long(durationOfSelf), // {3} - 自身消耗的时间
+                Long.valueOf(startTime), // {1} - 起始时间
+                Long.valueOf(duration), // {2} - 持续总时间
+                Long.valueOf(durationOfSelf), // {3} - 自身消耗的时间
                     new Double(percent), // {4} - 在父entry中所占的时间比例
                     new Double(percentOfAll) // {5} - 在总时间中所旧的时间比例
             };
@@ -496,7 +496,9 @@ public final class Profiler {
 
     public enum MessageLevel
     {
-        NO_MESSAGE,BRIEF_MESSAGE,DETAILED_MESSAGE;
+        NO_MESSAGE,
+        BRIEF_MESSAGE,
+        DETAILED_MESSAGE
     }
 
     /**
