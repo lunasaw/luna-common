@@ -25,7 +25,7 @@
         <commons-io.version>2.16.1</commons-io.version>
         <httpclient-5.version>5.3.1</httpclient-5.version>
         <guava.version>32.1.3-jre</guava.version>
-        <fast-json.version>2.0.48</fast-json.version>
+        <fast-json2.version>2.0.48</fast-json2.version>
         <oshi.version>6.4.9</oshi.version>
         <junit.version>4.13.2</junit.version>
         <lombok.version>1.18.32</lombok.version>
@@ -102,9 +102,9 @@
             <version>${oshi.version}</version> <!-- 这个版本不要随便升级，和JNA的环境有关 -->
         </dependency>
         <dependency>
-            <groupId>com.alibaba</groupId>
+            <groupId>com.alibaba.fastjson2</groupId>
             <artifactId>fastjson2</artifactId>
-            <version>${fast-json.version}</version>
+            <version>${fast-json2.version}</version>
         </dependency>
         <dependency>
             <groupId>jakarta.validation</groupId>
