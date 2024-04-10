@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.alibaba.fastjson2.JSON;
@@ -21,16 +20,12 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor
 public class SimpleGuavaCache<K, V> {
 
-    private LoadingCache<K, V>    cache;
-
-    private RemovalListener<K, V> listener;
-
-    private CacheLoader<K, V>     loader;
-
-    private Integer               expressTime = 2;
-
+    private static final Integer  EXPRESS_TIME = 2;
     /** LRU缓存的最大个数 */
-    private Long                  maximumSize = 200L;
+    private static final Long     MAXIMUM_SIZE = 200L;
+    private LoadingCache<K, V>    cache;
+    private RemovalListener<K, V> listener;
+    private CacheLoader<K, V>     loader;
 
     public SimpleGuavaCache(CacheLoader<K, V> loader) {
         this(loader, new DefaultRemovalListener<>());
@@ -39,7 +34,16 @@ public class SimpleGuavaCache<K, V> {
 
     public SimpleGuavaCache(CacheLoader<K, V> loader, RemovalListener<K, V> listener) {
         this.cache = CacheBuilder.newBuilder()
-            .maximumSize(maximumSize)
+            .maximumSize(MAXIMUM_SIZE)
+            .expireAfterWrite(EXPRESS_TIME, TimeUnit.MINUTES)
+            .removalListener(listener)
+            .build(loader);
+    }
+
+    public SimpleGuavaCache(RemovalListener<K, V> listener, CacheLoader<K, V> loader, Integer expressTime,
+        Long MAXIMUM_SIZE) {
+        this.cache = CacheBuilder.newBuilder()
+            .maximumSize(MAXIMUM_SIZE)
             .expireAfterWrite(expressTime, TimeUnit.MINUTES)
             .removalListener(listener)
             .build(loader);
@@ -47,8 +51,8 @@ public class SimpleGuavaCache<K, V> {
 
     public void refresh() {
         this.cache = CacheBuilder.newBuilder()
-            .maximumSize(maximumSize)
-            .expireAfterWrite(expressTime, TimeUnit.MINUTES)
+            .maximumSize(MAXIMUM_SIZE)
+            .expireAfterWrite(EXPRESS_TIME, TimeUnit.MINUTES)
             .removalListener(listener)
             .build(this.loader);
     }
