@@ -1,8 +1,10 @@
 package com.luna.common.utils;
 
-import com.luna.common.spring.SpringBeanService;
-import lombok.AllArgsConstructor;
 import org.junit.Test;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import com.luna.common.engine.model.EngineContext;
 import com.luna.common.engine.model.EngineRunData;
@@ -10,13 +12,11 @@ import com.luna.common.engine.model.NodeChain;
 import com.luna.common.engine.model.NodeConf;
 import com.luna.common.engine.task.AbstractEngineExecute;
 import com.luna.common.engine.task.AbstractEngineNode;
+import com.luna.common.spring.SpringBeanService;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 /**
  * @author luna
@@ -24,6 +24,19 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 public class EngineNodeTest {
+
+    private static final String RESULT_KEY = "this_is_result_key";
+
+    @Test
+    public void atest() {
+        AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(TestAdaptorConfig.class);
+        annotationConfigApplicationContext.start();
+        EngineRunData engineRunData = new EngineRunData();
+        EngineContext engineContext = new EngineContext();
+        TestEngineExecute testEngineExecute = new TestEngineExecute();
+        TestAdaptor execute = testEngineExecute.execute(EngineFlow.testLink, engineRunData, engineContext);
+        System.out.println(execute);
+    }
 
     @Configuration
     public static class TestAdaptorConfig {
@@ -38,22 +51,11 @@ public class EngineNodeTest {
         }
     }
 
-    @Test
-    public void atest() throws Exception {
-        AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(TestAdaptorConfig.class);
-        annotationConfigApplicationContext.start();
-        EngineRunData engineRunData = new EngineRunData();
-        EngineContext engineContext = new EngineContext();
-        TestEngineExecute testEngineExecute = new TestEngineExecute();
-        TestAdaptor execute = testEngineExecute.execute(EngineFlow.testLink, engineRunData, engineContext);
-        System.out.println(execute);
-    }
-
     @Component
-    public static class TestEngineNode extends AbstractEngineNode {
+    public static class TestEngineNode extends AbstractEngineNode<TestAdaptor> {
 
         @Override
-        public Object invokeNode(EngineRunData nodeData, EngineContext engineContext) {
+        public TestAdaptor invokeNode(EngineRunData nodeData, EngineContext engineContext) {
             log.info("invokeNode::nodeData = {}, engineContext = {}", nodeData, engineContext);
             return new TestAdaptor("hello");
         }
@@ -65,7 +67,7 @@ public class EngineNodeTest {
 
         @Override
         public String resultKey() {
-            return "this_is_result_key";
+            return RESULT_KEY;
         }
     }
 
@@ -80,15 +82,18 @@ public class EngineNodeTest {
         private static NodeChain testLink = new NodeChain();
 
         static {
-            testLink.add(TestEngineNode.class, new NodeConf(true, 100));
+            testLink.add("1", TestEngineNode.class, new NodeConf(true, 100));
+            testLink.add("1", TestEngineNode.class, new NodeConf(true, 100));
+            testLink.add("2", TestEngineNode.class, new NodeConf(true, 100));
+            testLink.add("2", TestEngineNode.class, new NodeConf(false, 100));
         }
     }
 
-    public class TestEngineExecute extends AbstractEngineExecute<TestAdaptor> {
+    public static class TestEngineExecute extends AbstractEngineExecute<TestAdaptor> {
 
         @Override
         public TestAdaptor assembleModel(EngineRunData engineRunData, EngineContext context) {
-            return (TestAdaptor)context.getAdaptorMap().get("this_is_result_key");
+            return (TestAdaptor)context.getAdaptorMap().get(RESULT_KEY);
         }
     }
 }
