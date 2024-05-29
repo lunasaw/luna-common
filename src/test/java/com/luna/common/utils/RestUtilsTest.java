@@ -1,5 +1,6 @@
 package com.luna.common.utils;
 
+import com.luna.common.net.HttpUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -29,5 +30,10 @@ public class RestUtilsTest {
             "{\"userMark\":\"15696756582\",\"password\":\"11111111\",\"site\":\"wednesday\"}");
         Assert.assertNotNull(result);
         Assert.assertEquals("{\"success\":true,\"code\":1,\"message\":\"success\",\"data\":true}", result);
+    }
+
+    @Test
+    public void atest() {
+        //
     }
 }

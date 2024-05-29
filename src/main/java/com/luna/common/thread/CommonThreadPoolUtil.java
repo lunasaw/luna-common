@@ -13,6 +13,7 @@ import com.luna.common.dto.ResultDTOUtils;
 import com.luna.common.dto.constant.ResultCode;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * ClassName:CommenThreadPoolUtil <br/>
@@ -20,10 +21,11 @@ import lombok.Data;
  *
  */
 @Data
+@NoArgsConstructor
 public class CommonThreadPoolUtil {
 
-    private static final long KEEP_ALIVE_TIME       = 0L;
-    private static final Logger                log         = LoggerFactory.getLogger(CommonThreadPoolUtil.class);
+    private static final long                  KEEP_ALIVE_TIME       = 0L;
+    private static final Logger                log                   = LoggerFactory.getLogger(CommonThreadPoolUtil.class);
     /** 核心线程数(默认初始化为10) */
     private static volatile int                cacheCorePoolSize     = 5;
     /** 核心线程控制的最大数目 */
@@ -32,16 +34,39 @@ public class CommonThreadPoolUtil {
     private static volatile int                blockingQueueWaitSize = 2000;
     /** 核心线程数自动调整的增量幅度 */
     private static volatile int                incrementCorePoolSize = 4;
+    /** 初始化线程对象ThreadLocal,重写initialValue()，保证ThreadLocal首次执行get方法时不会null异常 */
+    private final ThreadLocal<List<Future<?>>> threadLocal           = ThreadLocal.withInitial(ArrayList::new);
     /** 初始化线程池 */
-    private static ThreadPoolExecutor          threadPool            =
+    private ThreadPoolExecutor                 threadPool            =
         new ThreadPoolExecutor(cacheCorePoolSize, cacheCorePoolSize, KEEP_ALIVE_TIME,
             TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
-    /** 初始化线程对象ThreadLocal,重写initialValue()，保证ThreadLocal首次执行get方法时不会null异常 */
-    private final ThreadLocal<List<Future<?>>> threadLocal = ThreadLocal.withInitial(ArrayList::new);
 
-    public synchronized static void refresh() {
+    public CommonThreadPoolUtil(Integer cacheCorePoolSize) {
+        if (cacheCorePoolSize != null) {
+            setCacheCorePoolSize(cacheCorePoolSize);
+        }
+    }
+
+    public static void main(String[] args) {
+        CommonThreadPoolUtil commonThreadPoolUtil = new CommonThreadPoolUtil();
+        commonThreadPoolUtil.setCacheCorePoolSize(20);
+        for (int i = 0; i < 100; i++) {
+            commonThreadPoolUtil.dealTask((Callable<String>)() -> {
+                System.out.println("线程池执行任务");
+                return "线程池执行任务";
+            });
+        }
+        ResultDTO<Object> objectResultDTO = commonThreadPoolUtil.obtainTaskFuture();
+        System.out.println(objectResultDTO);
+    }
+
+    public synchronized void refresh() {
         threadPool = new ThreadPoolExecutor(cacheCorePoolSize, maxCorePoolSize, KEEP_ALIVE_TIME,
             TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
+    }
+
+    public ThreadPoolExecutor getThreadPool() {
+        return threadPool;
     }
 
     /**
@@ -148,7 +173,7 @@ public class CommonThreadPoolUtil {
                 cacheCorePoolSize = currentcorePoolSize;
                 log.warn("动态改变线程池大小====原核心线程池数目为：" + corePoolSize + ";现累加为：" + currentcorePoolSize);
             } else {
-                log.warn("动态改变线程池大小====核心线程池数目已累加为：" + cacheCorePoolSize + "；不会继续无限增加");
+                log.warn("动态改变线程池大小====核心线程池数目已累加为：" + blockingQueueWaitSize + "；不会继续无限增加");
             }
         }
     }
@@ -174,18 +199,5 @@ public class CommonThreadPoolUtil {
         threadPool.setCorePoolSize(cacheCorePoolSize);
         threadPool.setMaximumPoolSize(cacheCorePoolSize);
         CommonThreadPoolUtil.cacheCorePoolSize = cacheCorePoolSize;
-    }
-
-    public static void main(String[] args) {
-        CommonThreadPoolUtil commonThreadPoolUtil = new CommonThreadPoolUtil();
-        commonThreadPoolUtil.setCacheCorePoolSize(20);
-        for (int i = 0; i < 100; i++) {
-            commonThreadPoolUtil.dealTask((Callable<String>)() -> {
-                System.out.println("线程池执行任务");
-                return "线程池执行任务";
-            });
-        }
-        ResultDTO<Object> objectResultDTO = commonThreadPoolUtil.obtainTaskFuture();
-        System.out.println(objectResultDTO);
     }
 }
