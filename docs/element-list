@@ -17,6 +17,8 @@ com.luna.common.dto
 com.luna.common.dto.constant
 com.luna.common.encrypt
 com.luna.common.encrypt.security
+com.luna.common.engine.model
+com.luna.common.engine.task
 com.luna.common.escape
 com.luna.common.exception
 com.luna.common.file
@@ -45,6 +47,7 @@ com.luna.common.reflect
 com.luna.common.regex
 com.luna.common.replacer
 com.luna.common.sensitive
+com.luna.common.spring
 com.luna.common.text
 com.luna.common.thread
 com.luna.common.utils
