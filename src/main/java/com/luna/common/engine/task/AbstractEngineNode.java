@@ -1,11 +1,12 @@
 package com.luna.common.engine.task;
 
-import com.luna.common.engine.model.EngineContext;
-import com.luna.common.engine.spi.NodeSpi;
-import lombok.Data;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import com.luna.common.engine.model.EngineContext;
+import com.luna.common.engine.spi.NodeSpi;
+
+import lombok.Data;
 
 /**
  * @author luna
@@ -15,7 +16,7 @@ public abstract class AbstractEngineNode<T> implements EngineNode<T> {
     /**
      * SPI列表
      */
-    private List<NodeSpi> spiList = new ArrayList<>();
+    private List<NodeSpi> batchNodeNodeList = new ArrayList<>();
 
     @Override
     public boolean couldContinueExecute(EngineContext engineContext) {
@@ -23,5 +24,10 @@ public abstract class AbstractEngineNode<T> implements EngineNode<T> {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public List<NodeSpi> getSpiList() {
+        return batchNodeNodeList;
     }
 }

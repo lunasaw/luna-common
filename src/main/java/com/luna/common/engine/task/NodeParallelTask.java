@@ -1,14 +1,16 @@
 package com.luna.common.engine.task;
 
+import java.util.List;
+
 import com.luna.common.engine.spi.NodeSpi;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.luna.common.engine.model.EngineContext;
 import com.luna.common.engine.model.EngineRunData;
+import com.luna.common.engine.spi.BatchNodeNodeSpi;
 import com.luna.common.exception.BaseException;
-
-import java.util.List;
 
 /**
  * Node节点的执行类
@@ -44,10 +46,14 @@ public class NodeParallelTask extends TradeEngineCallable {
         try {
             // Node前置检查
             Object o = engineNode.invokeNode(engineRunData, engineContext);
-            AbstractEngineNode abstractEngineNode = (AbstractEngineNode)engineNode;
-            if (abstractEngineNode != null) {
-                List<NodeSpi> spiList = abstractEngineNode.getSpiList();
-
+            List<NodeSpi> spiList = engineNode.getSpiList();
+            if (CollectionUtils.isNotEmpty(spiList)) {
+                for (NodeSpi nodeSpi : spiList) {
+                    BatchNodeNodeSpi batchNodeNodeSpi = (BatchNodeNodeSpi)nodeSpi;
+                    if (batchNodeNodeSpi.isAccept(engineRunData, engineContext)) {
+                        batchNodeNodeSpi.invoke(engineRunData, engineContext);
+                    }
+                }
             }
             engineNode.afterInvoke(engineRunData, engineContext);
             // 后置处理

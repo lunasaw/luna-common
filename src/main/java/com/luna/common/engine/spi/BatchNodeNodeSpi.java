@@ -4,8 +4,6 @@ import com.luna.common.engine.model.EngineContext;
 
 /**
  * 每个流程节点的扩展点
- *
- * @date 2019-01-24 上午11:42
  **/
 public interface BatchNodeNodeSpi<T> extends NodeSpi {
     /**
