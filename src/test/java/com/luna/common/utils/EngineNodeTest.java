@@ -1,15 +1,19 @@
 package com.luna.common.utils;
 
 import org.junit.Test;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
+import com.alibaba.fastjson2.JSON;
 import com.luna.common.engine.model.EngineContext;
 import com.luna.common.engine.model.EngineRunData;
 import com.luna.common.engine.model.NodeChain;
 import com.luna.common.engine.model.NodeConf;
+import com.luna.common.engine.spi.AbstractBatchNodeNodeSpi;
 import com.luna.common.engine.task.AbstractEngineExecute;
 import com.luna.common.engine.task.AbstractEngineNode;
 import com.luna.common.spring.SpringBeanService;
@@ -49,6 +53,28 @@ public class EngineNodeTest {
         public SpringBeanService springBeanService() {
             return new SpringBeanService();
         }
+
+        @Bean
+        public TestBatchNodeNodeSpi testBatchNodeNodeSpi() {
+            return new TestBatchNodeNodeSpi();
+        }
+    }
+
+    @Component
+    public static class TestBatchNodeNodeSpi extends AbstractBatchNodeNodeSpi<TestAdaptor> implements InitializingBean {
+
+        @Autowired
+        private TestEngineNode testEngineNode;
+
+        @Override
+        public void invoke(EngineRunData engineRunData) {
+            System.out.println(JSON.toJSONString(engineRunData));
+        }
+
+        @Override
+        public void afterPropertiesSet() {
+            testEngineNode.add(this);
+        }
     }
 
     @Component
@@ -85,7 +111,7 @@ public class EngineNodeTest {
             testLink.add("1", TestEngineNode.class, new NodeConf(true, 100));
             testLink.add("1", TestEngineNode.class, new NodeConf(true, 100));
             testLink.add("2", TestEngineNode.class, new NodeConf(true, 100));
-            testLink.add("2", TestEngineNode.class, new NodeConf(false, 100));
+            testLink.add("2", TestEngineNode.class, new NodeConf(true, 100));
         }
     }
 

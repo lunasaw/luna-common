@@ -30,4 +30,8 @@ public abstract class AbstractEngineNode<T> implements EngineNode<T> {
     public List<NodeSpi> getSpiList() {
         return batchNodeNodeList;
     }
+
+    public void add(NodeSpi nodeSpi) {
+        batchNodeNodeList.add(nodeSpi);
+    }
 }

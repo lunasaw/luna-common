@@ -50,8 +50,8 @@ public class NodeParallelTask extends TradeEngineCallable {
             if (CollectionUtils.isNotEmpty(spiList)) {
                 for (NodeSpi nodeSpi : spiList) {
                     BatchNodeNodeSpi batchNodeNodeSpi = (BatchNodeNodeSpi)nodeSpi;
-                    if (batchNodeNodeSpi.isAccept(engineRunData, engineContext)) {
-                        batchNodeNodeSpi.invoke(engineRunData, engineContext);
+                    if (batchNodeNodeSpi.isAccept(engineRunData)) {
+                        batchNodeNodeSpi.invoke(engineRunData);
                     }
                 }
             }
