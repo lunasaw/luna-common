@@ -31,6 +31,7 @@
         <lombok.version>1.18.32</lombok.version>
         <validation-api.version>3.0.2</validation-api.version>
         <slf4j-simple.version>2.0.9</slf4j-simple.version>
+        <srping-context.version>6.1.5</srping-context.version>
     </properties>
     <developers>
         <developer>
@@ -124,7 +125,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>6.1.5</version>
+            <version>${srping-context.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
