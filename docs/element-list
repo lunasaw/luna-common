@@ -18,6 +18,7 @@ com.luna.common.dto.constant
 com.luna.common.encrypt
 com.luna.common.encrypt.security
 com.luna.common.engine.model
+com.luna.common.engine.spi
 com.luna.common.engine.task
 com.luna.common.escape
 com.luna.common.exception
