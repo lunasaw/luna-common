@@ -1,7 +1,10 @@
 package com.luna.common.engine.task;
 
+import java.util.List;
+
 import com.luna.common.engine.model.EngineContext;
 import com.luna.common.engine.model.EngineRunData;
+import com.luna.common.engine.spi.NodeSpi;
 
 /**
  *
@@ -39,5 +42,12 @@ public interface EngineNode<T> {
      * @return
      */
     boolean couldContinueExecute(EngineContext engineContext);
+
+    /**
+     * 获取扩展spi
+     * 
+     * @return
+     */
+    List<NodeSpi> getSpiList();
 
 }

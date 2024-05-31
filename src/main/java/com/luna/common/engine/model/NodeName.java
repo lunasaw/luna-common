@@ -1,11 +1,11 @@
 package com.luna.common.engine.model;
 
+import java.util.Objects;
+
 import com.luna.common.check.Assert;
-import lombok.AllArgsConstructor;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Objects;
 
 /**
  * 节点Key
