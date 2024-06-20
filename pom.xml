@@ -23,7 +23,7 @@
         <commons-lang3.version>3.14.0</commons-lang3.version>
         <commons-codec.version>1.16.1</commons-codec.version>
         <commons-io.version>2.16.1</commons-io.version>
-        <httpclient-5.version>5.4-alpha2</httpclient-5.version>
+        <httpclient-5.version>5.3.1</httpclient-5.version>
         <guava.version>32.1.3-jre</guava.version>
         <fast-json2.version>2.0.48</fast-json2.version>
         <oshi.version>6.4.9</oshi.version>
@@ -52,6 +52,16 @@
         <developerConnection>https://github.com/lunasaw/luna-common.git</developerConnection>
     </scm>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.httpcomponents.client5</groupId>
+                <artifactId>httpclient5</artifactId>
+                <version>${httpclient-5.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 -->
         <dependency>
@@ -75,7 +85,6 @@
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
-            <version>${httpclient-5.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
         <dependency>
