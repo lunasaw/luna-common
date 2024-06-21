@@ -73,6 +73,7 @@ public class ScreenUtil {
         return RobotUtil.captureScreen(screenRect);
     }
 
+
     /**
      * 截屏
      *

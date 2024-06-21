@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 import com.luna.common.exception.UtilException;
+import com.luna.common.file.FileTools;
 import com.luna.common.img.ImgUtil;
 
 /**
@@ -17,13 +18,6 @@ import com.luna.common.img.ImgUtil;
  */
 public class RobotUtil {
 
-    public static void main(String[] args) {
-        RobotUtil robotUtil = new RobotUtil();
-        robotUtil.delay = 1000;
-        click();
-        robotUtil.keyClick(KeyEvent.VK_S, KeyEvent.VK_LEFT);
-    }
-
     private static final Robot ROBOT;
     private static int         delay;
 
@@ -33,6 +27,10 @@ public class RobotUtil {
         } catch (AWTException e) {
             throw new UtilException(e);
         }
+    }
+
+    public static void main(String[] args) {
+        captureScreen(0, 0, 200, 300, FileTools.touch("/Users/weidian/Downloads/2.jpg"));
     }
 
     /**
@@ -46,6 +44,16 @@ public class RobotUtil {
     }
 
     /**
+     * 获取全局默认的延迟时间
+     *
+     * @return 全局默认的延迟时间
+     * @since 5.7.6
+     */
+    public static int getDelay() {
+        return delay;
+    }
+
+    /**
      * 设置默认的延迟时间<br>
      * 当按键执行完后的等待时间，也可以用ThreadUtil.sleep方法代替
      *
@@ -54,16 +62,6 @@ public class RobotUtil {
      */
     public static void setDelay(int delayMillis) {
         delay = delayMillis;
-    }
-
-    /**
-     * 获取全局默认的延迟时间
-     *
-     * @return 全局默认的延迟时间
-     * @since 5.7.6
-     */
-    public static int getDelay() {
-        return delay;
     }
 
     /**
@@ -207,6 +205,25 @@ public class RobotUtil {
         return ROBOT.createScreenCapture(screenRect);
     }
 
+    public static Robot getRobot(GraphicsDevice graphicsDevice) {
+        try {
+            return new Robot(graphicsDevice);
+        } catch (AWTException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 对指定设备截屏
+     * 
+     * @param robot
+     * @param screenRect
+     * @return
+     */
+    public static BufferedImage captureScreen(Robot robot, Rectangle screenRect) {
+        return robot.createScreenCapture(screenRect);
+    }
+
     /**
      * 截屏
      *
@@ -216,6 +233,25 @@ public class RobotUtil {
      */
     public static File captureScreen(Rectangle screenRect, File outFile) {
         ImgUtil.write(captureScreen(screenRect), outFile);
+        return outFile;
+    }
+
+    /**
+     * 截屏
+     *
+     * 截屏的矩形区域
+     * 
+     * @param x1
+     * @param y1
+     * @param x2
+     * @param y2
+     * @param outFile 写出到的文件
+     * @return 写出到的文件
+     * 
+     */
+    public static File captureScreen(int x1, int y1, int x2, int y2, File outFile) {
+        Rectangle rectangle = new Rectangle(x1, y1, x2 - x1, y2 - y1);
+        ImgUtil.write(captureScreen(rectangle), outFile);
         return outFile;
     }
 

@@ -1,13 +1,14 @@
 package com.luna.common.swing;
 
-import com.luna.common.exception.UtilException;
-import com.luna.common.text.StringTools;
-
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.List;
+
+import com.luna.common.text.StringTools;
 
 /**
  * 桌面相关工具（平台相关）<br>
@@ -17,6 +18,12 @@ import java.net.URISyntaxException;
  * @since 4.5.7
  */
 public class DesktopUtil {
+
+    public static List<GraphicsDevice> getScreenDevices() {
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice[] gs = ge.getScreenDevices();
+        return Arrays.asList(gs);
+    }
 
     /**
      * 获得{@link Desktop}
