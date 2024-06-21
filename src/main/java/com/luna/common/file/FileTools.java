@@ -1,6 +1,7 @@
 package com.luna.common.file;
 
 import static com.luna.common.file.PathUtil.del;
+import static com.luna.common.os.OSinfo.isWindows;
 import static java.nio.file.Files.isDirectory;
 
 import java.io.*;
@@ -14,13 +15,16 @@ import java.util.Objects;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.luna.common.check.Assert;
+import com.luna.common.constant.CharPoolConstant;
 import com.luna.common.constant.Constant;
 import com.luna.common.exception.BaseException;
 import com.luna.common.file.visitor.MoveVisitor;
 import com.luna.common.io.IoUtil;
 import com.luna.common.text.CharsetUtil;
+import com.luna.common.text.StringTools;
 
 /**
  * @author Luna
@@ -588,17 +592,32 @@ public class FileTools {
      * 创建文件及其父目录，如果这个文件存在，直接返回这个文件<br>
      * 此方法不对File对象类型做判断，如果File不存在，无法判断其类型
      *
+     * @param path 相对ClassPath的目录或者绝对路径目录，使用POSIX风格
+     * @return 文件，若路径为null，返回null
+     * @throws RuntimeException IO异常
+     */
+    public static File touch(String path) throws RuntimeException {
+        if (path == null) {
+            return null;
+        }
+        return touch(file(path));
+    }
+
+    /**
+     * 创建文件及其父目录，如果这个文件存在，直接返回这个文件<br>
+     * 此方法不对File对象类型做判断，如果File不存在，无法判断其类型
+     *
      * @param file 文件对象
      * @return 文件，若路径为null，返回null
      * @throws IOException IO异常
      */
-    public static File touch(File file) throws IOException {
+    public static File touch(File file) {
         if (null == file) {
             return null;
         }
         if (!file.exists()) {
-            Files.createFile(file.toPath());
             try {
+                Files.createFile(file.toPath());
                 // noinspection ResultOfMethodCallIgnored
                 file.createNewFile();
             } catch (Exception e) {
@@ -606,25 +625,6 @@ public class FileTools {
             }
         }
         return file;
-    }
-
-    /**
-     * 创建文件及其父目录，如果这个文件存在，直接返回这个文件<br>
-     * 此方法不对File对象类型做判断，如果File不存在，无法判断其类型
-     *
-     * @param path 相对ClassPath的目录或者绝对路径目录，使用POSIX风格
-     * @return 文件，若路径为null，返回null
-     * @throws IORuntimeException IO异常
-     */
-    public static File touch(String path) {
-        if (path == null) {
-            return null;
-        }
-        try {
-            return touch(file(path));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     /**
@@ -638,6 +638,22 @@ public class FileTools {
             return null;
         }
         return new File(path);
+    }
+
+    /**
+     * 创建File对象<br>
+     * 根据的路径构建文件，在Win下直接构建，在Linux下拆分路径单独构建
+     * 此方法会检查slip漏洞，漏洞说明见http://blog.nsfocus.net/zip-slip-2/
+     *
+     * @param parent 父文件对象
+     * @param path 文件路径
+     * @return File
+     */
+    public static File file(File parent, String path) {
+        if (StringTools.isBlank(path)) {
+            throw new NullPointerException("File path is blank!");
+        }
+        return checkSlip(parent, buildFile(parent, path));
     }
 
     /**
@@ -672,9 +688,295 @@ public class FileTools {
      * @param file 文件
      * @param charset 字符集
      * @return BufferedReader对象
-     * @throws IORuntimeException IO异常
+     * @throws RuntimeException IO异常
      */
     public static BufferedReader getReader(File file, Charset charset) {
         return IoUtil.getReader(getInputStream(file), charset);
+    }
+
+    /**
+     * 检查两个文件是否是同一个文件<br>
+     * 所谓文件相同，是指Path对象是否指向同一个文件或文件夹
+     *
+     * @param file1 文件1
+     * @param file2 文件2
+     * @return 是否相同
+     * @throws RuntimeException IO异常
+     * @see Files#isSameFile(Path, Path)
+     * @since 5.4.1
+     */
+    public static boolean equals(Path file1, Path file2) throws RuntimeException {
+        try {
+            return Files.isSameFile(file1, file2);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 检查两个文件是否是同一个文件<br>
+     * 所谓文件相同，是指File对象是否指向同一个文件或文件夹
+     *
+     * @param file1 文件1
+     * @param file2 文件2
+     * @return 是否相同
+     * @throws RuntimeException IO异常
+     */
+    public static boolean equals(File file1, File file2) throws RuntimeException {
+        Assert.notNull(file1);
+        Assert.notNull(file2);
+        if (false == file1.exists() || false == file2.exists()) {
+            // 两个文件都不存在判断其路径是否相同， 对于一个存在一个不存在的情况，一定不相同
+            return false == file1.exists()//
+                && false == file2.exists()//
+                && pathEquals(file1, file2);
+        }
+        return equals(file1.toPath(), file2.toPath());
+    }
+
+    /**
+     * 文件路径是否相同<br>
+     * 取两个文件的绝对路径比较，在Windows下忽略大小写，在Linux下不忽略。
+     *
+     * @param file1 文件1
+     * @param file2 文件2
+     * @return 文件路径是否相同
+     * @since 3.0.9
+     */
+    public static boolean pathEquals(File file1, File file2) {
+        if (isWindows()) {
+            // Windows环境
+            try {
+                if (StringTools.equalsIgnoreCase(file1.getCanonicalPath(), file2.getCanonicalPath())) {
+                    return true;
+                }
+            } catch (Exception e) {
+                if (StringTools.equalsIgnoreCase(file1.getAbsolutePath(), file2.getAbsolutePath())) {
+                    return true;
+                }
+            }
+        } else {
+            // 类Unix环境
+            try {
+                if (StringTools.equals(file1.getCanonicalPath(), file2.getCanonicalPath())) {
+                    return true;
+                }
+            } catch (Exception e) {
+                if (StringTools.equals(file1.getAbsolutePath(), file2.getAbsolutePath())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 检查父完整路径是否为自路径的前半部分，如果不是说明不是子路径，可能存在slip注入。
+     * <p>
+     * 见http://blog.nsfocus.net/zip-slip-2/
+     *
+     * @param parentFile 父文件或目录
+     * @param file 子文件或目录
+     * @return 子文件或目录
+     * @throws IllegalArgumentException 检查创建的子文件不在父目录中抛出此异常
+     */
+    public static File checkSlip(File parentFile, File file) throws IllegalArgumentException {
+        if (null != parentFile && null != file) {
+            if (!isSub(parentFile, file)) {
+                throw new IllegalArgumentException("New file is outside of the parent dir: " + file.getName());
+            }
+        }
+        return file;
+    }
+
+    /**
+     * 判断给定的目录是否为给定文件或文件夹的子目录
+     *
+     * @param parent 父目录
+     * @param sub 子目录
+     * @return 子目录是否为父目录的子目录
+     * @since 4.5.4
+     */
+    public static boolean isSub(File parent, File sub) {
+        Assert.notNull(parent);
+        Assert.notNull(sub);
+        return isSub(parent.toPath(), sub.toPath());
+    }
+
+    /**
+     * 判断给定的目录是否为给定文件或文件夹的子目录
+     *
+     * @param parent 父目录
+     * @param sub 子目录
+     * @return 子目录是否为父目录的子目录
+     * @since 5.5.5
+     */
+    public static boolean isSub(Path parent, Path sub) {
+        return PathUtil.toAbsNormal(sub).startsWith(PathUtil.toAbsNormal(parent));
+    }
+
+    /**
+     * 根据压缩包中的路径构建目录结构，在Win下直接构建，在Linux下拆分路径单独构建
+     *
+     * @param outFile 最外部路径
+     * @param fileName 文件名，可以包含路径
+     * @return 文件或目录
+     * @since 5.0.5
+     */
+    private static File buildFile(File outFile, String fileName) {
+        // 替换Windows路径分隔符为Linux路径分隔符，便于统一处理
+        fileName = fileName.replace('\\', '/');
+        if (false == isWindows()
+            // 检查文件名中是否包含"/"，不考虑以"/"结尾的情况
+            && fileName.lastIndexOf(CharPoolConstant.SLASH, fileName.length() - 2) > 0) {
+            // 在Linux下多层目录创建存在问题，/会被当成文件名的一部分，此处做处理
+            // 使用/拆分路径（zip中无\），级联创建父目录
+            final List<String> pathParts = Splitter.on('/').splitToList(fileName);
+            final int lastPartIndex = pathParts.size() - 1;// 目录个数
+            for (int i = 0; i < lastPartIndex; i++) {
+                // 由于路径拆分，slip不检查，在最后一步检查
+                outFile = new File(outFile, pathParts.get(i));
+            }
+            // noinspection ResultOfMethodCallIgnored
+            outFile.mkdirs();
+            // 最后一个部分如果非空，作为文件名
+            fileName = pathParts.get(lastPartIndex);
+        }
+        return new File(outFile, fileName);
+    }
+
+    /**
+     * 安全地级联创建目录 (确保并发环境下能创建成功)
+     *
+     * <pre>
+     *     并发环境下，假设 test 目录不存在，如果线程A mkdirs "test/A" 目录，线程B mkdirs "test/B"目录，
+     *     其中一个线程可能会失败，进而导致以下代码抛出 FileNotFoundException 异常
+     *
+     *     file.getParentFile().mkdirs(); // 父目录正在被另一个线程创建中，返回 false
+     *     file.createNewFile(); // 抛出 IO 异常，因为该线程无法感知到父目录已被创建
+     * </pre>
+     *
+     * @param dir 待创建的目录
+     * @param tryCount 最大尝试次数
+     * @param sleepMillis 线程等待的毫秒数
+     * @return true表示创建成功，false表示创建失败
+     * @author z8g
+     * @since 5.7.21
+     */
+    public static boolean mkdirsSafely(File dir, int tryCount, long sleepMillis) {
+        if (dir == null) {
+            return false;
+        }
+        if (dir.isDirectory()) {
+            return true;
+        }
+        for (int i = 1; i <= tryCount; i++) { // 高并发场景下，可以看到 i 处于 1 ~ 3 之间
+            // 如果文件已存在，也会返回 false，所以该值不能作为是否能创建的依据，因此不对其进行处理
+            // noinspection ResultOfMethodCallIgnored
+            dir.mkdirs();
+            if (dir.exists()) {
+                return true;
+            }
+            try {
+                Thread.sleep(sleepMillis);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return dir.exists();
+    }
+
+    /**
+     * 创建所给文件或目录的父目录
+     *
+     * @param file 文件或目录
+     * @return 父目录
+     */
+    public static File mkParentDirs(File file) {
+        if (null == file) {
+            return null;
+        }
+        return mkdir(getParent(file, 1));
+    }
+
+    /**
+     * 获取指定层级的父路径
+     *
+     * <pre>
+     * getParent(file("d:/aaa/bbb/cc/ddd", 0)) -》 "d:/aaa/bbb/cc/ddd"
+     * getParent(file("d:/aaa/bbb/cc/ddd", 2)) -》 "d:/aaa/bbb"
+     * getParent(file("d:/aaa/bbb/cc/ddd", 4)) -》 "d:/"
+     * getParent(file("d:/aaa/bbb/cc/ddd", 5)) -》 null
+     * </pre>
+     *
+     * @param file 目录或文件
+     * @param level 层级
+     * @return 路径File，如果不存在返回null
+     * @since 4.1.2
+     */
+    public static File getParent(File file, int level) {
+        if (level < 1 || null == file) {
+            return file;
+        }
+
+        File parentFile;
+        try {
+            parentFile = file.getCanonicalFile().getParentFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        if (1 == level) {
+            return parentFile;
+        }
+        return getParent(parentFile, level - 1);
+    }
+
+    /**
+     * 创建文件夹，会递归自动创建其不存在的父文件夹，如果存在直接返回此文件夹<br>
+     * 此方法不对File对象类型做判断，如果File不存在，无法判断其类型<br>
+     *
+     * @param dir 目录
+     * @return 创建的目录
+     */
+    public static File mkdir(File dir) {
+        if (dir == null) {
+            return null;
+        }
+        if (false == dir.exists()) {
+            mkdirsSafely(dir, 5, 1);
+        }
+        return dir;
+    }
+
+    public static void copy(File src, File dest) {
+        try {
+            copy(src, dest, false, false);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void copy(File src, File dest, Boolean isOverride, Boolean isCopyAttributes) throws IOException {
+        // check
+        Assert.notNull(src, "Source File is null !");
+        if (!src.exists()) {
+            throw new RuntimeException("File not exist: " + src);
+        }
+        Assert.notNull(dest, "Destination File or directiory is null !");
+        if (FileTools.equals(src, dest)) {
+            return;
+        }
+        final ArrayList<CopyOption> optionList = new ArrayList<>(2);
+        if (isOverride) {
+            optionList.add(StandardCopyOption.REPLACE_EXISTING);
+        }
+        if (isCopyAttributes) {
+            optionList.add(StandardCopyOption.COPY_ATTRIBUTES);
+        }
+
+        if (src.isDirectory()) {
+            throw new RuntimeException();
+        }
+        Files.copy(src.toPath(), dest.toPath(), optionList.toArray(new CopyOption[0]));
     }
 }

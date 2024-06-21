@@ -26,6 +26,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import com.luna.common.check.Assert;
 import com.luna.common.text.StringTools;
 
+import static com.luna.common.regex.Validator.isNotEmpty;
+
 /**
  * Miscellaneous object utility methods.
  *
@@ -92,6 +94,47 @@ public abstract class ObjectUtils {
             }
         }
         return false;
+    }
+
+    /**
+     * 是否包含{@code null}元素
+     *
+     * @param <T> 数组元素类型
+     * @param array 被检查的数组
+     * @return 是否包含{@code null}元素
+     * @since 3.0.7
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> boolean hasNull(T... array) {
+        if (isNotEmpty(array)) {
+            for (T element : array) {
+                if (isEmpty(element)) {
+                    return true;
+                }
+            }
+        }
+        return array == null;
+    }
+
+    /**
+     * 如果给定对象为{@code null}返回默认值
+     *
+     * <pre>
+     * ObjectUtil.defaultIfNull(null, null)      = null
+     * ObjectUtil.defaultIfNull(null, "")        = ""
+     * ObjectUtil.defaultIfNull(null, "zz")      = "zz"
+     * ObjectUtil.defaultIfNull("abc", *)        = "abc"
+     * ObjectUtil.defaultIfNull(Boolean.TRUE, *) = Boolean.TRUE
+     * </pre>
+     *
+     * @param <T> 对象类型
+     * @param object 被检查对象，可能为{@code null}
+     * @param defaultValue 被检查对象为{@code null}返回的默认值，可以为{@code null}
+     * @return 被检查对象为{@code null}返回默认值，否则返回原值
+     * @since 3.0.7
+     */
+    public static <T> T defaultIfNull(final T object, final T defaultValue) {
+        return isEmpty(object) ? defaultValue : object;
     }
 
     /**
