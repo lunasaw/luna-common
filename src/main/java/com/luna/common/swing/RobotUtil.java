@@ -6,8 +6,10 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
-import com.luna.common.exception.UtilException;
 import com.luna.common.file.FileTools;
+import org.apache.commons.lang3.ArrayUtils;
+
+import com.luna.common.exception.UtilException;
 import com.luna.common.img.ImgUtil;
 
 /**
@@ -18,8 +20,8 @@ import com.luna.common.img.ImgUtil;
  */
 public class RobotUtil {
 
-    private static final Robot ROBOT;
-    private static int         delay;
+    private static Robot ROBOT;
+    private static int   delay;
 
     static {
         try {
@@ -132,7 +134,8 @@ public class RobotUtil {
      */
     public static void keyPressString(String str) {
         ClipboardUtil.setStr(str);
-        keyPressWithCtrl(KeyEvent.VK_V);// 粘贴
+        keyPressWithCtrl(KeyEvent.VK_V);
+        // 粘贴
         delay();
     }
 
@@ -215,7 +218,7 @@ public class RobotUtil {
 
     /**
      * 对指定设备截屏
-     * 
+     *
      * @param robot
      * @param screenRect
      * @return
@@ -240,14 +243,14 @@ public class RobotUtil {
      * 截屏
      *
      * 截屏的矩形区域
-     * 
+     *
      * @param x1
      * @param y1
      * @param x2
      * @param y2
      * @param outFile 写出到的文件
      * @return 写出到的文件
-     * 
+     *
      */
     public static File captureScreen(int x1, int y1, int x2, int y2, File outFile) {
         Rectangle rectangle = new Rectangle(x1, y1, x2 - x1, y2 - y1);
@@ -262,5 +265,19 @@ public class RobotUtil {
         if (delay > 0) {
             ROBOT.delay(delay);
         }
+    }
+
+    public static Robot getRobot(Integer i) {
+        GraphicsDevice screenDevice = getScreenDevice(i);
+        return getRobot(screenDevice);
+    }
+
+    public static GraphicsDevice getScreenDevice(Integer i) {
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice[] screenDevices = ge.getScreenDevices();
+        if (ArrayUtils.isEmpty(screenDevices)) {
+            throw new RuntimeException("没有找到可用的屏幕设备");
+        }
+        return screenDevices[i];
     }
 }
