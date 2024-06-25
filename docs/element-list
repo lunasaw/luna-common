@@ -26,6 +26,8 @@ com.luna.common.file
 com.luna.common.file.compress
 com.luna.common.file.visitor
 com.luna.common.i18n
+com.luna.common.img
+com.luna.common.img.gif
 com.luna.common.io
 com.luna.common.map
 com.luna.common.math
@@ -49,6 +51,7 @@ com.luna.common.regex
 com.luna.common.replacer
 com.luna.common.sensitive
 com.luna.common.spring
+com.luna.common.swing
 com.luna.common.text
 com.luna.common.thread
 com.luna.common.utils
