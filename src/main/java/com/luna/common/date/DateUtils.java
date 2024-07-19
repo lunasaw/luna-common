@@ -1028,4 +1028,28 @@ public class DateUtils {
         }
         return list;
     }
+
+    /**
+     * 判断两个时间段是否有重叠
+     * 
+     * @param leftStartDate 区间1开始时间
+     * @param leftEndDate 区间1结束时间
+     * @param rightStartDate 区间2开始时间
+     * @param rightEndDate 区间2结束时间
+     * @return
+     */
+    public static boolean isOverlap(Date leftStartDate, Date leftEndDate, Date rightStartDate, Date rightEndDate) {
+        return ((leftStartDate.getTime() >= rightStartDate.getTime())
+            && leftStartDate.getTime() < rightEndDate.getTime())
+            ||
+            ((leftStartDate.getTime() > rightStartDate.getTime())
+                && leftStartDate.getTime() <= rightEndDate.getTime())
+            ||
+            ((rightStartDate.getTime() >= leftStartDate.getTime())
+                && rightStartDate.getTime() < leftEndDate.getTime())
+            ||
+            ((rightStartDate.getTime() > leftStartDate.getTime())
+                && rightStartDate.getTime() <= leftEndDate.getTime());
+
+    }
 }
