@@ -3,7 +3,10 @@ package com.luna.common.date;
 import java.lang.management.ManagementFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
@@ -28,29 +31,29 @@ public class DateUtils {
 
     public static final String                          ZONE_STR                   = "Asia/Shanghai";
 
-    public static final String                         FORMAT_YYYY_MM_DD          = "yyyy-MM-dd";
+    public static final String                          FORMAT_YYYY_MM_DD          = "yyyy-MM-dd";
 
-    public static final String                         FORMAT_YYYY_MM             = "yyyy-MM";
+    public static final String                          FORMAT_YYYY_MM             = "yyyy-MM";
 
-    public static final String                         FORMAT_YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
+    public static final String                          FORMAT_YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
 
-    public static final String                         FORMAT_YYYY_MM_DD_HH_MM    = "yyyy-MM-dd HH:mm";
+    public static final String                          FORMAT_YYYY_MM_DD_HH_MM    = "yyyy-MM-dd HH:mm";
 
-    public static final String                         FORMAT_HH_MM_SS            = "HH:mm:ss";
+    public static final String                          FORMAT_HH_MM_SS            = "HH:mm:ss";
 
-    public static final String                         FORMAT_YYYYMMDD            = "yyyyMMdd";
+    public static final String                          FORMAT_YYYYMMDD            = "yyyyMMdd";
 
-    public static final String                         FORMAT_YYYYMMDDHHMMSS      = "yyyyMMddHHmmssSSS";
+    public static final String                          FORMAT_YYYYMMDDHHMMSS      = "yyyyMMddHHmmssSSS";
 
-    public static final String                         FORMAT_CHINESE             = "yyyy年M月d日";
+    public static final String                          FORMAT_CHINESE             = "yyyy年M月d日";
 
-    public static final String                         FORMAT_HH_MM               = "HH:mm";
+    public static final String                          FORMAT_HH_MM               = "HH:mm";
 
-    public static final String                         FORMAT_YMDHMS              = "yyyyMMdd hh:mm:ss";
+    public static final String                          FORMAT_YMDHMS              = "yyyyMMdd hh:mm:ss";
 
-    public static final String                         START_TIME                 = "00:00:00";
+    public static final String                          START_TIME                 = "00:00:00";
 
-    public static final String                         END_TIME                   = "23:59:59";
+    public static final String                          END_TIME                   = "23:59:59";
 
     public static final DateTimeFormatter               ISO8601_COMPATIBLE_FORMAT  =
         DateTimeFormatter.ofPattern(ISO8601_COMPATIBLE_PATTERN, Locale.getDefault()).withZone(ZoneId.of(ZONE_STR));
@@ -64,19 +67,19 @@ public class DateUtils {
     public static final DateTimeFormatter               DATE                       =
         DateTimeFormatter.ofPattern(FORMAT_YYYY_MM_DD, Locale.getDefault()).withZone(ZoneId.of(ZONE_STR));
 
-    private static final SimpleDateFormat              SDF_DATE                   =
+    private static final SimpleDateFormat               SDF_DATE                   =
         new SimpleDateFormat(FORMAT_YYYY_MM_DD);
-    private static final SimpleDateFormat              PURE_DATE_FORMAT           =
+    private static final SimpleDateFormat               PURE_DATE_FORMAT           =
         new SimpleDateFormat(FORMAT_YYYYMMDD);
     private static final SimpleDateFormat               SDF_DATETIME               =
         new SimpleDateFormat(FORMAT_YYYY_MM_DD_HH_MM_SS);
-    private static final SimpleDateFormat              SDF_SHORTDATETIME          =
+    private static final SimpleDateFormat               SDF_SHORTDATETIME          =
         new SimpleDateFormat(FORMAT_YYYY_MM_DD_HH_MM);
-    private static final SimpleDateFormat              SDF_TIME                   =
+    private static final SimpleDateFormat               SDF_TIME                   =
         new SimpleDateFormat(FORMAT_HH_MM_SS);
-    private static final SimpleDateFormat              SDF_SIMPLEDATETIME         =
+    private static final SimpleDateFormat               SDF_SIMPLEDATETIME         =
         new SimpleDateFormat(FORMAT_YYYYMMDD);
-    private static final Map<String, SimpleDateFormat> SIMPLE_DATE_FORMATERS      =
+    private static final Map<String, SimpleDateFormat>  SIMPLE_DATE_FORMATERS      =
         new HashMap<String, SimpleDateFormat>();
 
     private static final Map<String, DateTimeFormatter> DATE_FORMATERS             =
@@ -207,6 +210,24 @@ public class DateUtils {
     }
 
     /**
+     * 将 TemporalAccessor 转换为 Date
+     *
+     * @param temporalAccessor
+     * @return
+     */
+    public static Date convertToDate(TemporalAccessor temporalAccessor, ZoneId zoneId) {
+        // 尝试将 TemporalAccessor 转换为 LocalDateTime 或 ZonedDateTime
+        LocalDateTime localDateTime = LocalDateTime.from(temporalAccessor);
+        // 根据你的需求选择时区，或者直接使用 UTC
+        ZonedDateTime zonedDateTime = localDateTime.atZone(zoneId);
+        // 将 ZonedDateTime 转换为 Instant
+        Instant instant = zonedDateTime.toInstant();
+        // 最终转换为 Date 对象
+        return Date.from(instant);
+    }
+
+    /**
+     * 将localTime + 时区 转为UTC时间
      * 返回自定义格式字符串
      */
     public static String formatTime(String aMask, TemporalAccessor aDate) {
@@ -221,6 +242,31 @@ public class DateUtils {
             }
             synchronized (sd) {
                 return sd.format(aDate);
+            }
+        }
+    }
+
+    public static Date parseTime(String aMask, String strDate) {
+        return convertToDate(parseTimeSd(aMask, strDate), ZoneId.systemDefault());
+    }
+
+    /**
+     * @param aMask
+     * @param strDate
+     * @return
+     */
+    public static TemporalAccessor parseTimeSd(String aMask, String strDate) {
+        if (strDate == null) {
+            return null;
+        } else {
+            DateTimeFormatter sd = getCachedDateTimeFormat(aMask);
+
+            if (sd == null) {
+                sd = DateTimeFormatter.ofPattern(aMask, Locale.getDefault()).withZone(ZoneId.of(ZONE_STR));
+                return sd.parse(strDate);
+            }
+            synchronized (sd) {
+                return sd.parse(strDate);
             }
         }
     }
