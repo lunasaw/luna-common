@@ -6,7 +6,6 @@ import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.*;
 
-import javax.annotation.Nullable;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -957,7 +956,7 @@ public class StringTools extends StringUtils {
      * @see #hasLength(String)
      * @see #hasText(CharSequence)
      */
-    public static boolean hasLength(@Nullable CharSequence str) {
+    public static boolean hasLength(CharSequence str) {
         return (str != null && str.length() > 0);
     }
 
@@ -972,7 +971,7 @@ public class StringTools extends StringUtils {
      * @see #hasLength(CharSequence)
      * @see #hasText(String)
      */
-    public static boolean hasLength(@Nullable String str) {
+    public static boolean hasLength(String str) {
         return (str != null && !str.isEmpty());
     }
 
@@ -999,7 +998,7 @@ public class StringTools extends StringUtils {
      * @see #hasLength(CharSequence)
      * @see Character#isWhitespace
      */
-    public static boolean hasText(@Nullable CharSequence str) {
+    public static boolean hasText(CharSequence str) {
         return (str != null && str.length() > 0 && containsText(str));
     }
 
@@ -1017,7 +1016,7 @@ public class StringTools extends StringUtils {
      * @see #hasLength(String)
      * @see Character#isWhitespace
      */
-    public static boolean hasText(@Nullable String str) {
+    public static boolean hasText(String str) {
         return (str != null && !str.isEmpty() && containsText(str));
     }
 
@@ -1039,7 +1038,7 @@ public class StringTools extends StringUtils {
      * contains at least 1 whitespace character
      * @see Character#isWhitespace
      */
-    public static boolean containsWhitespace(@Nullable CharSequence str) {
+    public static boolean containsWhitespace(CharSequence str) {
         if (!hasLength(str)) {
             return false;
         }
@@ -1061,7 +1060,7 @@ public class StringTools extends StringUtils {
      * contains at least 1 whitespace character
      * @see #containsWhitespace(CharSequence)
      */
-    public static boolean containsWhitespace(@Nullable String str) {
+    public static boolean containsWhitespace(String str) {
         return containsWhitespace((CharSequence)str);
     }
 
@@ -1199,7 +1198,7 @@ public class StringTools extends StringUtils {
      * @param prefix the prefix to look for
      * @see String#startsWith
      */
-    public static boolean startsWithIgnoreCase(@Nullable String str, @Nullable String prefix) {
+    public static boolean startsWithIgnoreCase(String str, String prefix) {
         return (str != null && prefix != null && str.length() >= prefix.length() &&
             str.regionMatches(true, 0, prefix, 0, prefix.length()));
     }
@@ -1212,7 +1211,7 @@ public class StringTools extends StringUtils {
      * @param suffix the suffix to look for
      * @see String#endsWith
      */
-    public static boolean endsWithIgnoreCase(@Nullable String str, @Nullable String suffix) {
+    public static boolean endsWithIgnoreCase(String str, String suffix) {
         return (str != null && suffix != null && str.length() >= suffix.length() &&
             str.regionMatches(true, str.length() - suffix.length(), suffix, 0, suffix.length()));
     }
@@ -1266,7 +1265,7 @@ public class StringTools extends StringUtils {
      * @param newPattern {@code String} to insert
      * @return a {@code String} with the replacements
      */
-    public static String replace(String inString, String oldPattern, @Nullable String newPattern) {
+    public static String replace(String inString, String oldPattern, String newPattern) {
         if (!hasLength(inString) || !hasLength(oldPattern) || newPattern == null) {
             return inString;
         }
@@ -1315,7 +1314,7 @@ public class StringTools extends StringUtils {
      * E.g. "az\n" will delete 'a's, 'z's and new lines.
      * @return the resulting {@code String}
      */
-    public static String deleteAny(String inString, @Nullable String charsToDelete) {
+    public static String deleteAny(String inString, String charsToDelete) {
         if (!hasLength(inString) || !hasLength(charsToDelete)) {
             return inString;
         }
@@ -1341,8 +1340,8 @@ public class StringTools extends StringUtils {
      * @return the quoted {@code String} (e.g. "'myString'"),
      * or {@code null} if the input was {@code null}
      */
-    @Nullable
-    public static String quote(@Nullable String str) {
+
+    public static String quote(String str) {
         return (str != null ? "'" + str + "'" : null);
     }
 
@@ -1354,8 +1353,8 @@ public class StringTools extends StringUtils {
      * @return the quoted {@code String} (e.g. "'myString'"),
      * or the input object as-is if not a {@code String}
      */
-    @Nullable
-    public static Object quoteIfString(@Nullable Object obj) {
+
+    public static Object quoteIfString(Object obj) {
         return (obj instanceof String ? quote((String)obj) : obj);
     }
 
@@ -1432,8 +1431,8 @@ public class StringTools extends StringUtils {
      * @param path the file path (may be {@code null})
      * @return the extracted filename, or {@code null} if none
      */
-    @Nullable
-    public static String getFilename(@Nullable String path) {
+
+    public static String getFilename(String path) {
         if (path == null) {
             return null;
         }
@@ -1449,8 +1448,8 @@ public class StringTools extends StringUtils {
      * @param path the file path (may be {@code null})
      * @return the extracted filename extension, or {@code null} if none
      */
-    @Nullable
-    public static String getFilenameExtension(@Nullable String path) {
+
+    public static String getFilenameExtension(String path) {
         if (path == null) {
             return null;
         }
@@ -1659,7 +1658,7 @@ public class StringTools extends StringUtils {
      * @see Locale#forLanguageTag
      * @since 5.0.4
      */
-    @Nullable
+
     public static Locale parseLocale(String localeValue) {
         String[] tokens = tokenizeLocaleSource(localeValue);
         if (tokens.length == 1) {
@@ -1689,7 +1688,7 @@ public class StringTools extends StringUtils {
      * @return a corresponding {@code Locale} instance, or {@code null} if none
      * @throws IllegalArgumentException in case of an invalid locale specification
      */
-    @Nullable
+
     public static Locale parseLocaleString(String localeString) {
         return parseLocaleTokens(localeString, tokenizeLocaleSource(localeString));
     }
@@ -1698,7 +1697,7 @@ public class StringTools extends StringUtils {
         return tokenizeToStringArray(localeSource, "_ ", false, false);
     }
 
-    @Nullable
+
     private static Locale parseLocaleTokens(String localeString, String[] tokens) {
         String language = (tokens.length > 0 ? tokens[0] : "");
         String country = (tokens.length > 1 ? tokens[1] : "");
@@ -1778,7 +1777,7 @@ public class StringTools extends StringUtils {
      * (potentially {@code null} or empty)
      * @return the resulting {@code String} array
      */
-    public static String[] toStringArray(@Nullable Collection<String> collection) {
+    public static String[] toStringArray(Collection<String> collection) {
         return (collection != null ? collection.toArray(new String[0]) : new String[0]);
     }
 
@@ -1791,7 +1790,7 @@ public class StringTools extends StringUtils {
      * (potentially {@code null} or empty)
      * @return the resulting {@code String} array
      */
-    public static String[] toStringArray(@Nullable Enumeration<String> enumeration) {
+    public static String[] toStringArray(Enumeration<String> enumeration) {
         return (enumeration != null ? toStringArray(Collections.list(enumeration)) : new String[0]);
     }
 
@@ -1804,7 +1803,7 @@ public class StringTools extends StringUtils {
      * @param str the {@code String} to append
      * @return the new array (never {@code null})
      */
-    public static String[] addStringToArray(@Nullable String[] array, String str) {
+    public static String[] addStringToArray(String[] array, String str) {
         if (ObjectUtils.isEmpty(array)) {
             return new String[] {str};
         }
@@ -1825,8 +1824,8 @@ public class StringTools extends StringUtils {
      * @param array2 the second array (can be {@code null})
      * @return the new array ({@code null} if both given arrays were {@code null})
      */
-    @Nullable
-    public static String[] concatenateStringArrays(@Nullable String[] array1, @Nullable String[] array2) {
+
+    public static String[] concatenateStringArrays(String[] array1, String[] array2) {
         if (ObjectUtils.isEmpty(array1)) {
             return array2;
         }
@@ -1855,8 +1854,8 @@ public class StringTools extends StringUtils {
      * (with every entry included at most once, even entries within the first array)
      */
     @Deprecated
-    @Nullable
-    public static String[] mergeStringArrays(@Nullable String[] array1, @Nullable String[] array2) {
+
+    public static String[] mergeStringArrays(String[] array1, String[] array2) {
         if (ObjectUtils.isEmpty(array1)) {
             return array2;
         }
@@ -1935,8 +1934,8 @@ public class StringTools extends StringUtils {
      * index 1 being after the delimiter (neither element includes the delimiter);
      * or {@code null} if the delimiter wasn't found in the given input {@code String}
      */
-    @Nullable
-    public static String[] split(@Nullable String toSplit, @Nullable String delimiter) {
+
+    public static String[] split(String toSplit, String delimiter) {
         if (!hasLength(toSplit) || !hasLength(delimiter)) {
             return null;
         }
@@ -1963,7 +1962,7 @@ public class StringTools extends StringUtils {
      * @return a {@code Properties} instance representing the array contents,
      * or {@code null} if the array to process was {@code null} or empty
      */
-    @Nullable
+
     public static Properties splitArrayElementsIntoProperties(String[] array, String delimiter) {
         return splitArrayElementsIntoProperties(array, delimiter, null);
     }
@@ -1985,9 +1984,9 @@ public class StringTools extends StringUtils {
      * @return a {@code Properties} instance representing the array contents,
      * or {@code null} if the array to process was {@code null} or empty
      */
-    @Nullable
+
     public static Properties splitArrayElementsIntoProperties(
-        String[] array, String delimiter, @Nullable String charsToDelete) {
+        String[] array, String delimiter, String charsToDelete) {
 
         if (ObjectUtils.isEmpty(array)) {
             return null;
@@ -2026,7 +2025,7 @@ public class StringTools extends StringUtils {
      * @see String#trim()
      * @see #delimitedListToStringArray
      */
-    public static String[] tokenizeToStringArray(@Nullable String str, String delimiters) {
+    public static String[] tokenizeToStringArray(String str, String delimiters) {
         return tokenizeToStringArray(str, delimiters, true, true);
     }
 
@@ -2052,7 +2051,7 @@ public class StringTools extends StringUtils {
      * @see #delimitedListToStringArray
      */
     public static String[] tokenizeToStringArray(
-        @Nullable String str, String delimiters, boolean trimTokens, boolean ignoreEmptyTokens) {
+        String str, String delimiters, boolean trimTokens, boolean ignoreEmptyTokens) {
 
         if (str == null) {
             return new String[0];
@@ -2087,7 +2086,7 @@ public class StringTools extends StringUtils {
      * @return an array of the tokens in the list
      * @see #tokenizeToStringArray
      */
-    public static String[] delimitedListToStringArray(@Nullable String str, @Nullable String delimiter) {
+    public static String[] delimitedListToStringArray(String str, String delimiter) {
         return delimitedListToStringArray(str, delimiter, null);
     }
 
@@ -2109,7 +2108,7 @@ public class StringTools extends StringUtils {
      * @see #tokenizeToStringArray
      */
     public static String[] delimitedListToStringArray(
-        @Nullable String str, @Nullable String delimiter, @Nullable String charsToDelete) {
+        String str, String delimiter, String charsToDelete) {
 
         if (str == null) {
             return new String[0];
@@ -2146,7 +2145,7 @@ public class StringTools extends StringUtils {
      * @param str the input {@code String} (potentially {@code null} or empty)
      * @return an array of strings, or the empty array in case of empty input
      */
-    public static String[] commaDelimitedListToStringArray(@Nullable String str) {
+    public static String[] commaDelimitedListToStringArray(String str) {
         return delimitedListToStringArray(str, ",");
     }
 
@@ -2160,7 +2159,7 @@ public class StringTools extends StringUtils {
      * @return a set of {@code String} entries in the list
      * @see #removeDuplicateStrings(String[])
      */
-    public static Set<String> commaDelimitedListToSet(@Nullable String str) {
+    public static Set<String> commaDelimitedListToSet(String str) {
         String[] tokens = commaDelimitedListToStringArray(str);
         return new LinkedHashSet<>(Arrays.asList(tokens));
     }
@@ -2177,7 +2176,7 @@ public class StringTools extends StringUtils {
      * @return the delimited {@code String}
      */
     public static String collectionToDelimitedString(
-        @Nullable Collection<?> coll, String delim, String prefix, String suffix) {
+        Collection<?> coll, String delim, String prefix, String suffix) {
 
         if (CollectionUtils.isEmpty(coll)) {
             return "";
@@ -2203,7 +2202,7 @@ public class StringTools extends StringUtils {
      * @param delim the delimiter to use (typically a ",")
      * @return the delimited {@code String}
      */
-    public static String collectionToDelimitedString(@Nullable Collection<?> coll, String delim) {
+    public static String collectionToDelimitedString(Collection<?> coll, String delim) {
         return collectionToDelimitedString(coll, delim, "", "");
     }
 
@@ -2215,7 +2214,7 @@ public class StringTools extends StringUtils {
      * @param coll the {@code Collection} to convert (potentially {@code null} or empty)
      * @return the delimited {@code String}
      */
-    public static String collectionToCommaDelimitedString(@Nullable Collection<?> coll) {
+    public static String collectionToCommaDelimitedString(Collection<?> coll) {
         return collectionToDelimitedString(coll, ",");
     }
 
@@ -2228,7 +2227,7 @@ public class StringTools extends StringUtils {
      * @param delim the delimiter to use (typically a ",")
      * @return the delimited {@code String}
      */
-    public static String arrayToDelimitedString(@Nullable Object[] arr, String delim) {
+    public static String arrayToDelimitedString(Object[] arr, String delim) {
         if (ObjectUtils.isEmpty(arr)) {
             return "";
         }
@@ -2252,7 +2251,7 @@ public class StringTools extends StringUtils {
      * @param arr the array to display (potentially {@code null} or empty)
      * @return the delimited {@code String}
      */
-    public static String arrayToCommaDelimitedString(@Nullable Object[] arr) {
+    public static String arrayToCommaDelimitedString(Object[] arr) {
         return arrayToDelimitedString(arr, ",");
     }
 
