@@ -86,7 +86,7 @@ public class AsyncHttpUtils {
 
     @SneakyThrows
     public static void refresh() {
-        HTTP_ASYNC_CLIENT_BUILDER.setDefaultCookieStore(HttpUtils.COOKIE_STORE);
+        HTTP_ASYNC_CLIENT_BUILDER.setDefaultCookieStore(HttpUtils.getCookieStore());
         asyncClient = HTTP_ASYNC_CLIENT_BUILDER.build();
         asyncClient.start();
     }
@@ -267,7 +267,7 @@ public class AsyncHttpUtils {
     public static <T> T doAsyncRequest(AsyncRequestProducer producer, AsyncResponseConsumer<T> consumer, FutureCallback<T> callback) {
         final Future<T> future;
         try {
-            future = asyncClient.execute(producer, consumer, HttpUtils.CLIENT_CONTEXT, callback);
+            future = asyncClient.execute(producer, consumer, HttpUtils.getClientContext(), callback);
             return future.get();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -280,7 +280,7 @@ public class AsyncHttpUtils {
 
     public static <T> Future<T> doAsyncRequestFuture(AsyncRequestProducer producer, AsyncResponseConsumer<T> consumer, FutureCallback<T> callback) {
         try {
-            return asyncClient.execute(producer, consumer, HttpUtils.CLIENT_CONTEXT, callback);
+            return asyncClient.execute(producer, consumer, HttpUtils.getClientContext(), callback);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -98,7 +98,7 @@ public class HttpHighLevelUtil {
 
     public static <T> T doRequest(HttpClientResponseHandler<T> responseHandler, HttpHost httpHost, HttpUriRequestBase httpUriRequestBase) {
         try {
-            return HTTP_REQUESTER.execute(httpHost, httpUriRequestBase, Timeout.ofSeconds(HttpUtils.CONNECT_TIMEOUT), HttpUtils.CLIENT_CONTEXT,
+            return HTTP_REQUESTER.execute(httpHost, httpUriRequestBase, Timeout.ofSeconds(HttpUtils.CONNECT_TIMEOUT), HttpUtils.getClientContext(),
                 responseHandler);
         } catch (Exception e) {
             throw new RuntimeException(e);
