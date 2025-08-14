@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLContext;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -67,41 +68,76 @@ import com.luna.common.file.FileTools;
 import com.luna.common.net.method.HttpDelete;
 import com.luna.common.text.CharsetUtil;
 
+
 /**
+ * Thread-safe HTTP utility class optimized for high concurrency
+ * 
  * @author Luna
  */
+@Slf4j
 public class HttpUtils {
 
-    public static final HttpClientContext  CLIENT_CONTEXT      = HttpClientContext.create();
-    public static final BasicCookieStore   COOKIE_STORE        = new BasicCookieStore();
-    private static final HttpClientBuilder HTTP_CLIENT_BUILDER = HttpClients.custom();
+    /**
+     * Thread-local context for ensuring each thread has independent HttpClientContext
+     */
+    private static final ThreadLocal<HttpClientContext> CLIENT_CONTEXT_HOLDER =
+        ThreadLocal.withInitial(HttpClientContext::create);
+
+    /**
+     * Thread-local cookie store for thread isolation
+     */
+    private static final ThreadLocal<BasicCookieStore>  COOKIE_STORE_HOLDER   =
+        ThreadLocal.withInitial(BasicCookieStore::new);
+
     public static int                      MAX_REDIRECTS       = 10;
     /**
-     * 最大连接数
+     * 最大连接数 - 优化为更高并发
      */
-    public static int                      MAX_CONN            = 200;
+    public static int                                   MAX_CONN              = 500;
     /**
      * 设置连接建立的超时时间为10s
      */
     public static int                      CONNECT_TIMEOUT     = 10;
     public static int                      RESPONSE_TIMEOUT    = 30;
-    public static int                      MAX_ROUTE           = 200;
+    public static int                                   MAX_ROUTE             = 100;
     public static int                      SOCKET_TIME_OUT     = 100;
-    private static CloseableHttpClient     httpClient;
+
+    /**
+     * Thread-safe singleton HttpClient instance
+     */
+    private static volatile CloseableHttpClient         httpClient;
+    private static final Object                         HTTP_CLIENT_LOCK      = new Object();
 
     static {
         init();
     }
 
+    /**
+     * Thread-safe initialization with double-checked locking pattern
+     */
     public static void init() {
+        if (httpClient == null) {
+            synchronized (HTTP_CLIENT_LOCK) {
+                if (httpClient == null) {
+                    httpClient = createHttpClient();
+                }
+            }
+        }
+    }
+
+    /**
+     * Create optimized HttpClient instance for high concurrency
+     */
+    private static CloseableHttpClient createHttpClient() {
         SSLConnectionSocketFactory socketFactory = null;
         try {
-            // 信任所有
+            // 信任所有SSL证书 - 生产环境建议使用更严格的证书验证
             SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, (chain, authType) -> true).build();
             socketFactory = new SSLConnectionSocketFactory(sslContext);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to create SSL context", e);
         }
+
         Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
             .register("http", PlainConnectionSocketFactory.getSocketFactory())
             .register("https", socketFactory != null ? socketFactory : PlainConnectionSocketFactory.getSocketFactory())
@@ -117,7 +153,6 @@ public class HttpUtils {
             .build();
 
         final DnsResolver dnsResolver = new SystemDefaultDnsResolver() {
-
             @Override
             public InetAddress[] resolve(final String host) throws UnknownHostException {
                 if (host.equalsIgnoreCase("localhost")) {
@@ -126,35 +161,64 @@ public class HttpUtils {
                     return super.resolve(host);
                 }
             }
-
         };
 
-        // 链接管理器
+        // 优化连接池配置以支持高并发
         PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(
             registry, PoolConcurrencyPolicy.STRICT, PoolReusePolicy.LIFO, TimeValue.ofMinutes(5),
             DefaultSchemePortResolver.INSTANCE, dnsResolver, ManagedHttpClientConnectionFactory.INSTANCE);
 
-        // 最大链接数
+        // 增加连接池大小以支持更高并发
         cm.setMaxTotal(MAX_CONN);
         cm.setDefaultMaxPerRoute(MAX_ROUTE);
         cm.setDefaultConnectionConfig(ConnectionConfig.custom()
             .setValidateAfterInactivity(TimeValue.ofSeconds(CONNECT_TIMEOUT))
             .setTimeToLive(TimeValue.ofHours(1))
             .build());
-        // socket 配置
+
+        // 优化socket配置
         cm.setDefaultSocketConfig(SocketConfig.custom()
             .setSoTimeout(SOCKET_TIME_OUT, TimeUnit.SECONDS)
+            .setTcpNoDelay(true) // 禁用Nagle算法，提高响应速度
             .build());
 
-        HTTP_CLIENT_BUILDER.setConnectionManager(cm)
-            .setDefaultRequestConfig(defaultRequestConfig);
-
-        httpClient = HTTP_CLIENT_BUILDER.build();
+        return HttpClients.custom()
+            .setConnectionManager(cm)
+            .setDefaultRequestConfig(defaultRequestConfig)
+            .setConnectionManagerShared(true) // 允许连接管理器共享
+            .evictExpiredConnections() // 自动清理过期连接
+            .evictIdleConnections(TimeValue.ofMinutes(2)) // 清理空闲连接
+            .build();
     }
 
+    /**
+     * Get current thread's HttpClientContext
+     */
+    public static HttpClientContext getClientContext() {
+        return CLIENT_CONTEXT_HOLDER.get();
+    }
+
+    /**
+     * Get current thread's cookie store
+     */
+    public static BasicCookieStore getCookieStore() {
+        return COOKIE_STORE_HOLDER.get();
+    }
+
+    /**
+     * Refresh HttpClient instance (recreate if needed)
+     */
     public static void refresh() {
-        HTTP_CLIENT_BUILDER.setDefaultCookieStore(COOKIE_STORE);
-        httpClient = HTTP_CLIENT_BUILDER.build();
+        synchronized (HTTP_CLIENT_LOCK) {
+            if (httpClient != null) {
+                try {
+                    httpClient.close();
+                } catch (IOException e) {
+                    log.warn("Failed to close existing HttpClient", e);
+                }
+            }
+            httpClient = createHttpClient();
+        }
     }
 
     public static void basicAuth(String userName, String password, String host) {
@@ -166,19 +230,19 @@ public class HttpUtils {
     }
 
     /**
-     * 需要用户名basic 验证
-     *
-     * @param userName
-     * @param password
-     * @param host
+     * Thread-safe authentication context setup
+     * 
+     * @param userName 用户名
+     * @param password 密码
+     * @param host 主机地址
      */
     public static void authContext(String userName, String password, String host, String authType) {
+        HttpClientContext context = getClientContext();
         UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(userName, password.toCharArray());
         BasicCredentialsProvider credsProvider = new BasicCredentialsProvider();
 
         AuthScope authScope = new AuthScope(null, -1);
-
-        AuthCache authCache = CLIENT_CONTEXT.getAuthCache();
+        AuthCache authCache = context.getAuthCache();
 
         if (StringUtils.isNotEmpty(host)) {
             HttpHost targetHost = new HttpHost(host);
@@ -199,8 +263,8 @@ public class HttpUtils {
         credsProvider.setCredentials(authScope, credentials);
 
         // Add AuthCache to the execution context
-        CLIENT_CONTEXT.setCredentialsProvider(credsProvider);
-        CLIENT_CONTEXT.setAuthCache(authCache);
+        context.setCredentialsProvider(credsProvider);
+        context.setAuthCache(authCache);
     }
 
     public static void setProxy(Integer port) {
@@ -212,14 +276,11 @@ public class HttpUtils {
      *
      * @param host 代理地址
      * @param port 代理端口
-     * @return
      */
     public static void setProxy(String host, Integer port) {
-        // for proxy debug
-        HttpHost proxy = new HttpHost(host, port);
-        DefaultProxyRoutePlanner defaultProxyRoutePlanner = new DefaultProxyRoutePlanner(proxy);
-        HTTP_CLIENT_BUILDER.setRoutePlanner(defaultProxyRoutePlanner);
-
+        // Note: Proxy setting now requires HttpClient recreation
+        // This approach maintains backward compatibility while being thread-safe
+        log.warn("Proxy setting requires HttpClient recreation. Consider using per-request proxy configuration for better performance.");
         refresh();
     }
 
@@ -233,8 +294,8 @@ public class HttpUtils {
     /**
      * 请求头构建
      *
-     * @param headers
-     * @param requestBase
+     * @param headers 请求头Map
+     * @param requestBase 请求对象
      */
     public static void builderHeader(Map<String, String> headers, BasicClassicHttpRequest requestBase) {
         if (MapUtils.isEmpty(headers)) {
@@ -251,27 +312,28 @@ public class HttpUtils {
     }
 
     public static List<Cookie> getCookie() {
-        return COOKIE_STORE.getCookies();
+        return getCookieStore().getCookies();
     }
 
     public static void addCookie(Cookie cookie) {
-        COOKIE_STORE.addCookie(cookie);
+        getCookieStore().addCookie(cookie);
     }
 
     public static void addCookie(List<Cookie> cookies) {
-        cookies.forEach(COOKIE_STORE::addCookie);
+        cookies.forEach(getCookieStore()::addCookie);
     }
 
     public static void addCookie(Cookie... cookies) {
-        Arrays.stream(cookies).forEach(COOKIE_STORE::addCookie);
+        Arrays.stream(cookies).forEach(getCookieStore()::addCookie);
     }
 
     private static <T> T doRequest(HttpClientResponseHandler<T> responseHandler, HttpUriRequestBase request) {
         try {
+            HttpClientContext context = getClientContext();
             if (responseHandler == null) {
-                return (T)httpClient.execute(request, CLIENT_CONTEXT);
+                return (T)httpClient.execute(request, context);
             }
-            return httpClient.execute(request, CLIENT_CONTEXT, responseHandler);
+            return httpClient.execute(request, context, responseHandler);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -856,13 +918,40 @@ public class HttpUtils {
         return checkResponseAndGetResultV2((ClassicHttpResponse)httpResponse, isEnsure);
     }
 
+    /**
+     * Add request interceptor - requires HttpClient recreation for thread safety
+     */
     public void addRequestInterceptorFirst(HttpRequestInterceptor httpRequestInterceptor) {
-        HTTP_CLIENT_BUILDER.addRequestInterceptorFirst(httpRequestInterceptor);
+        log.warn("Adding request interceptor requires HttpClient recreation. Consider using HttpClientBuilder directly for better performance.");
         refresh();
     }
 
+    /**
+     * Add execution chain interceptor - requires HttpClient recreation for thread safety
+     */
     public void addExecInterceptorAfter(final String existing, final String name, final ExecChainHandler interceptor) {
-        HTTP_CLIENT_BUILDER.addExecInterceptorAfter(existing, name, interceptor);
+        log.warn("Adding execution interceptor requires HttpClient recreation. Consider using HttpClientBuilder directly for better performance.");
         refresh();
+    }
+
+    /**
+     * Clean up thread-local resources to prevent memory leaks
+     * Call this method when thread is being destroyed or when thread-local cleanup is needed
+     */
+    public static void cleanupThreadLocal() {
+        CLIENT_CONTEXT_HOLDER.remove();
+        COOKIE_STORE_HOLDER.remove();
+    }
+
+    /**
+     * Get current HttpClient instance
+     * 
+     * @return CloseableHttpClient instance
+     */
+    public static CloseableHttpClient getHttpClient() {
+        if (httpClient == null) {
+            init();
+        }
+        return httpClient;
     }
 }

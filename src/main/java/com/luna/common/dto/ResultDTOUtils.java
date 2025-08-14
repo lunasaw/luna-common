@@ -44,7 +44,15 @@ public class ResultDTOUtils<T> {
         return new ResultDTO<>(false, code, message);
     }
 
+    public static <T> ResultDTO<T> fail(int code, String message) {
+        return new ResultDTO<>(false, code, message);
+    }
+
     public static <T> ResultDTO<T> failure(int code, String message, T object) {
         return new ResultDTO<>(false, code, message, object);
+    }
+
+    public static <T> ResultDTO<T> failure(String message) {
+        return new ResultDTO<>(false, ResultCode.ERROR_SYSTEM_EXCEPTION, message);
     }
 }
