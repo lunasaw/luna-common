@@ -61,9 +61,9 @@ public class SystemInfoUtil {
     }
 
     /**
-     * 本级ip 过滤 回环地址、链路本地地址或多播地址
-     * 
-     * @return
+     * 获取所有IPv4地址（包含回环地址）
+     *
+     * @return IPv4地址列表
      */
     public static List<String> getAllIpv4() {
         List<String> allIpAddress = getAllIpAddress();
@@ -74,8 +74,31 @@ public class SystemInfoUtil {
     }
 
     /**
-     * 本级ip 过滤 回环地址、链路本地地址或多播地址
-     * @return
+     * 优先返回非回环的外网IPv4，获取不到再返回回环IPv4，都获取不到返回null
+     *
+     * @return IPv4地址
+     */
+    public static String getBestIpv4() {
+        try {
+            // 优先：非回环、非链路本地、非多播的IPv4
+            Optional<String> nonLoopback = getInetAddress(true).stream()
+                .map(InetAddress::getHostAddress)
+                .filter(e -> !e.contains(":"))
+                .findFirst();
+            if (nonLoopback.isPresent()) {
+                return nonLoopback.get();
+            }
+            // 兜底：回环IPv4
+            return getAllIpv4().stream().filter(e -> e.startsWith("127.")).findFirst().orElse(null);
+        } catch (SocketException e) {
+            return null;
+        }
+    }
+
+    /**
+     * 获取非回环、非链路本地、非多播的IP地址（IPv4/IPv6均可能返回）
+     *
+     * @return IP地址字符串
      */
     public static String getNoLoopbackIP() {
         return getAddress().getHostAddress();
@@ -90,8 +113,9 @@ public class SystemInfoUtil {
     }
 
     /**
-     * 获取非回环网卡IP
-     * @return
+     * 获取非回环、非链路本地、非多播网卡的InetAddress
+     *
+     * @return InetAddress
      */
     public static InetAddress getAddress() {
         try {
@@ -161,12 +185,15 @@ public class SystemInfoUtil {
 
     /**
      * 获取本机随机Mac地址
-     * 
+     *
      * @return
      */
     public static String getRandomMac() {
         List<String> macList = getMacList();
-        return macList.get(RandomUtils.nextInt(0, macList.size() - 1));
+        if (CollectionUtils.isEmpty(macList)) {
+            return null;
+        }
+        return macList.get(RandomUtils.nextInt(0, macList.size()));
     }
 
     public static List<InetAddress> getInetAddress(Boolean filterLoopback) throws SocketException {
@@ -228,7 +255,7 @@ public class SystemInfoUtil {
      * @param size 字节大小
      * @return 转换后值
      */
-    public String convertFileSize(long size) {
+    public static String convertFileSize(long size) {
         long kb = 1024;
         long mb = kb * 1024;
         long gb = mb * 1024;
